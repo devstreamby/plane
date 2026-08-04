@@ -83,8 +83,6 @@ export const getDefaultKanbanGroupBy = (
 };
 
 export class IssueFilterHelperStore implements IIssueFilterHelperStore {
-  
-
   /**
    * @description This method is used to apply the display filters on the issues
    * @param {IIssueFilters} filters
