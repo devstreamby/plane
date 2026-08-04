@@ -13,6 +13,7 @@ export type TIssueLayouts = "list" | "kanban" | "calendar" | "spreadsheet" | "ga
 
 export type TIssueGroupByOptions =
   | "state"
+  | "board_column"
   | "priority"
   | "labels"
   | "created_by"
@@ -64,6 +65,7 @@ export type TIssueParams =
   | "priority"
   | "state_group"
   | "state"
+  | "board_column"
   | "assignees"
   | "mentions"
   | "created_by"

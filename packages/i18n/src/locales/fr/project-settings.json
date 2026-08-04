@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Colonnes du tableau",
+      "heading": "Colonnes du tableau",
+      "description": "Regroupez les états dans les colonnes de votre tableau et ordonnez-les selon le déroulement réel du travail.",
+      "add_column": "Ajouter une colonne",
+      "delete_column": "Supprimer la colonne",
+      "empty_column": "Faites glisser des états ici",
+      "entry_state": "Les éléments de travail déposés ici passent à {state}",
+      "new_column_name": "Colonne {count}",
+      "empty": {
+        "description": "Ce projet n'a pas encore de colonnes de tableau. Tant que vous n'en ajoutez pas, le tableau est regroupé par état.",
+        "create_defaults": "Créer les colonnes par défaut"
+      },
+      "unmapped": {
+        "title": "Hors du tableau",
+        "description": "États qu'aucune colonne n'affiche. Faites-en glisser un dans une colonne pour le placer sur le tableau.",
+        "empty": "Tous les états sont sur le tableau."
+      },
+      "delete_modal": {
+        "title": "Supprimer cette colonne ?",
+        "description": "« {name} » sera retirée du tableau. Ses états sont conservés, ils cessent simplement d'apparaître sur le tableau."
+      },
+      "toasts": {
+        "create_error": "La colonne n'a pas pu être créée. Veuillez réessayer.",
+        "delete_error": "La colonne n'a pas pu être supprimée. Veuillez réessayer.",
+        "rename_error": "La colonne n'a pas pu être renommée. Veuillez réessayer.",
+        "reorder_error": "Les colonnes n'ont pas pu être réordonnées. Veuillez réessayer.",
+        "move_state_error": "L'état n'a pas pu être déplacé. Veuillez réessayer."
+      }
+    },
     "work_item_types": {
       "heading": "Types d’éléments de travail",
       "description": "Créez et personnalisez différents types d’éléments de travail avec des propriétés uniques"

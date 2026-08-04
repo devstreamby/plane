@@ -353,6 +353,11 @@ export const coreRoutes: RouteConfigEntry[] = [
               ":workspaceSlug/settings/projects/:projectId/workflows",
               "./(all)/[workspaceSlug]/(settings)/settings/projects/[projectId]/workflows/page.tsx"
             ),
+            // Project Board Columns
+            route(
+              ":workspaceSlug/settings/projects/:projectId/board-columns",
+              "./(all)/[workspaceSlug]/(settings)/settings/projects/[projectId]/board-columns/page.tsx"
+            ),
             // Project Labels
             route(
               ":workspaceSlug/settings/projects/:projectId/labels",

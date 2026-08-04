@@ -20,6 +20,7 @@ export type TIssueFilterKeys = "priority" | "state" | "labels";
 
 export enum EServerGroupByToFilterOptions {
   "state_id" = "state",
+  "state__board_column_id" = "board_column",
   "priority" = "priority",
   "labels__id" = "labels",
   "state__group" = "state_group",
@@ -233,8 +234,18 @@ export const ISSUE_DISPLAY_FILTERS_BY_PAGE: TIssueFiltersToDisplayByPageType = {
       kanban: {
         display_properties: ISSUE_DISPLAY_PROPERTIES_KEYS,
         display_filters: {
-          group_by: ["state", "priority", "cycle", "module", "labels", "assignees", "created_by"],
-          sub_group_by: ["state", "priority", "cycle", "module", "labels", "assignees", "created_by", null],
+          group_by: ["board_column", "state", "priority", "cycle", "module", "labels", "assignees", "created_by"],
+          sub_group_by: [
+            "board_column",
+            "state",
+            "priority",
+            "cycle",
+            "module",
+            "labels",
+            "assignees",
+            "created_by",
+            null,
+          ],
           order_by: ["sort_order", "-created_at", "-updated_at", "start_date", "-priority", "target_date"],
           type: ["active", "backlog"],
         },

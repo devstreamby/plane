@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Cột của bảng",
+      "heading": "Cột của bảng",
+      "description": "Nhóm các trạng thái vào các cột của bảng và sắp xếp chúng theo đúng cách công việc thực sự diễn ra.",
+      "add_column": "Thêm cột",
+      "delete_column": "Xóa cột",
+      "empty_column": "Kéo trạng thái vào đây",
+      "entry_state": "Mục công việc thả vào đây sẽ chuyển sang {state}",
+      "new_column_name": "Cột {count}",
+      "empty": {
+        "description": "Dự án này chưa có cột nào của bảng. Cho đến khi bạn thêm cột, bảng được nhóm theo trạng thái.",
+        "create_defaults": "Tạo các cột mặc định"
+      },
+      "unmapped": {
+        "title": "Không có trên bảng",
+        "description": "Các trạng thái không cột nào hiển thị. Kéo một trạng thái vào cột để đưa nó lên bảng.",
+        "empty": "Tất cả trạng thái đều đã có trên bảng."
+      },
+      "delete_modal": {
+        "title": "Xóa cột này?",
+        "description": "\"{name}\" sẽ bị gỡ khỏi bảng. Các trạng thái của nó vẫn còn, chỉ là không còn hiển thị trên bảng."
+      },
+      "toasts": {
+        "create_error": "Không thể tạo cột. Vui lòng thử lại.",
+        "delete_error": "Không thể xóa cột. Vui lòng thử lại.",
+        "rename_error": "Không thể đổi tên cột. Vui lòng thử lại.",
+        "reorder_error": "Không thể sắp xếp lại các cột. Vui lòng thử lại.",
+        "move_state_error": "Không thể di chuyển trạng thái. Vui lòng thử lại."
+      }
+    },
     "work_item_types": {
       "heading": "Loại mục công việc",
       "description": "Tạo và tùy chỉnh các loại mục công việc khác nhau với các thuộc tính riêng"

@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Sloupce nástěnky",
+      "heading": "Sloupce nástěnky",
+      "description": "Seskupte stavy do sloupců nástěnky a seřaďte je tak, jak práce ve skutečnosti postupuje.",
+      "add_column": "Přidat sloupec",
+      "delete_column": "Smazat sloupec",
+      "empty_column": "Sem přetáhněte stavy",
+      "entry_state": "Pracovní položky přetažené sem dostanou stav {state}",
+      "new_column_name": "Sloupec {count}",
+      "empty": {
+        "description": "Tento projekt zatím nemá žádné sloupce nástěnky. Dokud je nepřidáte, nástěnka se seskupuje podle stavu.",
+        "create_defaults": "Vytvořit výchozí sloupce"
+      },
+      "unmapped": {
+        "title": "Mimo nástěnku",
+        "description": "Stavy, které nezobrazuje žádný sloupec. Přetažením do sloupce je umístíte na nástěnku.",
+        "empty": "Všechny stavy jsou na nástěnce."
+      },
+      "delete_modal": {
+        "title": "Smazat tento sloupec?",
+        "description": "Sloupec „{name}“ bude z nástěnky odstraněn. Jeho stavy zůstanou, jen se přestanou na nástěnce zobrazovat."
+      },
+      "toasts": {
+        "create_error": "Sloupec se nepodařilo vytvořit. Zkuste to prosím znovu.",
+        "delete_error": "Sloupec se nepodařilo smazat. Zkuste to prosím znovu.",
+        "rename_error": "Sloupec se nepodařilo přejmenovat. Zkuste to prosím znovu.",
+        "reorder_error": "Pořadí sloupců se nepodařilo změnit. Zkuste to prosím znovu.",
+        "move_state_error": "Stav se nepodařilo přesunout. Zkuste to prosím znovu."
+      }
+    },
     "work_item_types": {
       "heading": "Typy pracovních položek",
       "description": "Vytvářejte a přizpůsobujte různé typy pracovních položek s jedinečnými vlastnostmi"

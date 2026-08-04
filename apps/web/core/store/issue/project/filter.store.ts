@@ -23,7 +23,7 @@ import type {
 import { EIssuesStoreType } from "@plane/types";
 import { handleIssueQueryParamsByLayout } from "@plane/utils";
 import type { IBaseIssueFilterStore } from "../helpers/issue-filter-helper.store";
-import { IssueFilterHelperStore } from "../helpers/issue-filter-helper.store";
+import { getDefaultKanbanGroupBy, IssueFilterHelperStore } from "../helpers/issue-filter-helper.store";
 // helpers
 // types
 import type { IIssueRootStore } from "../root.store";
@@ -220,10 +220,11 @@ export class ProjectIssuesFilter extends IssueFilterHelperStore implements IProj
             _filters.displayFilters.sub_group_by = null;
             updatedDisplayFilters.sub_group_by = null;
           }
-          // set group_by to state if layout is switched to kanban and group_by is null
+          // set the default board grouping if layout is switched to kanban and group_by is null
           if (_filters.displayFilters.layout === "kanban" && _filters.displayFilters.group_by === null) {
-            _filters.displayFilters.group_by = "state";
-            updatedDisplayFilters.group_by = "state";
+            const defaultGroupBy = getDefaultKanbanGroupBy(this.rootIssueStore, projectId);
+            _filters.displayFilters.group_by = defaultGroupBy;
+            updatedDisplayFilters.group_by = defaultGroupBy;
           }
 
           runInAction(() => {

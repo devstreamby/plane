@@ -20,6 +20,7 @@ import type {
   IIssueFilters,
   IIssueFiltersResponse,
   IssuePaginationOptions,
+  TIssueGroupByOptions,
   TIssueKanbanFilters,
   TIssueParams,
   TStaticViewTypes,
@@ -30,6 +31,8 @@ import { EIssueLayoutTypes } from "@plane/types";
 import { getComputedDisplayFilters, getComputedDisplayProperties } from "@plane/utils";
 // lib
 import { storage } from "@/lib/local-storage";
+// store
+import type { IIssueRootStore } from "../root.store";
 import { getEnabledDisplayFilters } from "@/plane-web/store/issue/helpers/filter-utils";
 
 interface ILocalStoreIssueFilters {
@@ -67,8 +70,20 @@ export interface IIssueFilterHelperStore {
   computedDisplayProperties(filters: IIssueDisplayProperties): IIssueDisplayProperties;
 }
 
+/**
+ * The grouping a board falls back to when none is set. Projects that have configured board
+ * columns get those, everything else keeps grouping by state.
+ */
+export const getDefaultKanbanGroupBy = (
+  rootIssueStore: IIssueRootStore,
+  projectId: string | undefined | null
+): TIssueGroupByOptions => {
+  const boardColumns = rootIssueStore.rootStore?.state?.getProjectBoardColumns(projectId) ?? [];
+  return boardColumns.length > 0 ? "board_column" : "state";
+};
+
 export class IssueFilterHelperStore implements IIssueFilterHelperStore {
-  constructor() {}
+  
 
   /**
    * @description This method is used to apply the display filters on the issues

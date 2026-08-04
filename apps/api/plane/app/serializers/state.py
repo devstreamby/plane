@@ -6,7 +6,7 @@
 from .base import BaseSerializer
 from rest_framework import serializers
 
-from plane.db.models import State, StateGroup
+from plane.db.models import BoardColumn, State, StateGroup
 
 
 class StateSerializer(BaseSerializer):
@@ -40,3 +40,15 @@ class StateLiteSerializer(BaseSerializer):
         model = State
         fields = ["id", "name", "color", "group"]
         read_only_fields = fields
+
+
+class BoardColumnSerializer(BaseSerializer):
+    state_ids = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BoardColumn
+        fields = ["id", "project_id", "workspace_id", "name", "sequence", "state_ids"]
+        read_only_fields = ["workspace", "project", "state_ids"]
+
+    def get_state_ids(self, obj) -> list:
+        return [str(state.id) for state in obj.states.all()]

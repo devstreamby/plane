@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Stĺpce nástenky",
+      "heading": "Stĺpce nástenky",
+      "description": "Zoskupte stavy do stĺpcov nástenky a zoraďte ich tak, ako práca skutočne postupuje.",
+      "add_column": "Pridať stĺpec",
+      "delete_column": "Odstrániť stĺpec",
+      "empty_column": "Sem presuňte stavy",
+      "entry_state": "Pracovné položky presunuté sem dostanú stav {state}",
+      "new_column_name": "Stĺpec {count}",
+      "empty": {
+        "description": "Tento projekt zatiaľ nemá stĺpce nástenky. Kým ich nepridáte, nástenka sa zoskupuje podľa stavu.",
+        "create_defaults": "Vytvoriť predvolené stĺpce"
+      },
+      "unmapped": {
+        "title": "Mimo nástenky",
+        "description": "Stavy, ktoré nezobrazuje žiadny stĺpec. Presunutím do stĺpca ich umiestnite na nástenku.",
+        "empty": "Všetky stavy sú na nástenke."
+      },
+      "delete_modal": {
+        "title": "Odstrániť tento stĺpec?",
+        "description": "Stĺpec „{name}“ bude odstránený z nástenky. Jeho stavy zostanú, len sa prestanú na nástenke zobrazovať."
+      },
+      "toasts": {
+        "create_error": "Stĺpec sa nepodarilo vytvoriť. Skúste to znova.",
+        "delete_error": "Stĺpec sa nepodarilo odstrániť. Skúste to znova.",
+        "rename_error": "Stĺpec sa nepodarilo premenovať. Skúste to znova.",
+        "reorder_error": "Poradie stĺpcov sa nepodarilo zmeniť. Skúste to znova.",
+        "move_state_error": "Stav sa nepodarilo presunúť. Skúste to znova."
+      }
+    },
     "work_item_types": {
       "heading": "Typy pracovných položiek",
       "description": "Vytvárajte a prispôsobujte rôzne typy pracovných položiek s jedinečnými vlastnosťami"

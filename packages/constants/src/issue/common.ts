@@ -26,6 +26,7 @@ export type TIssueFilterPriorityObject = {
 
 export enum EIssueGroupByToServerOptions {
   "state" = "state_id",
+  "board_column" = "state__board_column_id",
   "priority" = "priority",
   "labels" = "labels__id",
   "state_detail.group" = "state__group",
@@ -33,14 +34,15 @@ export enum EIssueGroupByToServerOptions {
   "cycle" = "cycle_id",
   "module" = "issue_module__module_id",
   "target_date" = "target_date",
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
   "project" = "project_id",
   "created_by" = "created_by",
-  // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
   "team_project" = "project_id",
 }
 
 export enum EIssueGroupBYServerToProperty {
   "state_id" = "state_id",
+  "state__board_column_id" = "state__board_column_id",
   "priority" = "priority",
   "labels__id" = "label_ids",
   "state__group" = "state__group",
@@ -114,6 +116,7 @@ export const ISSUE_GROUP_BY_OPTIONS: {
   key: TIssueGroupByOptions;
   titleTranslationKey: string;
 }[] = [
+  { key: "board_column", titleTranslationKey: "common.board_column" },
   { key: "state", titleTranslationKey: "common.states" },
   { key: "state_detail.group", titleTranslationKey: "common.state_groups" },
   { key: "priority", titleTranslationKey: "common.priority" },

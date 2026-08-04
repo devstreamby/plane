@@ -93,6 +93,13 @@ export const PROJECT_SETTINGS: Record<TProjectSettingsTabs, TProjectSettingsItem
     access: [EUserProjectRoles.ADMIN, EUserProjectRoles.MEMBER],
     highlight: (pathname: string, baseUrl: string) => pathname === `${baseUrl}/workflows/`,
   },
+  board_columns: {
+    key: "board_columns",
+    i18n_label: "project_settings.board_columns.label",
+    href: `/board-columns`,
+    access: [EUserProjectRoles.ADMIN, EUserProjectRoles.MEMBER],
+    highlight: (pathname: string, baseUrl: string) => pathname === `${baseUrl}/board-columns/`,
+  },
   labels: {
     key: "labels",
     i18n_label: "common.labels",
@@ -130,6 +137,7 @@ export const GROUPED_PROJECT_SETTINGS: Record<PROJECT_SETTINGS_CATEGORY, TProjec
   [PROJECT_SETTINGS_CATEGORY.WORK_STRUCTURE]: [
     PROJECT_SETTINGS["states"],
     PROJECT_SETTINGS["workflows"],
+    PROJECT_SETTINGS["board_columns"],
     PROJECT_SETTINGS["labels"],
     PROJECT_SETTINGS["estimates"],
   ],

@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Kolom papan",
+      "heading": "Kolom papan",
+      "description": "Kelompokkan status ke dalam kolom papan Anda dan urutkan sesuai alur kerja yang sebenarnya.",
+      "add_column": "Tambah kolom",
+      "delete_column": "Hapus kolom",
+      "empty_column": "Seret status ke sini",
+      "entry_state": "Item kerja yang dijatuhkan di sini akan menjadi {state}",
+      "new_column_name": "Kolom {count}",
+      "empty": {
+        "description": "Proyek ini belum memiliki kolom papan. Sampai Anda menambahkannya, papan dikelompokkan berdasarkan status.",
+        "create_defaults": "Buat kolom bawaan"
+      },
+      "unmapped": {
+        "title": "Tidak ada di papan",
+        "description": "Status yang tidak ditampilkan kolom mana pun. Seret salah satunya ke sebuah kolom untuk menampilkannya di papan.",
+        "empty": "Semua status sudah ada di papan."
+      },
+      "delete_modal": {
+        "title": "Hapus kolom ini?",
+        "description": "\"{name}\" akan dihapus dari papan. Statusnya tetap ada, hanya tidak lagi ditampilkan di papan."
+      },
+      "toasts": {
+        "create_error": "Kolom tidak dapat dibuat. Silakan coba lagi.",
+        "delete_error": "Kolom tidak dapat dihapus. Silakan coba lagi.",
+        "rename_error": "Nama kolom tidak dapat diubah. Silakan coba lagi.",
+        "reorder_error": "Urutan kolom tidak dapat diubah. Silakan coba lagi.",
+        "move_state_error": "Status tidak dapat dipindahkan. Silakan coba lagi."
+      }
+    },
     "work_item_types": {
       "heading": "Tipe item kerja",
       "description": "Buat dan sesuaikan berbagai tipe item kerja dengan properti unik"

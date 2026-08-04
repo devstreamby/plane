@@ -116,6 +116,7 @@ export interface IBaseIssuesStore {
 export const ISSUE_GROUP_BY_KEY: Record<TIssueDisplayFilterOptions, keyof TIssue> = {
   project: "project_id",
   state: "state_id",
+  board_column: "state_id", // board_column is derived from the state's column
   "state_detail.group": "state_id", // state_detail.group is only being used for state_group display,
   priority: "priority",
   labels: "label_ids",
@@ -132,6 +133,7 @@ export const ISSUE_FILTER_DEFAULT_DATA: Record<TIssueDisplayFilterOptions, keyof
   cycle: "cycle_id",
   module: "module_ids",
   state: "state_id",
+  board_column: "state_id", // dropping into a column writes the column's state onto the work item
   "state_detail.group": "state__group", // state_detail.group is only being used for state_group display,
   priority: "priority",
   labels: "label_ids",
@@ -1673,6 +1675,14 @@ export abstract class BaseIssuesStore implements IBaseIssuesStore {
     // Handle special case for state group
     if (groupByKey === "state_detail.group") {
       return [this.rootIssueStore.rootStore.state.stateMap?.[value]?.group ?? issueObject.state__group];
+    }
+
+    // Board columns group by the column the work item's state is mapped to
+    if (groupByKey === "board_column") {
+      const stateStore = this.rootIssueStore.rootStore.state;
+      return [
+        stateStore.getColumnIdForStateId(issueObject.project_id, value) ?? issueObject.state__board_column_id ?? "None",
+      ];
     }
 
     return [value];

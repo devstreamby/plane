@@ -4,17 +4,25 @@
  * See the LICENSE file for details.
  */
 
-import { set, groupBy } from "lodash-es";
+import { set, unset, groupBy } from "lodash-es";
 import { action, computed, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 // plane imports
 import { STATE_GROUPS } from "@plane/constants";
-import type { IIntakeState, IState, TStateTransitionMap, TStateTransitionPayload } from "@plane/types";
+import type {
+  IIntakeState,
+  IState,
+  TBoardColumn,
+  TBoardColumnPayload,
+  TStateTransitionMap,
+  TStateTransitionPayload,
+} from "@plane/types";
 // helpers
 import { sortStates } from "@plane/utils";
 // plane web
 import { ProjectStateService } from "@/services/project/project-state.service";
 import { ProjectStateTransitionService } from "@/services/project/project-state-transition.service";
+import { ProjectBoardColumnService } from "@/services/project/project-board-column.service";
 import type { RootStore } from "@/plane-web/store/root.store";
 
 export interface IStateStore {
@@ -76,20 +84,45 @@ export interface IStateStore {
     projectId: string,
     payload: TStateTransitionPayload
   ) => Promise<TStateTransitionMap>;
+  // board: columns
+  boardColumnMap: Record<string, Record<string, TBoardColumn>>;
+  boardColumnsFetchedMap: Record<string, boolean>;
+  getProjectBoardColumns: (projectId: string | null | undefined) => TBoardColumn[];
+  getColumnIdForStateId: (
+    projectId: string | null | undefined,
+    stateId: string | null | undefined
+  ) => string | undefined;
+  getTargetStateIdForColumn: (
+    projectId: string | null | undefined,
+    columnId: string | null | undefined,
+    currentStateId?: string | null
+  ) => string | undefined;
+  fetchBoardColumns: (workspaceSlug: string, projectId: string) => Promise<TBoardColumn[]>;
+  createBoardColumn: (workspaceSlug: string, projectId: string, data: TBoardColumnPayload) => Promise<TBoardColumn>;
+  updateBoardColumn: (
+    workspaceSlug: string,
+    projectId: string,
+    columnId: string,
+    data: TBoardColumnPayload
+  ) => Promise<TBoardColumn>;
+  deleteBoardColumn: (workspaceSlug: string, projectId: string, columnId: string) => Promise<void>;
 }
 
 export class StateStore implements IStateStore {
   stateMap: Record<string, IState> = {};
   intakeStateMap: Record<string, IIntakeState> = {};
   transitionMap: Record<string, TStateTransitionMap> = {};
+  boardColumnMap: Record<string, Record<string, TBoardColumn>> = {};
   //loaders
   fetchedMap: Record<string, boolean> = {};
   fetchedIntakeMap: Record<string, boolean> = {};
   transitionsFetchedMap: Record<string, boolean> = {};
+  boardColumnsFetchedMap: Record<string, boolean> = {};
   rootStore: RootStore;
   router;
   stateService: ProjectStateService;
   stateTransitionService: ProjectStateTransitionService;
+  boardColumnService: ProjectBoardColumnService;
 
   constructor(_rootStore: RootStore) {
     makeObservable(this, {
@@ -97,9 +130,11 @@ export class StateStore implements IStateStore {
       stateMap: observable,
       intakeStateMap: observable,
       transitionMap: observable,
+      boardColumnMap: observable,
       fetchedMap: observable,
       fetchedIntakeMap: observable,
       transitionsFetchedMap: observable,
+      boardColumnsFetchedMap: observable,
       // computed
       projectStates: computed,
       groupedProjectStates: computed,
@@ -115,9 +150,15 @@ export class StateStore implements IStateStore {
       markStateAsDefault: action,
       moveStatePosition: action,
       updateStateTransitions: action,
+      // board column actions
+      fetchBoardColumns: action,
+      createBoardColumn: action,
+      updateBoardColumn: action,
+      deleteBoardColumn: action,
     });
     this.stateService = new ProjectStateService();
     this.stateTransitionService = new ProjectStateTransitionService();
+    this.boardColumnService = new ProjectBoardColumnService();
     this.router = _rootStore.router;
     this.rootStore = _rootStore;
   }
@@ -482,4 +523,96 @@ export class StateStore implements IStateStore {
     // Calculate percentage: ((index + 1) / totalLength) * 100
     return ((stateIndex + 1) / statesInGroup.length) * 100;
   });
+
+  /**
+   * Board: columns of a project, ordered left to right
+   */
+  getProjectBoardColumns = computedFn((projectId: string | null | undefined) => {
+    if (!projectId) return [];
+    // `Object.values` already returns a fresh array, so sorting in place mutates nothing shared.
+    // eslint-disable-next-line unicorn/no-array-sort
+    return Object.values(this.boardColumnMap[projectId] ?? {}).sort((a, b) => a.sequence - b.sequence);
+  });
+
+  /**
+   * Board: the column a state is mapped to, undefined when the state is not on the board.
+   * The columns' `state_ids` are the single source of truth for this mapping.
+   */
+  getColumnIdForStateId = computedFn(
+    (projectId: string | null | undefined, stateId: string | null | undefined): string | undefined => {
+      if (!projectId || !stateId) return undefined;
+      return this.getProjectBoardColumns(projectId).find((column) => column.state_ids.includes(stateId))?.id;
+    }
+  );
+
+  /**
+   * Board: the state a work item should land in when dropped into a column. Staying inside
+   * the same column keeps the current state, otherwise the column's first state is used.
+   */
+  getTargetStateIdForColumn = computedFn(
+    (
+      projectId: string | null | undefined,
+      columnId: string | null | undefined,
+      currentStateId?: string | null
+    ): string | undefined => {
+      if (!projectId || !columnId) return undefined;
+      const column = this.getProjectBoardColumns(projectId).find((item) => item.id === columnId);
+      if (!column) return undefined;
+      if (currentStateId && column.state_ids.includes(currentStateId)) return currentStateId;
+      // `state_ids` follows the states' own ordering, so the first entry is the leftmost state.
+      return column.state_ids[0];
+    }
+  );
+
+  /**
+   * Board: fetches the columns of a project
+   */
+  fetchBoardColumns = async (workspaceSlug: string, projectId: string) => {
+    const response = await this.boardColumnService.getBoardColumns(workspaceSlug, projectId);
+    runInAction(() => {
+      set(this.boardColumnMap, [projectId], Object.fromEntries((response ?? []).map((column) => [column.id, column])));
+      set(this.boardColumnsFetchedMap, projectId, true);
+    });
+    return response;
+  };
+
+  /**
+   * Board: creates a column
+   */
+  createBoardColumn = async (workspaceSlug: string, projectId: string, data: TBoardColumnPayload) => {
+    const response = await this.boardColumnService.createBoardColumn(workspaceSlug, projectId, data);
+    runInAction(() => {
+      set(this.boardColumnMap, [projectId, response.id], response);
+    });
+    return response;
+  };
+
+  /**
+   * Board: updates a column. `state_ids` bulk-replaces its states, so any state that moved
+   * in from another column has to be dropped from that column locally as well.
+   */
+  updateBoardColumn = async (workspaceSlug: string, projectId: string, columnId: string, data: TBoardColumnPayload) => {
+    const response = await this.boardColumnService.updateBoardColumn(workspaceSlug, projectId, columnId, data);
+    runInAction(() => {
+      Object.values(this.boardColumnMap[projectId] ?? {}).forEach((column) => {
+        if (column.id === columnId) return;
+        const remaining = column.state_ids.filter((stateId) => !response.state_ids.includes(stateId));
+        if (remaining.length !== column.state_ids.length) {
+          set(this.boardColumnMap, [projectId, column.id], { ...column, state_ids: remaining });
+        }
+      });
+      set(this.boardColumnMap, [projectId, response.id], response);
+    });
+    return response;
+  };
+
+  /**
+   * Board: deletes a column, its states fall back to being unmapped
+   */
+  deleteBoardColumn = async (workspaceSlug: string, projectId: string, columnId: string) => {
+    await this.boardColumnService.deleteBoardColumn(workspaceSlug, projectId, columnId);
+    runInAction(() => {
+      unset(this.boardColumnMap, [projectId, columnId]);
+    });
+  };
 }

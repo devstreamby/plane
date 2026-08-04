@@ -70,9 +70,7 @@ export const isWorkspaceLevel = (type: EIssuesStoreType) =>
     EIssuesStoreType.TEAM_VIEW,
     EIssuesStoreType.TEAM_PROJECT_WORK_ITEMS,
     EIssuesStoreType.WORKSPACE_DRAFT,
-  ].includes(type)
-    ? true
-    : false;
+  ].includes(type);
 
 type TGetGroupByColumns = {
   groupBy: GroupByColumnTypes | null;
@@ -88,7 +86,7 @@ type TGetGroupByColumns = {
 export const getGroupByColumns = ({
   groupBy,
   includeNone,
-  isWorkspaceLevel,
+  isWorkspaceLevel: workspaceLevel,
   isEpic = false,
   projectId,
 }: TGetGroupByColumns): IGroupByColumn[] | undefined => {
@@ -116,6 +114,7 @@ export const getGroupByColumns = ({
     cycle: getCycleColumns,
     module: getModuleColumns,
     state: getStateColumns,
+    board_column: getBoardColumnColumns,
     "state_detail.group": getStateGroupColumns,
     priority: getPriorityColumns,
     labels: getLabelsColumns,
@@ -125,7 +124,7 @@ export const getGroupByColumns = ({
   };
 
   // Get and return the columns for the specified group by option
-  return groupByColumnMap[groupBy]?.({ isWorkspaceLevel, projectId });
+  return groupByColumnMap[groupBy]?.({ isWorkspaceLevel: workspaceLevel, projectId });
 };
 
 const getProjectColumns = (): IGroupByColumn[] | undefined => {
@@ -225,6 +224,36 @@ const getStateColumns = ({ projectId }: TGetColumns): IGroupByColumn[] | undefin
   }));
 };
 
+const getBoardColumnColumns = ({ projectId }: TGetColumns): IGroupByColumn[] | undefined => {
+  const { getProjectBoardColumns, getStateById } = store.state;
+  const currentProjectId = projectId ?? store.router.projectId;
+  if (!currentProjectId) return;
+  const boardColumns = getProjectBoardColumns(currentProjectId);
+  if (boardColumns.length === 0) return;
+
+  const columns: IGroupByColumn[] = boardColumns.map((boardColumn) => {
+    // Work items dropped into or created in a column land in its first state.
+    const targetState = getStateById(boardColumn.state_ids[0]);
+    return {
+      id: boardColumn.id,
+      name: boardColumn.name,
+      icon: targetState ? (
+        <div className="size-4 rounded-full">
+          <StateGroupIcon stateGroup={targetState.group} color={targetState.color} size={EIconSize.LG} />
+        </div>
+      ) : undefined,
+      payload: targetState ? { state_id: targetState.id } : {},
+      // A column without states has nowhere to put a work item.
+      isDropDisabled: !targetState,
+      dropErrorMessage: !targetState ? "This column has no state mapped to it" : undefined,
+    };
+  });
+
+  // States that are not mapped onto the board still need somewhere to show up.
+  columns.push({ id: "None", name: "None", payload: {}, isDropDisabled: true });
+  return columns;
+};
+
 const getStateGroupColumns = (): IGroupByColumn[] => {
   const stateGroups = STATE_GROUPS;
   // map state groups to group by columns
@@ -251,11 +280,11 @@ const getPriorityColumns = (): IGroupByColumn[] => {
   }));
 };
 
-const getLabelsColumns = ({ isWorkspaceLevel }: TGetColumns): IGroupByColumn[] => {
+const getLabelsColumns = ({ isWorkspaceLevel: workspaceLevel }: TGetColumns): IGroupByColumn[] => {
   const { workspaceLabels, projectLabels } = store.label;
   // map labels to group by columns
   const labels = [
-    ...(isWorkspaceLevel ? workspaceLabels || [] : projectLabels || []),
+    ...(workspaceLevel ? workspaceLabels || [] : projectLabels || []),
     { id: "None", name: "None", color: "#666" },
   ];
   // map labels to group by columns
@@ -269,11 +298,14 @@ const getLabelsColumns = ({ isWorkspaceLevel }: TGetColumns): IGroupByColumn[] =
   }));
 };
 
-const getAssigneeColumns = ({ isWorkspaceLevel, projectId }: TGetColumns): IGroupByColumn[] | undefined => {
+const getAssigneeColumns = ({
+  isWorkspaceLevel: workspaceLevel,
+  projectId,
+}: TGetColumns): IGroupByColumn[] | undefined => {
   // store values
   const { getUserDetails } = store.memberRoot;
   // derived values
-  const { memberIds, includeNone } = getScopeMemberIds({ isWorkspaceLevel, projectId });
+  const { memberIds, includeNone } = getScopeMemberIds({ isWorkspaceLevel: workspaceLevel, projectId });
   const assigneeColumns: IGroupByColumn[] = [];
 
   if (!memberIds) return [];
@@ -452,8 +484,8 @@ const handleSortOrder = (
 
   if (destinationIssues && destinationIssues.length > 0) {
     if (destinationIndex === 0) {
-      const destinationIssueId = destinationIssues[0];
-      const destinationIssue = getIssueById(destinationIssueId);
+      const firstDestinationIssueId = destinationIssues[0];
+      const destinationIssue = getIssueById(firstDestinationIssueId);
       if (!destinationIssue) return currentIssueState;
 
       currentIssueState = {
@@ -461,8 +493,8 @@ const handleSortOrder = (
         sort_order: destinationIssue.sort_order - sortOrderDefaultValue,
       };
     } else if (destinationIndex === destinationIssues.length) {
-      const destinationIssueId = destinationIssues[destinationIssues.length - 1];
-      const destinationIssue = getIssueById(destinationIssueId);
+      const lastDestinationIssueId = destinationIssues[destinationIssues.length - 1];
+      const destinationIssue = getIssueById(lastDestinationIssueId);
       if (!destinationIssue) return currentIssueState;
 
       currentIssueState = {
@@ -503,6 +535,28 @@ export const getIssueBlockId = (issueId: string | undefined, groupId: string | u
 const getGroupId = (groupId: string) => {
   if (groupId === "None") return [];
   return [groupId];
+};
+
+/**
+ * Resolves the value to write on the work item for a destination group.
+ *
+ * Every grouping axis stores the group id itself, except board columns: those group by column
+ * but live on the work item's state, so the destination column has to be resolved back to the
+ * state the item should land in.
+ */
+const getDropGroupValue = (
+  groupBy: TIssueGroupByOptions,
+  destinationGroupId: string,
+  sourceIssue: TIssue
+): string | null => {
+  if (groupBy !== "board_column") return destinationGroupId === "None" ? null : destinationGroupId;
+  // Unmapped states are not a drop target, so there is nothing to move the item to.
+  if (destinationGroupId === "None") return sourceIssue.state_id ?? null;
+  return (
+    store.state.getTargetStateIdForColumn(sourceIssue.project_id, destinationGroupId, sourceIssue.state_id) ??
+    sourceIssue.state_id ??
+    null
+  );
 };
 
 export const handleGroupDragDrop = async (
@@ -553,7 +607,7 @@ export const handleGroupDragDrop = async (
       if (destination.groupId !== "None") groupValue = uniq(concat(groupValue, [destination.groupId]));
     } // else just update the groupValue based on destination groupId
     else {
-      groupValue = destination.groupId === "None" ? null : destination.groupId;
+      groupValue = getDropGroupValue(groupBy, destination.groupId, sourceIssue);
     }
 
     // keep track of updates on what was added and what was removed
@@ -573,7 +627,7 @@ export const handleGroupDragDrop = async (
       if (destination.subGroupId !== "None") subGroupValue = uniq(concat(subGroupValue, [destination.subGroupId]));
     } // else just update the subGroupValue based on destination subGroupId
     else {
-      subGroupValue = destination.subGroupId === "None" ? null : destination.subGroupId;
+      subGroupValue = getDropGroupValue(subGroupBy, destination.subGroupId, sourceIssue);
     }
 
     // keep track of updates on what was added and what was removed
@@ -731,7 +785,7 @@ export const isDisplayFiltersApplied = (filters: Partial<IIssueFilters>): boolea
     (key) => !filters.displayProperties?.[key as keyof IIssueDisplayProperties]
   );
 
-  const isDisplayFiltersApplied = Object.keys(filters.displayFilters ?? {}).some((key) => {
+  const hasDisplayFiltersApplied = Object.keys(filters.displayFilters ?? {}).some((key) => {
     const value = filters.displayFilters?.[key as keyof IIssueDisplayFilterOptions];
     if (!value) return false;
     // -create_at is the default order
@@ -741,7 +795,7 @@ export const isDisplayFiltersApplied = (filters: Partial<IIssueFilters>): boolea
     return true;
   });
 
-  return isDisplayPropertiesApplied || isDisplayFiltersApplied;
+  return isDisplayPropertiesApplied || hasDisplayFiltersApplied;
 };
 
 /**

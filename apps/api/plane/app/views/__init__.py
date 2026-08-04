@@ -86,6 +86,7 @@ from .workspace.sticky import WorkspaceStickyViewSet
 
 from .state.base import StateViewSet, IntakeStateEndpoint
 from .state.transition import StateTransitionEndpoint
+from .state.board_column import BoardColumnViewSet
 from .view.base import (
     WorkspaceViewViewSet,
     WorkspaceViewIssuesViewSet,

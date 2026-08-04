@@ -27,6 +27,22 @@ export type TStateTransitionPayload = {
   transitions: TStateTransitionMap;
 };
 
+/** Board: a column of the project board, owning one or more states. */
+export interface TBoardColumn {
+  readonly id: string;
+  name: string;
+  sequence: number;
+  project_id: string;
+  workspace_id: string;
+  state_ids: string[];
+}
+
+export type TBoardColumnPayload = {
+  name?: string;
+  sequence?: number;
+  state_ids?: string[];
+};
+
 export interface IStateLite {
   color: string;
   group: TStateGroups;

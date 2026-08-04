@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Columnas del tablero",
+      "heading": "Columnas del tablero",
+      "description": "Agrupe los estados en las columnas de su tablero y ordénelas según el flujo real del trabajo.",
+      "add_column": "Añadir columna",
+      "delete_column": "Eliminar columna",
+      "empty_column": "Arrastre estados aquí",
+      "entry_state": "Los elementos de trabajo que se suelten aquí pasarán a {state}",
+      "new_column_name": "Columna {count}",
+      "empty": {
+        "description": "Este proyecto aún no tiene columnas de tablero. Hasta que añada alguna, el tablero se agrupa por estado.",
+        "create_defaults": "Crear columnas predeterminadas"
+      },
+      "unmapped": {
+        "title": "Fuera del tablero",
+        "description": "Estados que no muestra ninguna columna. Arrastre uno a una columna para colocarlo en el tablero.",
+        "empty": "Todos los estados están en el tablero."
+      },
+      "delete_modal": {
+        "title": "¿Eliminar esta columna?",
+        "description": "«{name}» se quitará del tablero. Sus estados se mantienen, solo dejan de mostrarse en el tablero."
+      },
+      "toasts": {
+        "create_error": "No se pudo crear la columna. Inténtelo de nuevo.",
+        "delete_error": "No se pudo eliminar la columna. Inténtelo de nuevo.",
+        "rename_error": "No se pudo renombrar la columna. Inténtelo de nuevo.",
+        "reorder_error": "No se pudieron reordenar las columnas. Inténtelo de nuevo.",
+        "move_state_error": "No se pudo mover el estado. Inténtelo de nuevo."
+      }
+    },
     "work_item_types": {
       "heading": "Tipos de elemento de trabajo",
       "description": "Crea y personaliza diferentes tipos de elementos de trabajo con propiedades únicas"
