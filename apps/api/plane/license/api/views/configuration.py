@@ -27,6 +27,13 @@ from plane.license.api.serializers import InstanceConfigurationSerializer
 from plane.license.utils.encryption import encrypt_data
 from plane.utils.cache import cache_response, invalidate_cache
 from plane.license.utils.instance_value import get_email_configuration
+from plane.authentication.ldap import (
+    ActiveDirectoryClient,
+    LdapConfigurationError,
+    LdapConnectionError,
+    LdapInvalidCredentials,
+    get_ldap_configuration,
+)
 
 
 class InstanceConfigurationEndpoint(BaseAPIView):
@@ -167,5 +174,30 @@ class EmailCredentialCheckEndpoint(BaseAPIView):
         except Exception:
             return Response(
                 {"error": "Could not send email. Please check your configuration"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class LdapConnectionCheckEndpoint(BaseAPIView):
+    permission_classes = [InstanceAdminPermission]
+
+    def post(self, request):
+        try:
+            configuration = get_ldap_configuration(overrides=request.data)
+            ActiveDirectoryClient(configuration).test_connection()
+            return Response(
+                {"message": "Active Directory connection succeeded."},
+                status=status.HTTP_200_OK,
+            )
+        except LdapConfigurationError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except LdapInvalidCredentials:
+            return Response(
+                {"error": "The bind account credentials were rejected by Active Directory."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except LdapConnectionError:
+            return Response(
+                {"error": "Could not establish a trusted LDAPS connection. Check the host, port, and CA certificate."},
                 status=status.HTTP_400_BAD_REQUEST,
             )

@@ -44,6 +44,7 @@ from .views import (
     GiteaOauthInitiateEndpoint,
     GiteaCallbackSpaceEndpoint,
     GiteaOauthInitiateSpaceEndpoint,
+    LdapSignInEndpoint,
 )
 
 urlpatterns = [
@@ -150,4 +151,6 @@ urlpatterns = [
         GiteaCallbackSpaceEndpoint.as_view(),
         name="space-gitea-callback",
     ),
+    ## Active Directory over LDAPS
+    path("ldap/", LdapSignInEndpoint.as_view(), name="ldap-sign-in"),
 ]

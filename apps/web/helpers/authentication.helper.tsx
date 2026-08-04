@@ -78,6 +78,10 @@ export enum EAuthenticationErrorCodes {
   GOOGLE_OAUTH_PROVIDER_ERROR = "5115",
   GITHUB_OAUTH_PROVIDER_ERROR = "5120",
   GITLAB_OAUTH_PROVIDER_ERROR = "5121",
+  LDAP_NOT_CONFIGURED = "5200",
+  LDAP_INVALID_CREDENTIALS = "5201",
+  LDAP_CONNECTION_ERROR = "5202",
+  LDAP_USER_DATA_INVALID = "5203",
   // Reset Password
   INVALID_PASSWORD_TOKEN = "5125",
   EXPIRED_PASSWORD_TOKEN = "5130",
@@ -282,6 +286,22 @@ const errorCodeMessages: {
     title: `GitLab OAuth provider error`,
     message: () => `GitLab OAuth provider error. Please try again.`,
   },
+  [EAuthenticationErrorCodes.LDAP_NOT_CONFIGURED]: {
+    title: `Active Directory is not configured`,
+    message: () => `Active Directory sign-in is not configured. Please contact your administrator.`,
+  },
+  [EAuthenticationErrorCodes.LDAP_INVALID_CREDENTIALS]: {
+    title: `Authentication failed`,
+    message: () => `The domain username or password is incorrect.`,
+  },
+  [EAuthenticationErrorCodes.LDAP_CONNECTION_ERROR]: {
+    title: `Active Directory is unavailable`,
+    message: () => `Plane could not reach Active Directory. Please try again or contact your administrator.`,
+  },
+  [EAuthenticationErrorCodes.LDAP_USER_DATA_INVALID]: {
+    title: `Directory account cannot be used`,
+    message: () => `The directory account is missing a valid email or has a conflicting identity.`,
+  },
 
   // Reset Password
   [EAuthenticationErrorCodes.INVALID_PASSWORD_TOKEN]: {
@@ -408,6 +428,10 @@ export const authErrorHandler = (errorCode: EAuthenticationErrorCodes, email?: s
     EAuthenticationErrorCodes.GOOGLE_OAUTH_PROVIDER_ERROR,
     EAuthenticationErrorCodes.GITHUB_OAUTH_PROVIDER_ERROR,
     EAuthenticationErrorCodes.GITLAB_OAUTH_PROVIDER_ERROR,
+    EAuthenticationErrorCodes.LDAP_NOT_CONFIGURED,
+    EAuthenticationErrorCodes.LDAP_INVALID_CREDENTIALS,
+    EAuthenticationErrorCodes.LDAP_CONNECTION_ERROR,
+    EAuthenticationErrorCodes.LDAP_USER_DATA_INVALID,
     EAuthenticationErrorCodes.INVALID_PASSWORD_TOKEN,
     EAuthenticationErrorCodes.EXPIRED_PASSWORD_TOKEN,
     EAuthenticationErrorCodes.INCORRECT_OLD_PASSWORD,

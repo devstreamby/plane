@@ -102,10 +102,19 @@ class Adapter:
     def __check_signup(self, email):
         """Check if sign up is enabled or not and raise exception if not enabled"""
 
+        # LDAP is a trusted identity source. It can provision authenticated
+        # directory users even when public email sign-up is disabled.
+        if self.provider == "ldap":
+            (LDAP_CREATE_USERS,) = get_configuration_value(
+                [{"key": "LDAP_CREATE_USERS", "default": os.environ.get("LDAP_CREATE_USERS", "1")}]
+            )
+            if LDAP_CREATE_USERS == "1":
+                return True
+
         # Get configuration value
-        (ENABLE_SIGNUP,) = get_configuration_value([
-            {"key": "ENABLE_SIGNUP", "default": os.environ.get("ENABLE_SIGNUP", "1")}
-        ])
+        (ENABLE_SIGNUP,) = get_configuration_value(
+            [{"key": "ENABLE_SIGNUP", "default": os.environ.get("ENABLE_SIGNUP", "1")}]
+        )
 
         # Check if sign up is disabled and invite is present or not
         if ENABLE_SIGNUP == "0" and not WorkspaceMemberInvite.objects.filter(email=email).exists():
@@ -129,10 +138,12 @@ class Adapter:
             "github": "ENABLE_GITHUB_SYNC",
             "gitlab": "ENABLE_GITLAB_SYNC",
             "gitea": "ENABLE_GITEA_SYNC",
+            "ldap": "ENABLE_LDAP_SYNC",
         }
         config_key = provider_config_map.get(self.provider)
         if config_key:
-            (enabled,) = get_configuration_value([{"key": config_key, "default": os.environ.get(config_key, "0")}])
+            default = "1" if self.provider == "ldap" else "0"
+            (enabled,) = get_configuration_value([{"key": config_key, "default": os.environ.get(config_key, default)}])
             return enabled == "1"
         return False
 
@@ -237,7 +248,7 @@ class Adapter:
         user.last_active = timezone.now()
         user.last_login_time = timezone.now()
         user.last_login_ip = get_client_ip(request=self.request)
-        user.last_login_uagent = self.request.META.get("HTTP_USER_AGENT")
+        user.last_login_uagent = self.request.META.get("HTTP_USER_AGENT") or ""
         user.token_updated_at = timezone.now()
         # Activate provisioned accounts that have never been deactivated.
         # Explicitly-deactivated accounts are rejected earlier in
