@@ -14,6 +14,7 @@ class LegacyToRichFiltersConverter:
     # Default mapping from legacy filter names to new rich filter field names
     DEFAULT_FIELD_MAPPINGS = {
         "state": "state_id",
+        "board_column": "board_column_id",
         "labels": "label_id",
         "cycle": "cycle_id",
         "module": "module_id",
@@ -30,6 +31,7 @@ class LegacyToRichFiltersConverter:
     # Default fields that expect UUID values
     DEFAULT_UUID_FIELDS = {
         "state_id",
+        "board_column_id",
         "label_id",
         "cycle_id",
         "module_id",
