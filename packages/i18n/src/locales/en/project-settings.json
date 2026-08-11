@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Board columns",
+      "heading": "Board columns",
+      "description": "Group statuses into the columns of your board and order them the way work actually moves.",
+      "add_column": "Add column",
+      "delete_column": "Delete column",
+      "empty_column": "Drag statuses here",
+      "entry_state": "Work items dropped here get {state}",
+      "new_column_name": "Column {count}",
+      "empty": {
+        "description": "This project has no board columns yet. Its board groups by status until you add some.",
+        "create_defaults": "Create default columns"
+      },
+      "unmapped": {
+        "title": "Not on the board",
+        "description": "Statuses that no column shows. Drag one into a column to put it on the board.",
+        "empty": "Every status is on the board."
+      },
+      "delete_modal": {
+        "title": "Delete this column?",
+        "description": "\"{name}\" will be removed from the board. Its statuses stay, they just stop being shown on the board."
+      },
+      "toasts": {
+        "create_error": "The column could not be created. Please try again.",
+        "delete_error": "The column could not be deleted. Please try again.",
+        "rename_error": "The column could not be renamed. Please try again.",
+        "reorder_error": "The columns could not be reordered. Please try again.",
+        "move_state_error": "The status could not be moved. Please try again."
+      }
+    },
     "work_item_types": {
       "heading": "Work item Types",
       "description": "Create and customize different types of work items with unique properties"

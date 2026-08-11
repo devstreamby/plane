@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Pano sütunları",
+      "heading": "Pano sütunları",
+      "description": "Durumları panonuzun sütunlarında gruplayın ve işin gerçekte ilerlediği sıraya göre düzenleyin.",
+      "add_column": "Sütun ekle",
+      "delete_column": "Sütunu sil",
+      "empty_column": "Durumları buraya sürükleyin",
+      "entry_state": "Buraya bırakılan iş öğeleri {state} durumunu alır",
+      "new_column_name": "Sütun {count}",
+      "empty": {
+        "description": "Bu projede henüz pano sütunu yok. Siz ekleyene kadar pano duruma göre gruplanır.",
+        "create_defaults": "Varsayılan sütunları oluştur"
+      },
+      "unmapped": {
+        "title": "Panoda değil",
+        "description": "Hiçbir sütunun göstermediği durumlar. Panoya eklemek için birini bir sütuna sürükleyin.",
+        "empty": "Tüm durumlar panoda."
+      },
+      "delete_modal": {
+        "title": "Bu sütun silinsin mi?",
+        "description": "\"{name}\" panodan kaldırılacak. Durumları kalır, yalnızca panoda gösterilmez."
+      },
+      "toasts": {
+        "create_error": "Sütun oluşturulamadı. Lütfen tekrar deneyin.",
+        "delete_error": "Sütun silinemedi. Lütfen tekrar deneyin.",
+        "rename_error": "Sütun yeniden adlandırılamadı. Lütfen tekrar deneyin.",
+        "reorder_error": "Sütunlar yeniden sıralanamadı. Lütfen tekrar deneyin.",
+        "move_state_error": "Durum taşınamadı. Lütfen tekrar deneyin."
+      }
+    },
     "work_item_types": {
       "heading": "İş öğesi Türleri",
       "description": "Benzersiz özelliklere sahip farklı iş öğesi türleri oluşturun ve özelleştirin"

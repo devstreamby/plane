@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "看板列",
+      "heading": "看板列",
+      "description": "将状态归入看板的列中，并按工作实际流转的顺序排列这些列。",
+      "add_column": "添加列",
+      "delete_column": "删除列",
+      "empty_column": "将状态拖到这里",
+      "entry_state": "拖放到此处的工作项将变为{state}",
+      "new_column_name": "第 {count} 列",
+      "empty": {
+        "description": "此项目还没有看板列。在您添加之前，看板按状态分组。",
+        "create_defaults": "创建默认列"
+      },
+      "unmapped": {
+        "title": "不在看板上",
+        "description": "没有任何列显示的状态。将状态拖入某一列即可把它放到看板上。",
+        "empty": "所有状态都已在看板上。"
+      },
+      "delete_modal": {
+        "title": "删除此列？",
+        "description": "“{name}”将从看板中移除。它的状态仍会保留，只是不再显示在看板上。"
+      },
+      "toasts": {
+        "create_error": "无法创建该列。请重试。",
+        "delete_error": "无法删除该列。请重试。",
+        "rename_error": "无法重命名该列。请重试。",
+        "reorder_error": "无法重新排序这些列。请重试。",
+        "move_state_error": "无法移动该状态。请重试。"
+      }
+    },
     "work_item_types": {
       "heading": "工作项类型",
       "description": "创建和自定义具有独特属性的不同类型工作项"

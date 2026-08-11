@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Coloanele tablei",
+      "heading": "Coloanele tablei",
+      "description": "Grupați stările în coloanele tablei și ordonați-le după modul real în care avansează munca.",
+      "add_column": "Adăugați o coloană",
+      "delete_column": "Ștergeți coloana",
+      "empty_column": "Trageți stările aici",
+      "entry_state": "Activitățile plasate aici primesc {state}",
+      "new_column_name": "Coloana {count}",
+      "empty": {
+        "description": "Acest proiect nu are încă coloane ale tablei. Până când adăugați câteva, tabla este grupată după stare.",
+        "create_defaults": "Creați coloanele implicite"
+      },
+      "unmapped": {
+        "title": "În afara tablei",
+        "description": "Stări pe care nu le afișează nicio coloană. Trageți una într-o coloană pentru a o aduce pe tablă.",
+        "empty": "Toate stările sunt pe tablă."
+      },
+      "delete_modal": {
+        "title": "Ștergeți această coloană?",
+        "description": "„{name}” va fi eliminată de pe tablă. Stările sale rămân, doar că nu mai sunt afișate pe tablă."
+      },
+      "toasts": {
+        "create_error": "Coloana nu a putut fi creată. Încercați din nou.",
+        "delete_error": "Coloana nu a putut fi ștearsă. Încercați din nou.",
+        "rename_error": "Coloana nu a putut fi redenumită. Încercați din nou.",
+        "reorder_error": "Coloanele nu au putut fi reordonate. Încercați din nou.",
+        "move_state_error": "Starea nu a putut fi mutată. Încercați din nou."
+      }
+    },
     "work_item_types": {
       "heading": "Tipuri de activități",
       "description": "Creează și personalizează diferite tipuri de activități cu proprietăți unice"

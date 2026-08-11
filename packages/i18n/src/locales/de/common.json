@@ -422,6 +422,7 @@
     "states": "Status",
     "state": "Status",
     "state_groups": "Statusgruppen",
+    "board_column": "Board-Spalte",
     "state_group": "Statusgruppe",
     "priorities": "Prioritäten",
     "priority": "Priorität",

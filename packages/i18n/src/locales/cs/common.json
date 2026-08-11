@@ -422,6 +422,7 @@
     "states": "Stavy",
     "state": "Stav",
     "state_groups": "Skupiny stavů",
+    "board_column": "Sloupec nástěnky",
     "state_group": "Skupina stavů",
     "priorities": "Priority",
     "priority": "Priorita",

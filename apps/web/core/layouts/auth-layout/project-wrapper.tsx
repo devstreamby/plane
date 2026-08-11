@@ -26,6 +26,7 @@ import {
   PROJECT_VIEWS,
   PROJECT_INTAKE_STATE,
   PROJECT_STATE_TRANSITIONS,
+  PROJECT_BOARD_COLUMNS,
 } from "@plane/constants";
 // hooks
 import { useProjectEstimates } from "@/hooks/store/estimates";
@@ -61,7 +62,7 @@ export const ProjectAuthWrapper = observer(function ProjectAuthWrapper(props: IP
   const {
     project: { fetchProjectMembers, fetchProjectUserProperties },
   } = useMember();
-  const { fetchProjectStates, fetchProjectIntakeState, fetchStateTransitions } = useProjectState();
+  const { fetchProjectStates, fetchProjectIntakeState, fetchStateTransitions, fetchBoardColumns } = useProjectState();
   const { data: currentUserData } = useUser();
   const { fetchProjectLabels } = useLabel();
   const { getProjectEstimates } = useProjectEstimates();
@@ -122,6 +123,11 @@ export const ProjectAuthWrapper = observer(function ProjectAuthWrapper(props: IP
       revalidateOnFocus: false,
     }
   );
+  // fetching project board columns
+  useSWR(PROJECT_BOARD_COLUMNS(projectId, currentProjectRole), () => fetchBoardColumns(workspaceSlug, projectId), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+  });
   // fetching project estimates
   useSWR(PROJECT_ESTIMATES(projectId, currentProjectRole), () => getProjectEstimates(workspaceSlug, projectId), {
     revalidateIfStale: false,

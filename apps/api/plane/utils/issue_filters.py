@@ -104,6 +104,32 @@ def filter_state_group(params, issue_filter, method, prefix=""):
     return issue_filter
 
 
+def filter_board_column(params, issue_filter, method, prefix=""):
+    """Board: work items whose state is mapped to one of the given columns.
+
+    "None" stands for the states that are not mapped onto the board.
+    """
+    if method == "GET":
+        board_columns = [item for item in params.get("board_column").split(",") if item != "null"]
+    else:
+        value = params.get("board_column")
+        if not value or value == "null":
+            return issue_filter
+        board_columns = value if isinstance(value, list) else [value]
+
+    if not len(board_columns) or "" in board_columns:
+        return issue_filter
+
+    includes_unmapped = "None" in board_columns
+    column_ids = filter_valid_uuids([item for item in board_columns if item != "None"])
+
+    if includes_unmapped and not column_ids:
+        issue_filter[f"{prefix}state__board_column__isnull"] = True
+    elif column_ids and not includes_unmapped:
+        issue_filter[f"{prefix}state__board_column__in"] = column_ids
+    return issue_filter
+
+
 def filter_estimate_point(params, issue_filter, method, prefix=""):
     if method == "GET":
         estimate_points = [item for item in params.get("estimate_point").split(",") if item != "null"]
@@ -431,6 +457,7 @@ def issue_filters(query_params, method, prefix=""):
     ISSUE_FILTER = {
         "state": filter_state,
         "state_group": filter_state_group,
+        "board_column": filter_board_column,
         "estimate_point": filter_estimate_point,
         "priority": filter_priority,
         "parent": filter_parent,

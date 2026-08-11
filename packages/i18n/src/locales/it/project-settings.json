@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Colonne della bacheca",
+      "heading": "Colonne della bacheca",
+      "description": "Raggruppi gli stati nelle colonne della bacheca e li ordini secondo il reale flusso del lavoro.",
+      "add_column": "Aggiungi colonna",
+      "delete_column": "Elimina colonna",
+      "empty_column": "Trascini qui gli stati",
+      "entry_state": "Gli elementi di lavoro rilasciati qui passano a {state}",
+      "new_column_name": "Colonna {count}",
+      "empty": {
+        "description": "Questo progetto non ha ancora colonne della bacheca. Finché non ne aggiunge, la bacheca è raggruppata per stato.",
+        "create_defaults": "Crea colonne predefinite"
+      },
+      "unmapped": {
+        "title": "Fuori dalla bacheca",
+        "description": "Stati che nessuna colonna mostra. Ne trascini uno in una colonna per portarlo sulla bacheca.",
+        "empty": "Tutti gli stati sono sulla bacheca."
+      },
+      "delete_modal": {
+        "title": "Eliminare questa colonna?",
+        "description": "«{name}» verrà rimossa dalla bacheca. I suoi stati restano, semplicemente non vengono più mostrati sulla bacheca."
+      },
+      "toasts": {
+        "create_error": "Non è stato possibile creare la colonna. Riprovi.",
+        "delete_error": "Non è stato possibile eliminare la colonna. Riprovi.",
+        "rename_error": "Non è stato possibile rinominare la colonna. Riprovi.",
+        "reorder_error": "Non è stato possibile riordinare le colonne. Riprovi.",
+        "move_state_error": "Non è stato possibile spostare lo stato. Riprovi."
+      }
+    },
     "work_item_types": {
       "heading": "Tipi di elementi di lavoro",
       "description": "Crea e personalizza diversi tipi di elementi di lavoro con proprietà uniche"

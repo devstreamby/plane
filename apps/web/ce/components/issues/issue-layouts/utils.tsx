@@ -5,6 +5,7 @@
  */
 
 import type { FC } from "react";
+import { useParams } from "next/navigation";
 import { CalendarDays, LayersIcon, Paperclip } from "lucide-react";
 // types
 import { ISSUE_GROUP_BY_OPTIONS } from "@plane/constants";
@@ -45,6 +46,8 @@ import {
   SpreadsheetSubIssueColumn,
   SpreadsheetUpdatedOnColumn,
 } from "@/components/issues/issue-layouts/spreadsheet/columns";
+// hooks
+import { useProjectState } from "@/hooks/store/use-project-state";
 // store
 import { store } from "@/lib/store-context";
 
@@ -117,6 +120,12 @@ export const useGroupByOptions = (
   key: TIssueGroupByOptions;
   titleTranslationKey: string;
 }[] => {
-  const groupByOptions = ISSUE_GROUP_BY_OPTIONS.filter((option) => options.includes(option.key));
-  return groupByOptions;
+  const { projectId } = useParams();
+  const { getProjectBoardColumns } = useProjectState();
+  // Grouping by board column is meaningless until the project has columns configured.
+  const hasBoardColumns = getProjectBoardColumns(projectId?.toString()).length > 0;
+
+  return ISSUE_GROUP_BY_OPTIONS.filter(
+    (option) => options.includes(option.key) && (option.key !== "board_column" || hasBoardColumns)
+  );
 };

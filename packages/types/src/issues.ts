@@ -121,6 +121,7 @@ export type GroupByColumnTypes =
   | "cycle"
   | "module"
   | "state"
+  | "board_column"
   | "state_detail.group"
   | "priority"
   | "labels"

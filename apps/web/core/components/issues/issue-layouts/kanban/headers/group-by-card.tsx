@@ -6,14 +6,16 @@
 
 import React from "react";
 import { observer } from "mobx-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 // lucide icons
-import { Minimize2, Maximize2, Circle } from "lucide-react";
+import { Minimize2, Maximize2, Circle, Settings2 } from "lucide-react";
+import { useTranslation } from "@plane/i18n";
 import { PlusIcon } from "@plane/propel/icons";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { TIssue, ISearchIssueResponse, TIssueKanbanFilters, TIssueGroupByOptions } from "@plane/types";
 // ui
-import { CustomMenu } from "@plane/ui";
+import { CustomMenu, Tooltip } from "@plane/ui";
 // components
 import { ExistingIssuesListModal } from "@/components/core/modals/existing-issues-list-modal";
 import { CreateUpdateIssueModal } from "@/components/issues/issue-modal/modal";
@@ -62,6 +64,7 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
   const storeType = useIssueStoreType();
   // router
   const { workspaceSlug, projectId, moduleId, cycleId } = useParams();
+  const { t } = useTranslation();
 
   const renderExistingIssueModal = moduleId || cycleId;
   const ExistingIssuesListModalPayload = moduleId ? { module: moduleId.toString() } : { cycle: true };
@@ -140,6 +143,17 @@ export const HeaderGroupByCard = observer(function HeaderGroupByCard(props: IHea
         </div>
 
         <WorkFlowGroupTree groupBy={group_by} groupId={column_id} />
+
+        {group_by === "board_column" && !verticalAlignPosition && workspaceSlug && projectId && (
+          <Tooltip tooltipContent={t("project_settings.board_columns.heading")}>
+            <Link
+              href={`/${workspaceSlug}/settings/projects/${projectId}/board-columns/`}
+              className="flex h-[20px] w-[20px] flex-shrink-0 items-center justify-center overflow-hidden rounded-sm bg-layer-transparent transition-all hover:bg-layer-transparent-hover"
+            >
+              <Settings2 width={14} strokeWidth={2} />
+            </Link>
+          </Tooltip>
+        )}
 
         {sub_group_by === null && (
           <button

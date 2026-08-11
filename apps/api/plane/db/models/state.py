@@ -76,6 +76,44 @@ class TriageStateManager(SoftDeletionManager):
         return super().get_queryset().filter(group=StateGroup.TRIAGE.value)
 
 
+class BoardColumn(ProjectBaseModel):
+    """A column of the project's board.
+
+    Columns are ordered by `sequence` and own a set of states: every state
+    points at the column it is displayed in, and a state without a column is
+    simply not mapped onto the board.
+    """
+
+    name = models.CharField(max_length=255, verbose_name="Board Column Name")
+    sequence = models.FloatField(default=65535)
+
+    def __str__(self):
+        return f"{self.name} <{self.project.name}>"
+
+    class Meta:
+        unique_together = ["name", "project", "deleted_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "project"],
+                condition=Q(deleted_at__isnull=True),
+                name="board_column_unique_name_project_when_deleted_at_null",
+            )
+        ]
+        verbose_name = "Board Column"
+        verbose_name_plural = "Board Columns"
+        db_table = "board_columns"
+        ordering = ("sequence",)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            last_sequence = BoardColumn.objects.filter(project=self.project).aggregate(
+                largest=models.Max("sequence")
+            )["largest"]
+            if last_sequence is not None:
+                self.sequence = last_sequence + 15000
+        return super().save(*args, **kwargs)
+
+
 class State(ProjectBaseModel):
     name = models.CharField(max_length=255, verbose_name="State Name")
     description = models.TextField(verbose_name="State Description", blank=True)
@@ -92,6 +130,15 @@ class State(ProjectBaseModel):
     # Workflow: when True, any state may transition into this one regardless of
     # the source state's configured outgoing transitions.
     allow_any_transition = models.BooleanField(default=False)
+    # Board: the column this state is displayed in. Null means the state is not
+    # mapped onto the board and falls into the "None" group.
+    board_column = models.ForeignKey(
+        BoardColumn,
+        on_delete=models.SET_NULL,
+        related_name="states",
+        null=True,
+        blank=True,
+    )
     external_source = models.CharField(max_length=255, null=True, blank=True)
     external_id = models.CharField(max_length=255, blank=True, null=True)
 

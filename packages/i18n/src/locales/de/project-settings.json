@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Board-Spalten",
+      "heading": "Board-Spalten",
+      "description": "Gruppieren Sie Status in den Spalten Ihres Boards und ordnen Sie diese so an, wie die Arbeit tatsächlich verläuft.",
+      "add_column": "Spalte hinzufügen",
+      "delete_column": "Spalte löschen",
+      "empty_column": "Status hierher ziehen",
+      "entry_state": "Hierher gezogene Arbeitselemente erhalten {state}",
+      "new_column_name": "Spalte {count}",
+      "empty": {
+        "description": "Dieses Projekt hat noch keine Board-Spalten. Bis Sie welche hinzufügen, gruppiert das Board nach Status.",
+        "create_defaults": "Standardspalten erstellen"
+      },
+      "unmapped": {
+        "title": "Nicht auf dem Board",
+        "description": "Status, die keine Spalte zeigt. Ziehen Sie einen davon in eine Spalte, um ihn auf das Board zu bringen.",
+        "empty": "Alle Status sind auf dem Board."
+      },
+      "delete_modal": {
+        "title": "Diese Spalte löschen?",
+        "description": "„{name}“ wird vom Board entfernt. Die Status bleiben erhalten, sie werden nur nicht mehr auf dem Board angezeigt."
+      },
+      "toasts": {
+        "create_error": "Die Spalte konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+        "delete_error": "Die Spalte konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+        "rename_error": "Die Spalte konnte nicht umbenannt werden. Bitte versuchen Sie es erneut.",
+        "reorder_error": "Die Spalten konnten nicht neu angeordnet werden. Bitte versuchen Sie es erneut.",
+        "move_state_error": "Der Status konnte nicht verschoben werden. Bitte versuchen Sie es erneut."
+      }
+    },
     "work_item_types": {
       "heading": "Arbeitselementtypen",
       "description": "Erstellen und passen Sie verschiedene Typen von Arbeitselementen mit einzigartigen Eigenschaften an"

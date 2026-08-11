@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "看板欄",
+      "heading": "看板欄",
+      "description": "將狀態歸入看板的欄位中，並依照工作實際流動的順序排列這些欄位。",
+      "add_column": "新增欄",
+      "delete_column": "刪除欄",
+      "empty_column": "將狀態拖曳到這裡",
+      "entry_state": "拖放到此處的工作事項會變為{state}",
+      "new_column_name": "第 {count} 欄",
+      "empty": {
+        "description": "此專案尚未設定看板欄。在您新增之前，看板依狀態分組。",
+        "create_defaults": "建立預設欄"
+      },
+      "unmapped": {
+        "title": "不在看板上",
+        "description": "沒有任何欄顯示的狀態。將狀態拖入某一欄即可放到看板上。",
+        "empty": "所有狀態都已在看板上。"
+      },
+      "delete_modal": {
+        "title": "刪除此欄？",
+        "description": "「{name}」將從看板中移除。其狀態仍會保留，只是不再顯示於看板上。"
+      },
+      "toasts": {
+        "create_error": "無法建立此欄。請再試一次。",
+        "delete_error": "無法刪除此欄。請再試一次。",
+        "rename_error": "無法重新命名此欄。請再試一次。",
+        "reorder_error": "無法重新排序這些欄。請再試一次。",
+        "move_state_error": "無法移動此狀態。請再試一次。"
+      }
+    },
     "work_item_types": {
       "heading": "工作事項類型",
       "description": "使用獨特屬性建立和自訂不同類型的工作事項"

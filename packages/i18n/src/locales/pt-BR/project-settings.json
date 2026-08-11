@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Colunas do quadro",
+      "heading": "Colunas do quadro",
+      "description": "Agrupe os estados nas colunas do seu quadro e ordene-as conforme o trabalho realmente avança.",
+      "add_column": "Adicionar coluna",
+      "delete_column": "Excluir coluna",
+      "empty_column": "Arraste estados para cá",
+      "entry_state": "Itens de trabalho soltos aqui passam para {state}",
+      "new_column_name": "Coluna {count}",
+      "empty": {
+        "description": "Este projeto ainda não tem colunas de quadro. Até você adicionar alguma, o quadro é agrupado por estado.",
+        "create_defaults": "Criar colunas padrão"
+      },
+      "unmapped": {
+        "title": "Fora do quadro",
+        "description": "Estados que nenhuma coluna mostra. Arraste um para uma coluna para colocá-lo no quadro.",
+        "empty": "Todos os estados estão no quadro."
+      },
+      "delete_modal": {
+        "title": "Excluir esta coluna?",
+        "description": "\"{name}\" será removida do quadro. Seus estados permanecem, apenas deixam de aparecer no quadro."
+      },
+      "toasts": {
+        "create_error": "Não foi possível criar a coluna. Tente novamente.",
+        "delete_error": "Não foi possível excluir a coluna. Tente novamente.",
+        "rename_error": "Não foi possível renomear a coluna. Tente novamente.",
+        "reorder_error": "Não foi possível reordenar as colunas. Tente novamente.",
+        "move_state_error": "Não foi possível mover o estado. Tente novamente."
+      }
+    },
     "work_item_types": {
       "heading": "Tipos de item de trabalho",
       "description": "Crie e personalize diferentes tipos de itens de trabalho com propriedades únicas"

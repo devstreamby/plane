@@ -319,6 +319,36 @@
         }
       }
     },
+    "board_columns": {
+      "label": "Kolumny tablicy",
+      "heading": "Kolumny tablicy",
+      "description": "Stany można pogrupować w kolumny tablicy i ustawić je w kolejności, w jakiej praca faktycznie postępuje.",
+      "add_column": "Dodaj kolumnę",
+      "delete_column": "Usuń kolumnę",
+      "empty_column": "Przeciągnij tutaj stany",
+      "entry_state": "Elementy pracy upuszczone tutaj otrzymają stan {state}",
+      "new_column_name": "Kolumna {count}",
+      "empty": {
+        "description": "Ten projekt nie ma jeszcze kolumn tablicy. Do czasu ich dodania tablica jest grupowana według stanu.",
+        "create_defaults": "Utwórz domyślne kolumny"
+      },
+      "unmapped": {
+        "title": "Poza tablicą",
+        "description": "Stany, których nie pokazuje żadna kolumna. Przeciągnij stan do kolumny, aby umieścić go na tablicy.",
+        "empty": "Wszystkie stany są na tablicy."
+      },
+      "delete_modal": {
+        "title": "Usunąć tę kolumnę?",
+        "description": "Kolumna „{name}” zostanie usunięta z tablicy. Jej stany pozostaną, przestaną tylko być pokazywane na tablicy."
+      },
+      "toasts": {
+        "create_error": "Nie udało się utworzyć kolumny. Prosimy spróbować ponownie.",
+        "delete_error": "Nie udało się usunąć kolumny. Prosimy spróbować ponownie.",
+        "rename_error": "Nie udało się zmienić nazwy kolumny. Prosimy spróbować ponownie.",
+        "reorder_error": "Nie udało się zmienić kolejności kolumn. Prosimy spróbować ponownie.",
+        "move_state_error": "Nie udało się przenieść stanu. Prosimy spróbować ponownie."
+      }
+    },
     "work_item_types": {
       "heading": "Typy elementów pracy",
       "description": "Twórz i dostosowuj różne typy elementów pracy z unikalnymi właściwościami"

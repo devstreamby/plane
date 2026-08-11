@@ -10,6 +10,7 @@ from django.db.models.functions import Coalesce
 
 # Module imports
 from plane.db.models import (
+    BoardColumn,
     Cycle,
     Issue,
     Label,
@@ -23,6 +24,10 @@ from plane.db.models import (
     IssueLabel,
 )
 from typing import Optional, Dict, Tuple, Any, Union, List
+
+# ORM path used when work items are grouped by the column of the board their
+# state is mapped to.
+BOARD_COLUMN_FIELD = "state__board_column_id"
 
 
 def issue_queryset_grouper(
@@ -138,6 +143,11 @@ def issue_on_results(
         original_list.remove(FIELD_MAPPER[sub_group_by])
         original_list.append(sub_group_by)
 
+    # Board columns are reached through the issue's state, so the field is only
+    # pulled in when it is actually the grouping axis.
+    if BOARD_COLUMN_FIELD in (group_by, sub_group_by):
+        required_fields.append(BOARD_COLUMN_FIELD)
+
     required_fields.extend(original_list)
     return list(issues.values(*required_fields))
 
@@ -193,6 +203,12 @@ def issue_group_values(
 
     if field == "state__group":
         return ["backlog", "unstarted", "started", "completed", "cancelled"]
+
+    if field == BOARD_COLUMN_FIELD:
+        queryset = BoardColumn.objects.filter(workspace__slug=slug).values_list("id", flat=True)
+        if project_id:
+            return list(queryset.filter(project_id=project_id)) + ["None"]
+        return list(queryset) + ["None"]
 
     if field == "target_date":
         queryset = queryset.values_list("target_date", flat=True).distinct()
