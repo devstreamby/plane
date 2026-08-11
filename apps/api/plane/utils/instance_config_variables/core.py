@@ -144,6 +144,96 @@ gitea_config_variables = [
     },
 ]
 
+ldap_config_variables = [
+    {
+        "key": "IS_LDAP_ENABLED",
+        "value": os.environ.get("IS_LDAP_ENABLED", "0"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_PROVIDER_NAME",
+        "value": os.environ.get("LDAP_PROVIDER_NAME", "Active Directory"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_SERVER",
+        "value": os.environ.get("LDAP_SERVER", ""),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_PORT",
+        "value": os.environ.get("LDAP_PORT", "636"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_BIND_DN",
+        "value": os.environ.get("LDAP_BIND_DN", ""),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_BIND_PASSWORD",
+        "value": os.environ.get("LDAP_BIND_PASSWORD", ""),
+        "category": "LDAP",
+        "is_encrypted": True,
+    },
+    {
+        "key": "LDAP_USER_SEARCH_BASE",
+        "value": os.environ.get("LDAP_USER_SEARCH_BASE", ""),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_USER_SEARCH_FILTER",
+        "value": os.environ.get(
+            "LDAP_USER_SEARCH_FILTER",
+            "(&(objectClass=user)(|(sAMAccountName={username})(userPrincipalName={username})))",
+        ),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_EMAIL_ATTRIBUTE",
+        "value": os.environ.get("LDAP_EMAIL_ATTRIBUTE", "mail"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_FIRST_NAME_ATTRIBUTE",
+        "value": os.environ.get("LDAP_FIRST_NAME_ATTRIBUTE", "givenName"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_LAST_NAME_ATTRIBUTE",
+        "value": os.environ.get("LDAP_LAST_NAME_ATTRIBUTE", "sn"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_CA_CERTIFICATE",
+        "value": os.environ.get("LDAP_CA_CERTIFICATE", ""),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "ENABLE_LDAP_SYNC",
+        "value": os.environ.get("ENABLE_LDAP_SYNC", "1"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+    {
+        "key": "LDAP_CREATE_USERS",
+        "value": os.environ.get("LDAP_CREATE_USERS", "1"),
+        "category": "LDAP",
+        "is_encrypted": False,
+    },
+]
+
 smtp_config_variables = [
     {
         "key": "ENABLE_SMTP",
@@ -239,6 +329,7 @@ core_config_variables = [
     *github_config_variables,
     *gitlab_config_variables,
     *gitea_config_variables,
+    *ldap_config_variables,
     *smtp_config_variables,
     *llm_config_variables,
     *unsplash_config_variables,

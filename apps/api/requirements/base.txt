@@ -61,6 +61,8 @@ urllib3>=2.7.0
 requests==2.33.0
 # password validator
 zxcvbn==4.4.28
+# LDAP authentication
+ldap3==2.9.1
 # timezone
 pytz==2024.1
 # public holidays (offline, for workspace working-hours calendars)

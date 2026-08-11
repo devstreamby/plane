@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import { KeyRound, Mails } from "lucide-react";
+import { KeyRound, Mails, Network } from "lucide-react";
 // types
 import type {
   TCoreInstanceAuthenticationModeKeys,
@@ -24,6 +24,7 @@ import { GithubConfiguration } from "@/components/authentication/github-config";
 import { GitlabConfiguration } from "@/components/authentication/gitlab-config";
 import { GoogleConfiguration } from "@/components/authentication/google-config";
 import { PasswordLoginConfiguration } from "@/components/authentication/password-config-switch";
+import { LdapConfiguration } from "@/components/authentication/ldap-config";
 
 // Authentication methods
 export const getCoreAuthenticationModesMap: (
@@ -88,5 +89,13 @@ export const getCoreAuthenticationModesMap: (
     icon: <img src={giteaLogo} height={20} width={20} alt="Gitea Logo" />,
     config: <GiteaConfiguration disabled={disabled} updateConfig={updateConfig} />,
     enabledConfigKey: "IS_GITEA_ENABLED",
+  },
+  ldap: {
+    key: "ldap",
+    name: "Active Directory",
+    description: "Allow members to sign in with their on-premises Active Directory account over secure LDAPS.",
+    icon: <Network className="h-6 w-6 p-0.5 text-tertiary" />,
+    config: <LdapConfiguration disabled={disabled} updateConfig={updateConfig} />,
+    enabledConfigKey: "IS_LDAP_ENABLED",
   },
 });

@@ -9,6 +9,7 @@ from .configuration import (
     EmailCredentialCheckEndpoint,
     InstanceConfigurationEndpoint,
     DisableEmailFeatureEndpoint,
+    LdapConnectionCheckEndpoint,
 )
 
 

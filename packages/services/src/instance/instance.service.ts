@@ -129,6 +129,14 @@ export class InstanceService extends APIService {
       });
   }
 
+  async testLdapConnection(data: Partial<IFormattedInstanceConfiguration>): Promise<{ message: string }> {
+    return this.post("/api/instances/ldap-connection-check/", data)
+      .then((response) => response?.data)
+      .catch((error) => {
+        throw error?.response?.data;
+      });
+  }
+
   /**
    * Disables the email configuration
    * @returns {Promise<void>} Promise resolving to void

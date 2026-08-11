@@ -18,6 +18,7 @@ from plane.license.api.views import (
     InstanceAdminUserSessionEndpoint,
     InstanceWorkSpaceAvailabilityCheckEndpoint,
     InstanceWorkSpaceEndpoint,
+    LdapConnectionCheckEndpoint,
 )
 
 urlpatterns = [
@@ -64,6 +65,11 @@ urlpatterns = [
         "email-credentials-check/",
         EmailCredentialCheckEndpoint.as_view(),
         name="email-credential-check",
+    ),
+    path(
+        "ldap-connection-check/",
+        LdapConnectionCheckEndpoint.as_view(),
+        name="ldap-connection-check",
     ),
     path(
         "workspace-slug-check/",

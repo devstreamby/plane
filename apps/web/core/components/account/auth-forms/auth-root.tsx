@@ -26,6 +26,8 @@ import { TermsAndConditions } from "../terms-and-conditions";
 import { AuthBanner } from "./auth-banner";
 import { AuthHeader, AuthHeaderBase } from "./auth-header";
 import { AuthFormRoot } from "./form-root";
+import { LdapSignInForm } from "./ldap";
+import { Network } from "lucide-react";
 
 type TAuthRoot = {
   authMode: EAuthModes;
@@ -39,6 +41,7 @@ export const AuthRoot = observer(function AuthRoot(props: TAuthRoot) {
   const invitation_id = searchParams.get("invitation_id");
   const workspaceSlug = searchParams.get("slug");
   const error_code = searchParams.get("error_code");
+  const authMethod = searchParams.get("auth_method");
   // props
   const { authMode: currentAuthMode } = props;
   // states
@@ -46,13 +49,29 @@ export const AuthRoot = observer(function AuthRoot(props: TAuthRoot) {
   const [authStep, setAuthStep] = useState<EAuthSteps>(EAuthSteps.EMAIL);
   const [email, setEmail] = useState(emailParam ? emailParam.toString() : "");
   const [errorInfo, setErrorInfo] = useState<TAuthErrorInfo | undefined>(undefined);
+  const [isLdapFormOpen, setIsLdapFormOpen] = useState(authMethod === "ldap");
   // store hooks
   const { config } = useInstance();
   // derived values
   const oAuthActionText = authMode === EAuthModes.SIGN_UP ? "Sign up" : "Sign in";
   const { isOAuthEnabled, oAuthOptions } = useOAuthConfig(oAuthActionText);
+  const isLdapEnabled = config?.is_ldap_enabled || false;
+  const externalAuthOptions = [
+    ...(isLdapEnabled
+      ? [
+          {
+            id: "ldap",
+            text: `Continue with ${config?.ldap_provider_name || "Active Directory"}`,
+            icon: <Network className="h-[18px] w-[18px]" />,
+            onClick: () => setIsLdapFormOpen(true),
+            enabled: true,
+          },
+        ]
+      : []),
+    ...oAuthOptions,
+  ];
   const isEmailBasedAuthEnabled = config?.is_email_password_enabled || config?.is_magic_login_enabled;
-  const noAuthMethodsAvailable = !isOAuthEnabled && !isEmailBasedAuthEnabled;
+  const noAuthMethodsAvailable = !isOAuthEnabled && !isLdapEnabled && !isEmailBasedAuthEnabled;
 
   useEffect(() => {
     if (!authMode && currentAuthMode) setAuthMode(currentAuthMode);
@@ -100,6 +119,10 @@ export const AuthRoot = observer(function AuthRoot(props: TAuthRoot) {
     }
   }, [error_code, authMode]);
 
+  useEffect(() => {
+    if (authMethod === "ldap") setIsLdapFormOpen(true);
+  }, [authMethod]);
+
   if (!authMode) return <></>;
 
   if (noAuthMethodsAvailable) {
@@ -125,25 +148,31 @@ export const AuthRoot = observer(function AuthRoot(props: TAuthRoot) {
         authMode={authMode}
         currentAuthStep={authStep}
       />
-      {isOAuthEnabled && (
+      {(isOAuthEnabled || isLdapEnabled) && !isLdapFormOpen && (
         <OAuthOptions
-          options={oAuthOptions}
+          options={externalAuthOptions}
           compact={authStep === EAuthSteps.PASSWORD}
           showDivider={isEmailBasedAuthEnabled}
         />
       )}
-      {isEmailBasedAuthEnabled && (
+      {isLdapFormOpen && isLdapEnabled ? (
+        <LdapSignInForm
+          providerName={config?.ldap_provider_name || "Active Directory"}
+          nextPath={searchParams.get("next_path") || undefined}
+          onBack={() => setIsLdapFormOpen(false)}
+        />
+      ) : isEmailBasedAuthEnabled ? (
         <AuthFormRoot
           authStep={authStep}
           authMode={authMode}
           email={email}
-          setEmail={(email) => setEmail(email)}
-          setAuthMode={(authMode) => setAuthMode(authMode)}
-          setAuthStep={(authStep) => setAuthStep(authStep)}
-          setErrorInfo={(errorInfo) => setErrorInfo(errorInfo)}
+          setEmail={(value) => setEmail(value)}
+          setAuthMode={(value) => setAuthMode(value)}
+          setAuthStep={(value) => setAuthStep(value)}
+          setErrorInfo={(value) => setErrorInfo(value)}
           currentAuthMode={currentAuthMode}
         />
-      )}
+      ) : null}
       <TermsAndConditions authType={authMode} />
     </AuthContainer>
   );

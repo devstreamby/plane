@@ -55,6 +55,8 @@ class InstanceEndpoint(BaseAPIView):
             GITHUB_APP_NAME,
             IS_GITLAB_ENABLED,
             IS_GITEA_ENABLED,
+            IS_LDAP_ENABLED,
+            LDAP_PROVIDER_NAME,
             EMAIL_HOST,
             ENABLE_MAGIC_LINK_LOGIN,
             ENABLE_EMAIL_PASSWORD,
@@ -92,6 +94,14 @@ class InstanceEndpoint(BaseAPIView):
                 {
                     "key": "IS_GITEA_ENABLED",
                     "default": os.environ.get("IS_GITEA_ENABLED", "0"),
+                },
+                {
+                    "key": "IS_LDAP_ENABLED",
+                    "default": os.environ.get("IS_LDAP_ENABLED", "0"),
+                },
+                {
+                    "key": "LDAP_PROVIDER_NAME",
+                    "default": os.environ.get("LDAP_PROVIDER_NAME", "Active Directory"),
                 },
                 {"key": "EMAIL_HOST", "default": os.environ.get("EMAIL_HOST", "")},
                 {
@@ -133,6 +143,8 @@ class InstanceEndpoint(BaseAPIView):
         data["is_github_enabled"] = IS_GITHUB_ENABLED == "1"
         data["is_gitlab_enabled"] = IS_GITLAB_ENABLED == "1"
         data["is_gitea_enabled"] = IS_GITEA_ENABLED == "1"
+        data["is_ldap_enabled"] = IS_LDAP_ENABLED == "1"
+        data["ldap_provider_name"] = LDAP_PROVIDER_NAME or "Active Directory"
         data["is_magic_login_enabled"] = ENABLE_MAGIC_LINK_LOGIN == "1"
         data["is_email_password_enabled"] = ENABLE_EMAIL_PASSWORD == "1"
 
