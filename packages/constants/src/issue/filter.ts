@@ -209,6 +209,7 @@ export const ISSUE_DISPLAY_FILTERS_BY_PAGE: TIssueFiltersToDisplayByPageType = {
       "priority",
       "state_group",
       "state_id",
+      "board_column_id",
       "cycle_id",
       "module_id",
       "assignee_id",

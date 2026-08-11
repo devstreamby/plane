@@ -3,8 +3,10 @@
 # See the LICENSE file for details.
 
 import pytest
+from django.http import QueryDict
 
-from plane.db.models import BoardColumn, Project, ProjectMember, State, StateGroup
+from plane.db.models import BoardColumn, Issue, Project, ProjectMember, State, StateGroup
+from plane.utils.filters.filterset import IssueFilterSet
 from plane.utils.grouper import BOARD_COLUMN_FIELD, issue_group_values
 from plane.utils.issue_filters import issue_filters
 
@@ -60,6 +62,38 @@ class TestBoardColumnFilter:
 
     def test_ignores_empty_value(self):
         assert issue_filters({"board_column": "null"}, "GET") == {}
+
+    @pytest.mark.django_db
+    def test_rich_filter_selects_issues_by_column_id(self, workspace, create_user):
+        project = Project.objects.create(name="Rich filter project", identifier="RCH", workspace=workspace)
+        ProjectMember.objects.create(project=project, member=create_user, role=20)
+        column = BoardColumn.objects.create(name="Column", project=project, workspace=workspace)
+        state = State.objects.create(
+            name="Todo",
+            color="#000000",
+            group=StateGroup.UNSTARTED.value,
+            project=project,
+            workspace=workspace,
+            board_column=column,
+        )
+        unmapped_state = State.objects.create(
+            name="Backlog",
+            color="#000000",
+            group=StateGroup.BACKLOG.value,
+            project=project,
+            workspace=workspace,
+        )
+        matching_issue = Issue.objects.create(name="Matching", project=project, workspace=workspace, state=state)
+        Issue.objects.create(name="Unmapped", project=project, workspace=workspace, state=unmapped_state)
+
+        filter_data = QueryDict(mutable=True)
+        filter_data["board_column_id__in"] = str(column.id)
+        filter_set = IssueFilterSet(data=filter_data, queryset=Issue.objects.all())
+        assert filter_set.is_valid(), filter_set.errors
+        combined_filter = filter_set.build_combined_q()
+        filtered_issues = Issue.objects.filter(combined_filter)
+
+        assert list(filtered_issues) == [matching_issue]
 
 
 @pytest.mark.unit

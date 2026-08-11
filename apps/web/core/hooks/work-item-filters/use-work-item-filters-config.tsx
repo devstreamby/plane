@@ -7,8 +7,10 @@
 import { useCallback, useMemo } from "react";
 import { AtSign, Briefcase } from "lucide-react";
 // plane imports
+import { useTranslation } from "@plane/i18n";
 import { Logo } from "@plane/propel/emoji-icon-picker";
 import {
+  BoardLayoutIcon,
   CalendarLayoutIcon,
   CycleGroupIcon,
   CycleIcon,
@@ -36,6 +38,7 @@ import type {
 import { Avatar } from "@plane/ui";
 import {
   getAssigneeFilterConfig,
+  getBoardColumnFilterConfig,
   getCreatedAtFilterConfig,
   getCreatedByFilterConfig,
   getCycleFilterConfig,
@@ -92,11 +95,12 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const { allowedFilters, cycleIds, labelIds, memberIds, moduleIds, projectId, projectIds, stateIds, workspaceSlug } =
     props;
   // store hooks
+  const { t } = useTranslation();
   const { loader: projectLoader, getProjectById } = useProject();
   const { getCycleById } = useCycle();
   const { getLabelById } = useLabel();
   const { getModuleById } = useModule();
-  const { getStateById } = useProjectState();
+  const { getProjectBoardColumns, getStateById } = useProjectState();
   const { getUserDetails } = useMember();
   // derived values
   const operatorConfigs = useFiltersOperatorConfigs({ workspaceSlug });
@@ -114,6 +118,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       stateIds ? (stateIds.map((stateId) => getStateById(stateId)).filter((state) => state) as IState[]) : undefined,
     [stateIds, getStateById]
   );
+  const boardColumns = getProjectBoardColumns(projectId);
   const workItemLabels: IIssueLabel[] | undefined = useMemo(
     () =>
       labelIds
@@ -170,6 +175,19 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         ...operatorConfigs,
       }),
     [isFilterEnabled, workItemStates, operatorConfigs]
+  );
+
+  // board column filter config
+  const boardColumnFilterConfig = useMemo(
+    () =>
+      getBoardColumnFilterConfig<TWorkItemFilterProperty>("board_column_id")({
+        isEnabled: isFilterEnabled("board_column_id") && projectId !== undefined,
+        filterIcon: BoardLayoutIcon,
+        boardColumns,
+        label: t("common.board_column"),
+        ...operatorConfigs,
+      }),
+    [boardColumns, isFilterEnabled, operatorConfigs, projectId, t]
   );
 
   // label filter config
@@ -366,6 +384,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     areAllConfigsInitialized,
     configs: [
       stateFilterConfig,
+      boardColumnFilterConfig,
       stateGroupFilterConfig,
       assigneeFilterConfig,
       priorityFilterConfig,
@@ -385,6 +404,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       project_id: projectFilterConfig,
       state_group: stateGroupFilterConfig,
       state_id: stateFilterConfig,
+      board_column_id: boardColumnFilterConfig,
       label_id: labelFilterConfig,
       cycle_id: cycleFilterConfig,
       module_id: moduleFilterConfig,
