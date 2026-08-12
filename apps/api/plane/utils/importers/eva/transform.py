@@ -231,6 +231,9 @@ class EvaTransformer:
             expected_result = step.get("expected_result")
             if expected_result:
                 step_parts.append(f"<p><em>Expected</em></p>{expected_result}")
+            comment = step.get("comment")
+            if comment:
+                step_parts.append(f"<p><em>Comment</em></p>{comment}")
             parts.append("".join(step_parts))
         return "".join(parts)
 
