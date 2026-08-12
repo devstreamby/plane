@@ -161,3 +161,24 @@ def test_eva_transformer_converts_ndoc_tc_279_heic_attachment_card():
     assert "Open profile" in html
     assert "Expected result" in html
     assert "Click profile" in html
+
+
+@pytest.mark.unit
+def test_eva_transformer_includes_testcase_step_comment_after_expected_result():
+    transformer = EvaTransformer()
+    testcase = {
+        "code": "NSPORT-TC-29",
+        "steps": [
+            {
+                "text": "<p>Click Trainers</p>",
+                "expected_result": "<p>Trainers opens</p>",
+                "comment": "<p>Search and filter controls are visible</p>",
+            }
+        ],
+    }
+
+    html = transformer.testcase_description_html(testcase)
+
+    assert "Comment" in html
+    assert "Search and filter controls are visible" in html
+    assert html.index("Expected") < html.index("Comment")

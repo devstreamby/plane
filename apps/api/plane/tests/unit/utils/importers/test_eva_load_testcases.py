@@ -177,6 +177,55 @@ def test_eva_loader_skips_testcases_when_scope_disabled(create_user, workspace, 
 
 @pytest.mark.unit
 @pytest.mark.django_db
+def test_eva_loader_backfills_step_comments_for_existing_testcases(create_user, workspace, eva_projects):
+    tasks_project, testcase_project = eva_projects
+    importer = MagicMock()
+    importer.pk = uuid4()
+    importer.metadata = {"url": "", "token": ""}
+    importer.imported_data = None
+    loader = _build_loader(
+        importer=importer,
+        workspace=workspace,
+        tasks_project=tasks_project,
+        testcase_project=testcase_project,
+        actor=create_user,
+    )
+    existing_issue = Issue.objects.create(
+        project=testcase_project,
+        workspace=workspace,
+        name="Delete coach profile",
+        description_html=(
+            "<p><em>EVA test case: NSPORT-TC-29</em></p>"
+            "<h3>Steps</h3><h4>Step 1</h4><p>Click Trainers</p>"
+            "<p><em>Expected</em></p><p>Trainers opens</p>"
+        ),
+        external_source=EVA_EXTERNAL_SOURCE,
+        external_id="tc-29",
+        created_by=create_user,
+    )
+    testcase = {
+        "id": "tc-29",
+        "name": "Delete coach profile",
+        "code": "NSPORT-TC-29",
+        "steps": [
+            {
+                "text": "<p>Click Trainers</p>",
+                "expected_result": "<p>Trainers opens</p>",
+                "comment": "<p>Search and filter controls are visible</p>",
+            }
+        ],
+    }
+
+    with patch.object(loader, "_import_description_media", side_effect=lambda html, **kwargs: html):
+        loader._import_testcases([testcase], {})
+
+    existing_issue.refresh_from_db()
+    assert "<em>Comment</em>" in existing_issue.description_html
+    assert "Search and filter controls are visible" in existing_issue.description_html
+
+
+@pytest.mark.unit
+@pytest.mark.django_db
 def test_eva_loader_repairs_testcase_images_in_testcase_project(create_user, workspace, eva_projects):
     tasks_project, testcase_project = eva_projects
     importer = MagicMock()

@@ -799,8 +799,16 @@ class EvaLoader:
         refresh_description_html: Callable[[dict[str, Any]], str],
     ) -> bool:
         description_html = issue.description_html or ""
-        if looks_like_broken_eva_video_html(description_html) or looks_like_broken_eva_image_html(
-            description_html, self.eva_client.base_url
+        steps = source.get("steps") or []
+        has_missing_step_comments = (
+            isinstance(steps, list)
+            and any(isinstance(step, dict) and step.get("comment") for step in steps)
+            and "<em>Comment</em>" not in description_html
+        )
+        if (
+            has_missing_step_comments
+            or looks_like_broken_eva_video_html(description_html)
+            or looks_like_broken_eva_image_html(description_html, self.eva_client.base_url)
         ):
             repaired_html = self._import_description_media(
                 refresh_description_html(source),

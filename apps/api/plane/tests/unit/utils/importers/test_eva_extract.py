@@ -6,7 +6,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from plane.utils.importers.eva.constants import TESTCASE_FIELDS
 from plane.utils.importers.eva.extract import EvaExtractor
+
+
+@pytest.mark.unit
+def test_eva_extractor_requests_testcase_step_comments():
+    assert "steps.comment" in TESTCASE_FIELDS
 
 
 @pytest.mark.unit

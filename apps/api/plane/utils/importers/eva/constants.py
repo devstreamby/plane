@@ -107,6 +107,7 @@ TESTCASE_FIELDS = [
     "steps.name",
     "steps.text",
     "steps.expected_result",
+    "steps.comment",
 ]
 
 CHUNK_SIZE = 100
