@@ -20,7 +20,7 @@ from plane.utils.time_tracking import handle_issue_state_change
 # Work item keys look like ENG-42 at the start of an MR title or commit message.
 WORK_ITEM_KEY_RE = re.compile(r"^([A-Za-z][A-Za-z0-9_]{0,11})-(\d+)\b")
 # GitLab prefixes draft MRs with "Draft:" / "WIP:" — strip before matching the key.
-DRAFT_PREFIX_RE = re.compile(r"^(?i)(?:draft|wip)\s*:\s*")
+DRAFT_PREFIX_RE = re.compile(r"^(?:draft|wip)\s*:\s*", re.IGNORECASE)
 
 
 def normalize_work_item_text(text: Optional[str]) -> str:
