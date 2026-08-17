@@ -82,6 +82,7 @@ from .favorite import UserFavorite
 from .issue_type import IssueType, ProjectIssueType
 
 from .issue_time_log import IssueTimeLog
+from .gitlab import IssueGitLabMeta, ProjectGitLabConfig
 
 from .recent_visit import UserRecentVisit
 
