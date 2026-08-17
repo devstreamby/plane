@@ -39,7 +39,8 @@ export type TProjectSettingsTabs =
   | "board_columns"
   | "labels"
   | "estimates"
-  | "automations";
+  | "automations"
+  | "work_item_types";
 export type TProjectSettingsItem = {
   key: TProjectSettingsTabs;
   i18n_label: string;

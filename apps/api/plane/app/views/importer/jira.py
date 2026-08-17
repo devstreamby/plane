@@ -10,7 +10,7 @@ from plane.app.serializers import ImporterSerializer
 from plane.app.views import BaseAPIView
 from plane.app.views.importer.eva import _user_can_import_to_project
 from plane.bgtasks.jira_import_task import create_jira_importer_service_token, jira_import_task
-from plane.db.models import APIToken, Importer, Project, Workspace
+from plane.db.models import Importer, Project, Workspace
 from plane.utils.importers.jira.client import JiraApiClient, JiraApiError
 from plane.utils.importers.jira.extract import JiraExtractor
 from plane.utils.importers.jira.transform import JiraTransformer

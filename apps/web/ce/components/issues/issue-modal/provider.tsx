@@ -4,13 +4,14 @@
  * See the LICENSE file for details.
  */
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { observer } from "mobx-react";
 // plane imports
 import type { ISearchIssueResponse, TIssue } from "@plane/types";
 // components
 import { IssueModalContext } from "@/components/issues/issue-modal/context";
 // hooks
+import { useIssueType } from "@/hooks/store/use-issue-type";
 import { useUser } from "@/hooks/store/user/user-user";
 
 export type TIssueModalProviderProps = {
@@ -26,34 +27,36 @@ export const IssueModalProvider = observer(function IssueModalProvider(props: TI
   const [selectedParentIssue, setSelectedParentIssue] = useState<ISearchIssueResponse | null>(null);
   // store hooks
   const { projectsWithCreatePermissions } = useUser();
+  const { getProjectDefaultIssueType } = useIssueType();
   // derived values
-  const projectIdsWithCreatePermissions = Object.keys(projectsWithCreatePermissions ?? {});
-
-  return (
-    <IssueModalContext.Provider
-      value={{
-        allowedProjectIds: allowedProjectIds ?? projectIdsWithCreatePermissions,
-        workItemTemplateId: null,
-        setWorkItemTemplateId: () => {},
-        isApplyingTemplate: false,
-        setIsApplyingTemplate: () => {},
-        selectedParentIssue,
-        setSelectedParentIssue,
-        issuePropertyValues: {},
-        setIssuePropertyValues: () => {},
-        issuePropertyValueErrors: {},
-        setIssuePropertyValueErrors: () => {},
-        getIssueTypeIdOnProjectChange: () => null,
-        getActiveAdditionalPropertiesLength: () => 0,
-        handlePropertyValuesValidation: () => true,
-        handleCreateUpdatePropertyValues: () => Promise.resolve(),
-        handleProjectEntitiesFetch: () => Promise.resolve(),
-        handleTemplateChange: () => Promise.resolve(),
-        handleConvert: () => Promise.resolve(),
-        handleCreateSubWorkItem: () => Promise.resolve(),
-      }}
-    >
-      {children}
-    </IssueModalContext.Provider>
+  const projectIdsWithCreatePermissions = useMemo(
+    () => Object.keys(projectsWithCreatePermissions ?? {}),
+    [projectsWithCreatePermissions]
   );
+  const contextValue = useMemo(
+    () => ({
+      allowedProjectIds: allowedProjectIds ?? projectIdsWithCreatePermissions,
+      workItemTemplateId: null,
+      setWorkItemTemplateId: () => {},
+      isApplyingTemplate: false,
+      setIsApplyingTemplate: () => {},
+      selectedParentIssue,
+      setSelectedParentIssue,
+      issuePropertyValues: {},
+      setIssuePropertyValues: () => {},
+      issuePropertyValueErrors: {},
+      setIssuePropertyValueErrors: () => {},
+      getIssueTypeIdOnProjectChange: (projectId: string) => getProjectDefaultIssueType(projectId)?.id ?? null,
+      getActiveAdditionalPropertiesLength: () => 0,
+      handlePropertyValuesValidation: () => true,
+      handleCreateUpdatePropertyValues: () => Promise.resolve(),
+      handleProjectEntitiesFetch: () => Promise.resolve(),
+      handleTemplateChange: () => Promise.resolve(),
+      handleConvert: () => Promise.resolve(),
+      handleCreateSubWorkItem: () => Promise.resolve(),
+    }),
+    [allowedProjectIds, getProjectDefaultIssueType, projectIdsWithCreatePermissions, selectedParentIssue]
+  );
+
+  return <IssueModalContext.Provider value={contextValue}>{children}</IssueModalContext.Provider>;
 });

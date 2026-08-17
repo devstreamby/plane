@@ -13,11 +13,13 @@ import type { TLogoProps } from "@plane/types";
 // local imports
 import { getEmojiSize, stringToEmoji } from "./helper";
 import { LUCIDE_ICONS_LIST } from "./lucide-icons";
+import { PHOSPHOR_ICONS_LIST } from "./phosphor-icons";
+import { WORK_ITEM_TYPE_ICONS } from "./work-item-type-icons";
 
 type Props = {
   logo?: TLogoProps;
   size?: number;
-  type?: "lucide" | "material";
+  type?: "lucide" | "material" | "phosphor" | "work-item-type";
 };
 
 export function Logo({ logo, size = 16, type = "material" }: Props) {
@@ -61,9 +63,26 @@ export function Logo({ logo, size = 16, type = "material" }: Props) {
   // Icon rendering
   if (in_use === "icon") {
     const color = icon?.color;
+    const iconPackage = icon?.package ?? type;
+
+    if (iconPackage === "work-item-type") {
+      const workItemTypeIcon = WORK_ITEM_TYPE_ICONS.find((item) => item.name === value);
+      if (!workItemTypeIcon) return null;
+
+      const WorkItemTypeIconElement = workItemTypeIcon.element;
+      return <WorkItemTypeIconElement width={size} height={size} />;
+    }
+
+    if (iconPackage === "phosphor") {
+      const phosphorIcon = PHOSPHOR_ICONS_LIST.find((item) => item.name === value);
+      if (!phosphorIcon) return null;
+
+      const PhosphorIconElement = phosphorIcon.element;
+      return <PhosphorIconElement color={color} size={size} weight="duotone" />;
+    }
 
     // Lucide icon
-    if (type === "lucide") {
+    if (iconPackage === "lucide") {
       const lucideIcon = LUCIDE_ICONS_LIST.find((item) => item.name === value);
       if (!lucideIcon) return null;
 

@@ -46,6 +46,7 @@ from .project import (
     ProjectMemberPreferenceSerializer,
 )
 from .state import StateSerializer, StateLiteSerializer, BoardColumnSerializer
+from .issue_type import IssueTypeSerializer, IssueTypeLiteSerializer
 from .view import IssueViewSerializer, ViewIssueListSerializer
 from .cycle import (
     CycleSerializer,

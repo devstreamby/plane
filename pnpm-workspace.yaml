@@ -29,6 +29,7 @@ catalog:
   "@hocuspocus/server": "2.15.2"
   "@hocuspocus/transformer": "2.15.2"
   "@hypermod/utils": "^0.7.1"
+  "@phosphor-icons/react": "2.1.10"
   "@popperjs/core": "^2.11.8"
   "@radix-ui/react-scroll-area": "^1.2.3"
   "@react-pdf/renderer": "^4.3.0"

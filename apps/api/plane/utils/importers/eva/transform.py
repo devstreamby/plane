@@ -193,7 +193,7 @@ class EvaTransformer:
         created_at = comment.get("cmf_created_at")
         prefix = ""
         if author_name or created_at:
-            prefix = f"<p><em>Imported from EVA"
+            prefix = "<p><em>Imported from EVA"
             if author_name:
                 prefix += f" by {author_name}"
             if created_at:

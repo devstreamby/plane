@@ -6,17 +6,20 @@
 
 import React, { useEffect, useState } from "react";
 import { InfoIcon } from "lucide-react";
-import { SearchIcon } from "../../icons";
+import { SearchIcon } from "../../icons/actions/search-icon";
 import { cn } from "../../utils/classname";
 import { adjustColorForContrast, DEFAULT_COLORS } from "../helper";
+import type { TIconPackage } from "../helper";
 import { LucideIconsList } from "./lucide-root";
 import { MaterialIconList } from "./material-root";
+import { PhosphorIconsList } from "./phosphor-root";
+import { WorkItemTypeIconsList } from "./work-item-type-root";
 
 type IconRootProps = {
   onChange: (value: { name: string; color: string }) => void;
   defaultColor: string;
   searchDisabled?: boolean;
-  iconType: "material" | "lucide";
+  iconType: TIconPackage;
 };
 
 export function IconRoot(props: IconRootProps) {
@@ -27,6 +30,7 @@ export function IconRoot(props: IconRootProps) {
   const [hexValue, setHexValue] = useState("");
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [query, setQuery] = useState("");
+  const hasFixedColors = iconType === "work-item-type";
 
   useEffect(() => {
     if (DEFAULT_COLORS.includes(defaultColor.toLowerCase() ?? "")) setShowHexInput(false);
@@ -60,72 +64,80 @@ export function IconRoot(props: IconRootProps) {
             </div>
           </div>
         )}
-        <div className="grid h-9 grid-cols-9 items-center justify-items-center gap-2 px-2.5 py-1">
-          {showHexInput ? (
-            <div className="col-span-8 ml-2 flex items-center gap-1 justify-self-stretch">
-              <span
-                className="mr-1 h-4 w-4 flex-shrink-0 rounded-full"
-                style={{
-                  backgroundColor: `#${hexValue}`,
-                }}
-              />
-              <span className="flex-shrink-0 text-11 text-tertiary">HEX</span>
-              <span className="-mr-1 flex-shrink-0 text-11 text-secondary">#</span>
-              <input
-                type="text"
-                value={hexValue}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setHexValue(value);
-                  if (/^[0-9A-Fa-f]{6}$/.test(value)) setActiveColor(adjustColorForContrast(`#${value}`));
-                }}
-                className="block flex-grow rounded-sm border-[0.5px] border-none border-subtle bg-transparent px-3 py-2 pl-0 text-11 text-secondary placeholder-(--text-color-placeholder) ring-0 focus:outline-none"
-                autoFocus
-              />
-            </div>
-          ) : (
-            DEFAULT_COLORS.map((curCol) => (
-              <button
-                key={curCol}
-                type="button"
-                className="grid size-5 place-items-center"
-                onClick={() => {
-                  setActiveColor(curCol);
-                  setHexValue(curCol.slice(1, 7));
-                }}
-              >
-                <span className="h-4 w-4 cursor-pointer rounded-full" style={{ backgroundColor: curCol }} />
-              </button>
-            ))
-          )}
-          <button
-            type="button"
-            className={cn("grid h-4 w-4 place-items-center rounded-full border border-transparent", {
-              "border-strong-1": !showHexInput,
-            })}
-            onClick={() => {
-              setShowHexInput((prevData) => !prevData);
-              setHexValue(activeColor.slice(1, 7));
-            }}
-          >
+        {!hasFixedColors && (
+          <div className="grid h-9 grid-cols-9 items-center justify-items-center gap-2 px-2.5 py-1">
             {showHexInput ? (
-              <span className="h-4 w-4 rounded-full conical-gradient" />
+              <div className="col-span-8 ml-2 flex items-center gap-1 justify-self-stretch">
+                <span
+                  className="mr-1 h-4 w-4 flex-shrink-0 rounded-full"
+                  style={{
+                    backgroundColor: `#${hexValue}`,
+                  }}
+                />
+                <span className="flex-shrink-0 text-11 text-tertiary">HEX</span>
+                <span className="-mr-1 flex-shrink-0 text-11 text-secondary">#</span>
+                <input
+                  type="text"
+                  value={hexValue}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setHexValue(value);
+                    if (/^[0-9A-Fa-f]{6}$/.test(value)) setActiveColor(adjustColorForContrast(`#${value}`));
+                  }}
+                  className="block flex-grow rounded-sm border-[0.5px] border-none border-subtle bg-transparent px-3 py-2 pl-0 text-11 text-secondary placeholder-(--text-color-placeholder) ring-0 focus:outline-none"
+                  autoFocus
+                />
+              </div>
             ) : (
-              <span className="grid place-items-center text-10 text-tertiary">#</span>
+              DEFAULT_COLORS.map((curCol) => (
+                <button
+                  key={curCol}
+                  type="button"
+                  className="grid size-5 place-items-center"
+                  onClick={() => {
+                    setActiveColor(curCol);
+                    setHexValue(curCol.slice(1, 7));
+                  }}
+                >
+                  <span className="h-4 w-4 cursor-pointer rounded-full" style={{ backgroundColor: curCol }} />
+                </button>
+              ))
             )}
-          </button>
-        </div>
-        <div className="flex h-6 w-full items-center gap-2 py-1 pr-3 pl-4">
-          <InfoIcon className="h-3 w-3" />
-          <p className="text-11"> Colors will be adjusted to ensure sufficient contrast.</p>
-        </div>
-      </div>
-      <div className="mt-2 grid grid-cols-8 justify-items-center gap-1 px-2.5">
-        {iconType === "material" ? (
-          <MaterialIconList query={query} onChange={onChange} activeColor={activeColor} />
-        ) : (
-          <LucideIconsList query={query} onChange={onChange} activeColor={activeColor} />
+            <button
+              type="button"
+              className={cn("grid h-4 w-4 place-items-center rounded-full border border-transparent", {
+                "border-strong-1": !showHexInput,
+              })}
+              onClick={() => {
+                setShowHexInput((prevData) => !prevData);
+                setHexValue(activeColor.slice(1, 7));
+              }}
+            >
+              {showHexInput ? (
+                <span className="h-4 w-4 rounded-full conical-gradient" />
+              ) : (
+                <span className="grid place-items-center text-10 text-tertiary">#</span>
+              )}
+            </button>
+          </div>
         )}
+        {!hasFixedColors && (
+          <div className="flex h-6 w-full items-center gap-2 py-1 pr-3 pl-4">
+            <InfoIcon className="h-3 w-3" />
+            <p className="text-11"> Colors will be adjusted to ensure sufficient contrast.</p>
+          </div>
+        )}
+      </div>
+      <div
+        className={cn("mt-2 grid justify-items-center gap-1 px-2.5", {
+          "grid-cols-8": !hasFixedColors,
+          "grid-cols-3": hasFixedColors,
+        })}
+      >
+        {iconType === "material" && <MaterialIconList query={query} onChange={onChange} activeColor={activeColor} />}
+        {iconType === "lucide" && <LucideIconsList query={query} onChange={onChange} activeColor={activeColor} />}
+        {iconType === "phosphor" && <PhosphorIconsList query={query} onChange={onChange} activeColor={activeColor} />}
+        {iconType === "work-item-type" && <WorkItemTypeIconsList query={query} onChange={onChange} />}
       </div>
     </>
   );
