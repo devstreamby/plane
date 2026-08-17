@@ -9,14 +9,16 @@ import { InfoIcon } from "lucide-react";
 import { SearchIcon } from "../../icons";
 import { cn } from "../../utils/classname";
 import { adjustColorForContrast, DEFAULT_COLORS } from "../helper";
+import type { TIconPackage } from "../helper";
 import { LucideIconsList } from "./lucide-root";
 import { MaterialIconList } from "./material-root";
+import { PhosphorIconsList } from "./phosphor-root";
 
 type IconRootProps = {
   onChange: (value: { name: string; color: string }) => void;
   defaultColor: string;
   searchDisabled?: boolean;
-  iconType: "material" | "lucide";
+  iconType: TIconPackage;
 };
 
 export function IconRoot(props: IconRootProps) {
@@ -121,11 +123,9 @@ export function IconRoot(props: IconRootProps) {
         </div>
       </div>
       <div className="mt-2 grid grid-cols-8 justify-items-center gap-1 px-2.5">
-        {iconType === "material" ? (
-          <MaterialIconList query={query} onChange={onChange} activeColor={activeColor} />
-        ) : (
-          <LucideIconsList query={query} onChange={onChange} activeColor={activeColor} />
-        )}
+        {iconType === "material" && <MaterialIconList query={query} onChange={onChange} activeColor={activeColor} />}
+        {iconType === "lucide" && <LucideIconsList query={query} onChange={onChange} activeColor={activeColor} />}
+        {iconType === "phosphor" && <PhosphorIconsList query={query} onChange={onChange} activeColor={activeColor} />}
       </div>
     </>
   );

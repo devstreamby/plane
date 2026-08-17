@@ -42,6 +42,7 @@ from plane.db.models import (
     IssueDescriptionVersion,
     ProjectMember,
     EstimatePoint,
+    IssueType,
 )
 from plane.utils.content_validator import (
     validate_html_content,
@@ -86,6 +87,9 @@ class IssueCreateSerializer(BaseSerializer):
     )
     parent_id = serializers.PrimaryKeyRelatedField(
         source="parent", queryset=Issue.objects.all(), required=False, allow_null=True
+    )
+    type_id = serializers.PrimaryKeyRelatedField(
+        source="type", queryset=IssueType.objects.all(), required=False, allow_null=True
     )
     label_ids = serializers.ListField(
         child=serializers.PrimaryKeyRelatedField(queryset=Label.objects.all()),
@@ -174,6 +178,14 @@ class IssueCreateSerializer(BaseSerializer):
             ).exists()
         ):
             raise serializers.ValidationError("State is not valid please pass a valid state_id")
+
+        # Check the work item type is enabled for this project
+        if attrs.get("type") and not IssueType.objects.filter(
+            pk=attrs.get("type").id,
+            project_issue_types__project_id=self.context.get("project_id"),
+            project_issue_types__deleted_at__isnull=True,
+        ).exists():
+            raise serializers.ValidationError("Type is not valid please pass a valid type_id")
 
         # Check parent issue is from workspace as it can be cross workspace
         if (
@@ -797,6 +809,7 @@ class IssueSerializer(DynamicBaseSerializer):
             "project_id",
             "parent_id",
             "cycle_id",
+            "type_id",
             "module_ids",
             "label_ids",
             "assignee_ids",
@@ -862,6 +875,7 @@ class IssueListDetailSerializer(serializers.Serializer):
             "archived_at": instance.archived_at,
             # Computed fields
             "cycle_id": instance.cycle_id,
+            "type_id": instance.type_id,
             "module_ids": self.get_module_ids(instance),
             "label_ids": self.get_label_ids(instance),
             "assignee_ids": self.get_assignee_ids(instance),

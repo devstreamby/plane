@@ -58,11 +58,11 @@ export function EmojiPicker(props: TCustomEmojiPicker) {
     (value: { name: string; color: string }) => {
       onChange({
         type: EmojiIconPickerTypes.ICON,
-        value: value,
+        value: { ...value, package: iconType },
       });
       if (closeOnSelect) handleToggle(false);
     },
-    [onChange, closeOnSelect, handleToggle]
+    [onChange, closeOnSelect, handleToggle, iconType]
   );
 
   const tabs = useMemo(

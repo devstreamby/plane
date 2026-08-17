@@ -41,6 +41,7 @@ from plane.db.models import (
 )
 from plane.db.models.intake import IntakeIssueStatus
 from plane.utils.host import base_host
+from plane.utils.issue_type import ensure_default_issue_types
 from plane.utils.order_queryset import PROJECT_ORDER_BY_ALLOWLIST, sanitize_order_by
 
 
@@ -365,6 +366,9 @@ class ProjectViewSet(BaseViewSet):
                     )
 
             project = self.get_queryset().filter(pk=serializer.data["id"]).first()
+
+            if serializer.data.get("is_issue_type_enabled"):
+                ensure_default_issue_types(project)
 
             model_activity.delay(
                 model_name="project",

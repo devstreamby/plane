@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@base-ui-components/react": "catalog:",
+    "@phosphor-icons/react": "catalog:",
     "@plane/constants": "workspace:*",
     "@plane/hooks": "workspace:*",
     "@plane/types": "workspace:*",

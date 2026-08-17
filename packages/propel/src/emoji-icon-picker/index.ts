@@ -9,3 +9,4 @@ export * from "./helper";
 export * from "./logo";
 export * from "./lucide-icons";
 export * from "./material-icons";
+export * from "./phosphor-icons";

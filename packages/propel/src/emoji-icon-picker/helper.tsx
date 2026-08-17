@@ -11,6 +11,8 @@ export const EmojiIconPickerTypes = {
   ICON: "icon",
 } as const;
 
+export type TIconPackage = "lucide" | "material" | "phosphor";
+
 export type TChangeHandlerProps =
   | {
       type: typeof EmojiIconPickerTypes.EMOJI;
@@ -21,6 +23,7 @@ export type TChangeHandlerProps =
       value: {
         name: string;
         color: string;
+        package?: TIconPackage;
       };
     };
 
@@ -41,7 +44,7 @@ export type TCustomEmojiPicker = {
   placement?: TPlacement;
   searchDisabled?: boolean;
   searchPlaceholder?: string;
-  iconType?: "material" | "lucide";
+  iconType?: TIconPackage;
   theme?: "light" | "dark";
   side?: TSide;
   align?: TAlign;
