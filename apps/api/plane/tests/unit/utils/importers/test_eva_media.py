@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-from io import BytesIO
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 

@@ -7,31 +7,32 @@ from django.db import transaction
 from plane.db.models import IssueType, Project, ProjectIssueType
 
 
-def _phosphor_icon(name: str, color: str) -> dict:
+def _work_item_type_icon(name: str, color: str) -> dict:
     return {
         "in_use": "icon",
-        "icon": {"name": name, "color": color, "package": "phosphor"},
+        "icon": {"name": name, "color": color, "package": "work-item-type"},
     }
 
 
 # (name, is_default, is_epic, logo_props)
-# Phosphor icons are rendered as SVGs, so they do not depend on the Material Symbols
-# webfont being loaded. The package marker keeps the JSON self-describing for every
-# <Logo> render site.
+# The custom work item type icons are rendered as fixed-color SVGs. The package
+# marker keeps the JSON self-describing for every <Logo> render site.
 # Epic is seeded with is_epic=False on purpose: apps/api/plane/app/views/issue/archive.py:99
 # excludes is_epic=True issues from the archive view, and this fork treats Epic as an
 # ordinary work item type rather than a special entity.
 DEFAULT_ISSUE_TYPES = [
-    ("Task", True, False, _phosphor_icon("CheckSquare", "#5e6ad2")),
-    ("Bug", False, False, _phosphor_icon("Bug", "#e5484d")),
-    ("Story", False, False, _phosphor_icon("BookOpenText", "#02a594")),
-    ("Epic", False, False, _phosphor_icon("Lightning", "#8e4ec6")),
+    ("Task", True, False, _work_item_type_icon("Task", "#2563EB")),
+    ("Story", False, False, _work_item_type_icon("Story", "#059669")),
+    ("Subtask", False, False, _work_item_type_icon("Subtask", "#4F46E5")),
+    ("Epic", False, False, _work_item_type_icon("Epic", "#7C3AED")),
+    ("Bug", False, False, _work_item_type_icon("Bug", "#E11D48")),
+    ("Spike", False, False, _work_item_type_icon("Spike", "#F59E0B")),
 ]
 
 
 def ensure_default_issue_types(project: Project) -> None:
     """
-    Idempotently create the default work item types (Task/Bug/Story/Epic) for a
+    Idempotently create the six default work item types for a
     workspace and link them to the given project. Safe to call repeatedly.
     """
     with transaction.atomic():

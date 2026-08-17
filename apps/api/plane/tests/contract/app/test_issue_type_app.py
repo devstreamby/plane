@@ -108,7 +108,11 @@ class TestIssueTypeEndpoint:
     def test_delete_in_use_type_rejected(self, session_client, workspace, type_context, create_user):
         ctx = type_context
         Issue.objects.create(
-            name="Typed issue", project=ctx["project"], workspace=workspace, type=ctx["bug_type"], created_by=create_user
+            name="Typed issue",
+            project=ctx["project"],
+            workspace=workspace,
+            type=ctx["bug_type"],
+            created_by=create_user,
         )
 
         response = session_client.delete(self.detail_url(workspace.slug, ctx["project"].id, ctx["bug_type"].id))

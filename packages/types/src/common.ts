@@ -26,7 +26,7 @@ export type TLogoProps = {
     name?: string;
     color?: string;
     background_color?: string;
-    package?: "lucide" | "material" | "phosphor";
+    package?: "lucide" | "material" | "phosphor" | "work-item-type";
   };
 };
 

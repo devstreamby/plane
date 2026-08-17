@@ -19,12 +19,16 @@ class TestEnsureDefaultIssueTypes:
         return project
 
     @pytest.mark.django_db
-    def test_creates_four_default_types(self, workspace, project):
+    def test_creates_six_default_types(self, workspace, project):
         ensure_default_issue_types(project)
 
         names = set(IssueType.objects.filter(workspace=workspace).values_list("name", flat=True))
-        assert names == {"Task", "Bug", "Story", "Epic"}
-        assert ProjectIssueType.objects.filter(project=project).count() == 4
+        assert names == {"Task", "Bug", "Story", "Subtask", "Epic", "Spike"}
+        assert ProjectIssueType.objects.filter(project=project).count() == 6
+
+        for issue_type in IssueType.objects.filter(workspace=workspace):
+            assert issue_type.logo_props["icon"]["name"] == issue_type.name
+            assert issue_type.logo_props["icon"]["package"] == "work-item-type"
 
     @pytest.mark.django_db
     def test_exactly_one_default(self, project):
@@ -47,8 +51,8 @@ class TestEnsureDefaultIssueTypes:
         ensure_default_issue_types(project)
         ensure_default_issue_types(project)
 
-        assert IssueType.objects.filter(workspace=workspace).count() == 4
-        assert ProjectIssueType.objects.filter(project=project).count() == 4
+        assert IssueType.objects.filter(workspace=workspace).count() == 6
+        assert ProjectIssueType.objects.filter(project=project).count() == 6
 
     @pytest.mark.django_db
     def test_reuses_workspace_type_across_projects(self, workspace, project, create_user):

@@ -11,7 +11,7 @@ export const EmojiIconPickerTypes = {
   ICON: "icon",
 } as const;
 
-export type TIconPackage = "lucide" | "material" | "phosphor";
+export type TIconPackage = "lucide" | "material" | "phosphor" | "work-item-type";
 
 export type TChangeHandlerProps =
   | {

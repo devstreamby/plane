@@ -23,7 +23,10 @@ export interface IIssueTypeStore {
   // computed actions
   getProjectIssueTypes: (projectId: string | null | undefined) => TIssueType[];
   getProjectIssueTypeIds: (projectId: string | null | undefined) => string[];
-  getIssueTypeById: (projectId: string | null | undefined, issueTypeId: string | null | undefined) => TIssueType | undefined;
+  getIssueTypeById: (
+    projectId: string | null | undefined,
+    issueTypeId: string | null | undefined
+  ) => TIssueType | undefined;
   getProjectDefaultIssueType: (projectId: string | null | undefined) => TIssueType | undefined;
   // fetch actions
   fetchProjectIssueTypes: (workspaceSlug: string, projectId: string) => Promise<TIssueType[]>;
@@ -80,8 +83,8 @@ export class IssueTypeStore implements IIssueTypeStore {
     return Object.values(this.issueTypeMap[projectId] ?? {}).sort((a, b) => a.level - b.level);
   });
 
-  getProjectIssueTypeIds = computedFn(
-    (projectId: string | null | undefined): string[] => this.getProjectIssueTypes(projectId).map((type) => type.id)
+  getProjectIssueTypeIds = computedFn((projectId: string | null | undefined): string[] =>
+    this.getProjectIssueTypes(projectId).map((type) => type.id)
   );
 
   getIssueTypeById = computedFn(
@@ -91,9 +94,8 @@ export class IssueTypeStore implements IIssueTypeStore {
     }
   );
 
-  getProjectDefaultIssueType = computedFn(
-    (projectId: string | null | undefined): TIssueType | undefined =>
-      this.getProjectIssueTypes(projectId).find((type) => type.is_default)
+  getProjectDefaultIssueType = computedFn((projectId: string | null | undefined): TIssueType | undefined =>
+    this.getProjectIssueTypes(projectId).find((type) => type.is_default)
   );
 
   /**

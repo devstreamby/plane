@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { observer } from "mobx-react";
 // plane imports
 import type { ISearchIssueResponse, TIssue } from "@plane/types";
@@ -29,33 +29,34 @@ export const IssueModalProvider = observer(function IssueModalProvider(props: TI
   const { projectsWithCreatePermissions } = useUser();
   const { getProjectDefaultIssueType } = useIssueType();
   // derived values
-  const projectIdsWithCreatePermissions = Object.keys(projectsWithCreatePermissions ?? {});
-
-  return (
-    <IssueModalContext.Provider
-      value={{
-        allowedProjectIds: allowedProjectIds ?? projectIdsWithCreatePermissions,
-        workItemTemplateId: null,
-        setWorkItemTemplateId: () => {},
-        isApplyingTemplate: false,
-        setIsApplyingTemplate: () => {},
-        selectedParentIssue,
-        setSelectedParentIssue,
-        issuePropertyValues: {},
-        setIssuePropertyValues: () => {},
-        issuePropertyValueErrors: {},
-        setIssuePropertyValueErrors: () => {},
-        getIssueTypeIdOnProjectChange: (projectId: string) => getProjectDefaultIssueType(projectId)?.id ?? null,
-        getActiveAdditionalPropertiesLength: () => 0,
-        handlePropertyValuesValidation: () => true,
-        handleCreateUpdatePropertyValues: () => Promise.resolve(),
-        handleProjectEntitiesFetch: () => Promise.resolve(),
-        handleTemplateChange: () => Promise.resolve(),
-        handleConvert: () => Promise.resolve(),
-        handleCreateSubWorkItem: () => Promise.resolve(),
-      }}
-    >
-      {children}
-    </IssueModalContext.Provider>
+  const projectIdsWithCreatePermissions = useMemo(
+    () => Object.keys(projectsWithCreatePermissions ?? {}),
+    [projectsWithCreatePermissions]
   );
+  const contextValue = useMemo(
+    () => ({
+      allowedProjectIds: allowedProjectIds ?? projectIdsWithCreatePermissions,
+      workItemTemplateId: null,
+      setWorkItemTemplateId: () => {},
+      isApplyingTemplate: false,
+      setIsApplyingTemplate: () => {},
+      selectedParentIssue,
+      setSelectedParentIssue,
+      issuePropertyValues: {},
+      setIssuePropertyValues: () => {},
+      issuePropertyValueErrors: {},
+      setIssuePropertyValueErrors: () => {},
+      getIssueTypeIdOnProjectChange: (projectId: string) => getProjectDefaultIssueType(projectId)?.id ?? null,
+      getActiveAdditionalPropertiesLength: () => 0,
+      handlePropertyValuesValidation: () => true,
+      handleCreateUpdatePropertyValues: () => Promise.resolve(),
+      handleProjectEntitiesFetch: () => Promise.resolve(),
+      handleTemplateChange: () => Promise.resolve(),
+      handleConvert: () => Promise.resolve(),
+      handleCreateSubWorkItem: () => Promise.resolve(),
+    }),
+    [allowedProjectIds, getProjectDefaultIssueType, projectIdsWithCreatePermissions, selectedParentIssue]
+  );
+
+  return <IssueModalContext.Provider value={contextValue}>{children}</IssueModalContext.Provider>;
 });

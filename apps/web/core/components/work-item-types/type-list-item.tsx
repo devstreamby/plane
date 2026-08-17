@@ -58,9 +58,7 @@ export const WorkItemTypeListItem = observer(function WorkItemTypeListItem(props
             </span>
           )}
         </div>
-        {issueType.description && (
-          <p className="truncate text-body-xs text-tertiary">{issueType.description}</p>
-        )}
+        {issueType.description && <p className="text-body-xs truncate text-tertiary">{issueType.description}</p>}
       </div>
 
       {isEditable && !issueType.is_default && (
@@ -82,14 +80,13 @@ export const WorkItemTypeListItem = observer(function WorkItemTypeListItem(props
         </Tooltip>
       )}
 
-      {isEditable && (
-        <ToggleSwitch value={issueType.is_active} onChange={handleToggleActive} size="sm" />
-      )}
+      {isEditable && <ToggleSwitch value={issueType.is_active} onChange={handleToggleActive} size="sm" />}
 
       {isEditable && (
         <div className="flex items-center gap-1">
           <button
             type="button"
+            aria-label={t("edit")}
             onClick={() => onEdit(issueType)}
             className="rounded-sm p-1.5 text-tertiary hover:bg-layer-transparent-hover hover:text-secondary"
           >
@@ -101,6 +98,7 @@ export const WorkItemTypeListItem = observer(function WorkItemTypeListItem(props
           >
             <button
               type="button"
+              aria-label={t("delete")}
               onClick={() => onDeleteAttempt(issueType)}
               disabled={issueType.is_default}
               className="rounded-sm p-1.5 text-tertiary hover:bg-layer-transparent-hover hover:text-danger-primary disabled:cursor-not-allowed disabled:opacity-40"

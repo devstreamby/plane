@@ -25,7 +25,7 @@ type TWorkItemTypeFormValues = {
 
 const DEFAULT_LOGO: TLogoProps = {
   in_use: "icon",
-  icon: { name: "CheckSquare", color: "#5e6ad2", package: "phosphor" },
+  icon: { name: "Task", color: "#2563EB", package: "work-item-type" },
 };
 
 type Props = {
@@ -105,7 +105,7 @@ export const CreateUpdateWorkItemTypeModal = observer(function CreateUpdateWorkI
               name="logo_props"
               render={({ field: { value, onChange } }) => (
                 <EmojiPicker
-                  iconType="phosphor"
+                  iconType="work-item-type"
                   closeOnSelect={false}
                   isOpen={isEmojiPickerOpen}
                   handleToggle={setIsEmojiPickerOpen}
