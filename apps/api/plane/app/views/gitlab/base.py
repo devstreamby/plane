@@ -62,6 +62,16 @@ class GitLabWebhookEndpoint(APIView):
         return Response({"ignored": True, "event": event}, status=status.HTTP_200_OK)
 
 
+def _serialize_gitlab_config(config, slug: str) -> dict:
+    merge_from_state_id = config.merge_from_state_id if config else None
+    merge_to_state_id = config.merge_to_state_id if config else None
+    return {
+        "merge_from_state_id": str(merge_from_state_id) if merge_from_state_id else None,
+        "merge_to_state_id": str(merge_to_state_id) if merge_to_state_id else None,
+        "webhook_url": f"/api/hooks/gitlab/{slug}/",
+    }
+
+
 class ProjectGitLabConfigEndpoint(BaseAPIView):
     """Read/update per-project merge transition states."""
 
@@ -70,14 +80,7 @@ class ProjectGitLabConfigEndpoint(BaseAPIView):
         config = ProjectGitLabConfig.objects.filter(
             project_id=project_id, workspace__slug=slug, deleted_at__isnull=True
         ).first()
-        return Response(
-            {
-                "merge_from_state_id": str(config.merge_from_state_id) if config and config.merge_from_state_id else None,
-                "merge_to_state_id": str(config.merge_to_state_id) if config and config.merge_to_state_id else None,
-                "webhook_url": f"/api/hooks/gitlab/{slug}/",
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(_serialize_gitlab_config(config, slug), status=status.HTTP_200_OK)
 
     @allow_permission([ROLE.ADMIN])
     def patch(self, request, slug, project_id):
@@ -114,14 +117,7 @@ class ProjectGitLabConfigEndpoint(BaseAPIView):
 
         config.save(update_fields=update_fields)
 
-        return Response(
-            {
-                "merge_from_state_id": str(config.merge_from_state_id) if config.merge_from_state_id else None,
-                "merge_to_state_id": str(config.merge_to_state_id) if config.merge_to_state_id else None,
-                "webhook_url": f"/api/hooks/gitlab/{slug}/",
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response(_serialize_gitlab_config(config, slug), status=status.HTTP_200_OK)
 
 
 class IssueGitLabMetaEndpoint(BaseAPIView):

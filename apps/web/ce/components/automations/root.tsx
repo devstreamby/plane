@@ -53,6 +53,7 @@ export const CustomAutomationsRoot = observer(function CustomAutomationsRoot(pro
       .getConfig(workspaceSlug, projectId)
       .then((data) => {
         if (!cancelled) setConfig(data);
+        return;
       })
       .catch(() => {
         if (!cancelled) setConfig(null);
@@ -65,7 +66,9 @@ export const CustomAutomationsRoot = observer(function CustomAutomationsRoot(pro
     };
   }, [workspaceSlug, projectId]);
 
-  const updateConfig = async (payload: Partial<Pick<TProjectGitLabConfig, "merge_from_state_id" | "merge_to_state_id">>) => {
+  const updateConfig = async (
+    payload: Partial<Pick<TProjectGitLabConfig, "merge_from_state_id" | "merge_to_state_id">>
+  ) => {
     if (!isAdmin) return;
     const service = new ProjectGitLabService();
     try {
@@ -151,11 +154,11 @@ export const CustomAutomationsRoot = observer(function CustomAutomationsRoot(pro
               {config?.webhook_url && (
                 <div className="border-t border-subtle px-5 py-4 text-13 text-secondary">
                   GitLab webhook URL:{" "}
-                  <code className="text-primary break-all">{`${API_BASE_URL}${config.webhook_url}`}</code>
+                  <code className="break-all text-primary">{`${API_BASE_URL}${config.webhook_url}`}</code>
                   <div className="mt-1">
-                    Set env <code>GITLAB_WEBHOOK_SECRET</code> and use the same value as the GitLab webhook secret token.
-                    Enable Merge request + Push events. MR titles and commit messages must start with the work item key
-                    (e.g. <code>ENG-42 …</code>).
+                    Set env <code>GITLAB_WEBHOOK_SECRET</code> and use the same value as the GitLab webhook secret
+                    token. Enable Merge request + Push events. MR titles and commit messages must start with the work
+                    item key (e.g. <code>ENG-42 …</code>).
                   </div>
                 </div>
               )}
