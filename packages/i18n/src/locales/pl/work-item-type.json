@@ -2,6 +2,9 @@
   "work_item_types": {
     "label": "Typy Elementów Pracy",
     "label_lowercase": "typy elementów pracy",
+    "switcher": {
+      "tooltip": "Zmień typ elementu pracy"
+    },
     "settings": {
       "description": "Dostosuj i dodaj własne właściwości, aby dopasować do potrzeb zespołu.",
       "cant_delete_default_message": "Nie można usunąć tego typu elementu pracy, ponieważ jest on ustawiony jako domyślny dla tego projektu.",

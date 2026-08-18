@@ -2,6 +2,9 @@
   "work_item_types": {
     "label": "作業項目タイプ",
     "label_lowercase": "作業項目タイプ",
+    "switcher": {
+      "tooltip": "作業項目タイプを変更"
+    },
     "settings": {
       "description": "チームのニーズに合わせて独自のプロパティをカスタマイズして追加できます。",
       "cant_delete_default_message": "この作業項目タイプは削除できません。このプロジェクトのデフォルトの作業項目タイプとして設定されているためです。",

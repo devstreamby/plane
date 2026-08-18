@@ -2,6 +2,9 @@
   "work_item_types": {
     "label": "Typy pracovních položek",
     "label_lowercase": "typy pracovních položek",
+    "switcher": {
+      "tooltip": "Změnit typ pracovní položky"
+    },
     "settings": {
       "description": "Přizpůsobte si a přidejte vlastní vlastnosti, abyste to upravili podle potřeb vašeho týmu.",
       "cant_delete_default_message": "Tento typ pracovního položky nelze odstranit, protože je nastaven jako výchozí pro tento projekt.",

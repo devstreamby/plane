@@ -2,6 +2,9 @@
   "work_item_types": {
     "label": "Tipos de elementos de trabajo",
     "label_lowercase": "tipos de elementos de trabajo",
+    "switcher": {
+      "tooltip": "Cambiar tipo de elemento de trabajo"
+    },
     "settings": {
       "description": "Personaliza y agrega tus propias propiedades para adaptarlo a las necesidades de tu equipo.",
       "cant_delete_default_message": "No se puede eliminar este tipo de elemento de trabajo porque está establecido como el tipo predeterminado para este proyecto.",

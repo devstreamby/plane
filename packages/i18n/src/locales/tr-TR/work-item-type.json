@@ -2,6 +2,9 @@
   "work_item_types": {
     "label": "İş Öğesi Tipleri",
     "label_lowercase": "iş öğesi tipleri",
+    "switcher": {
+      "tooltip": "İş öğesi tipini değiştir"
+    },
     "settings": {
       "description": "Ekibinizin ihtiyaçlarına göre özelleştirin ve kendi özelliklerinizi ekleyin.",
       "cant_delete_default_message": "Bu iş öğesi türü mevcut iş öğeleriyle bağlantılı olduğundan silinemez.",

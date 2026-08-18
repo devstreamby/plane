@@ -2,6 +2,9 @@
   "work_item_types": {
     "label": "Arbeitsaufgabentypen",
     "label_lowercase": "arbeitsaufgabentypen",
+    "switcher": {
+      "tooltip": "Arbeitsaufgabentyp ändern"
+    },
     "settings": {
       "description": "Passen Sie eigene Eigenschaften an und fügen Sie sie hinzu, um sie an die Bedürfnisse Ihres Teams anzupassen.",
       "cant_delete_default_message": "Dieser Arbeitselementtyp kann nicht gelöscht werden, da er als Standard für dieses Projekt festgelegt ist.",
