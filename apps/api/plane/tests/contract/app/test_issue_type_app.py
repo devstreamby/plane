@@ -59,6 +59,10 @@ class TestIssueTypeEndpoint:
     def mark_default_url(workspace_slug, project_id, type_id):
         return f"/api/workspaces/{workspace_slug}/projects/{project_id}/issue-types/{type_id}/mark-default/"
 
+    @staticmethod
+    def issue_url(workspace_slug, project_id, issue_id):
+        return f"/api/workspaces/{workspace_slug}/projects/{project_id}/issues/{issue_id}/"
+
     @pytest.mark.django_db
     def test_list_returns_seeded_types(self, session_client, workspace, type_context):
         ctx = type_context
@@ -166,3 +170,70 @@ class TestIssueTypeEndpoint:
 
         response = session_client.get(self.list_url(workspace.slug, ctx["project"].id))
         assert response.status_code == status.HTTP_200_OK
+
+    @pytest.mark.django_db
+    def test_update_work_item_type_changes_type(self, session_client, workspace, type_context, create_user):
+        ctx = type_context
+        issue = Issue.objects.create(
+            name="Typed issue",
+            project=ctx["project"],
+            workspace=workspace,
+            type=ctx["task_type"],
+            created_by=create_user,
+        )
+
+        response = session_client.patch(
+            self.issue_url(workspace.slug, ctx["project"].id, issue.id),
+            {"type_id": str(ctx["bug_type"].id)},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_204_NO_CONTENT, response.data
+        issue.refresh_from_db()
+        assert issue.type_id == ctx["bug_type"].id
+
+    @pytest.mark.django_db
+    def test_update_work_item_type_rejects_type_not_in_project(
+        self, session_client, workspace, type_context, create_user
+    ):
+        ctx = type_context
+        issue = Issue.objects.create(
+            name="Typed issue",
+            project=ctx["project"],
+            workspace=workspace,
+            type=ctx["task_type"],
+            created_by=create_user,
+        )
+        foreign_type = IssueType.objects.create(workspace=workspace, name="Foreign", is_active=True)
+
+        response = session_client.patch(
+            self.issue_url(workspace.slug, ctx["project"].id, issue.id),
+            {"type_id": str(foreign_type.id)},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        issue.refresh_from_db()
+        assert issue.type_id == ctx["task_type"].id
+
+    @pytest.mark.django_db
+    def test_guest_cannot_update_work_item_type(self, session_client, workspace, type_context, create_user):
+        ctx = type_context
+        issue = Issue.objects.create(
+            name="Typed issue",
+            project=ctx["project"],
+            workspace=workspace,
+            type=ctx["task_type"],
+            created_by=create_user,
+        )
+        session_client.force_authenticate(user=ctx["guest"])
+
+        response = session_client.patch(
+            self.issue_url(workspace.slug, ctx["project"].id, issue.id),
+            {"type_id": str(ctx["bug_type"].id)},
+            format="json",
+        )
+
+        assert response.status_code in (status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED)
+        issue.refresh_from_db()
+        assert issue.type_id == ctx["task_type"].id

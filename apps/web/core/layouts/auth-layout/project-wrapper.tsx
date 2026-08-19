@@ -55,7 +55,7 @@ export const ProjectAuthWrapper = observer(function ProjectAuthWrapper(props: IP
   const [isJoiningProject, setIsJoiningProject] = useState(false);
   // store hooks
   const { fetchUserProjectInfo, allowPermissions, getProjectRoleByWorkspaceSlugAndProjectId } = useUserPermissions();
-  const { fetchProjectDetails, currentProjectDetails } = useProject();
+  const { fetchProjectDetails, getProjectById } = useProject();
   const { joinProject } = useUserPermissions();
   const { fetchAllCycles } = useCycle();
   const { fetchModulesSlim, fetchModules } = useModule();
@@ -137,9 +137,10 @@ export const ProjectAuthWrapper = observer(function ProjectAuthWrapper(props: IP
     revalidateOnFocus: false,
   });
   // fetching project work item types, only once the feature is enabled for this project
+  const isIssueTypeEnabledForProject = getProjectById(projectId)?.is_issue_type_enabled;
   useSWR(
-    currentProjectDetails?.is_issue_type_enabled ? PROJECT_ISSUE_TYPES(projectId, currentProjectRole) : null,
-    currentProjectDetails?.is_issue_type_enabled ? () => fetchProjectIssueTypes(workspaceSlug, projectId) : null,
+    isIssueTypeEnabledForProject ? PROJECT_ISSUE_TYPES(projectId, currentProjectRole) : null,
+    isIssueTypeEnabledForProject ? () => fetchProjectIssueTypes(workspaceSlug, projectId) : null,
     { revalidateIfStale: false, revalidateOnFocus: false }
   );
   // fetching project cycles
