@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="%(class)s_updated_by",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Updated By",
+                        verbose_name="Last Modified By",
                     ),
                 ),
                 (
@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="%(class)s_updated_by",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Updated By",
+                        verbose_name="Last Modified By",
                     ),
                 ),
                 (
