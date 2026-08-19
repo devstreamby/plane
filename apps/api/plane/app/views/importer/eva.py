@@ -11,6 +11,7 @@ from plane.app.views import BaseAPIView
 from plane.bgtasks.eva_import_task import create_importer_service_token, eva_import_task
 from plane.db.models import APIToken, Importer, Project, ProjectMember, Workspace, WorkspaceMember
 from plane.utils.importers.eva.client import EvaApiClient, EvaApiError
+from plane.utils.importers.eva.constants import CYCLE_SOURCE_CHOICES, MODULE_SOURCE_CHOICES
 from plane.utils.importers.eva.extract import EvaExtractor
 from plane.utils.importers.eva.transform import EvaTransformer
 
@@ -74,6 +75,20 @@ def _validate_import_config(
     if not import_tasks and not import_testcases:
         return Response(
             {"error": "At least one of config.import_tasks or config.import_testcases must be enabled"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    cycle_source = config.get("cycle_source")
+    if cycle_source is not None and cycle_source not in CYCLE_SOURCE_CHOICES:
+        return Response(
+            {"error": f"config.cycle_source must be one of {list(CYCLE_SOURCE_CHOICES)}"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    module_source = config.get("module_source")
+    if module_source is not None and module_source not in MODULE_SOURCE_CHOICES:
+        return Response(
+            {"error": f"config.module_source must be one of {list(MODULE_SOURCE_CHOICES)}"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

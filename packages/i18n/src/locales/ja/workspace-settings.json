@@ -230,6 +230,13 @@
           "import_tasks_option_description": "タスク、タスクのコメント、添付ファイル、ドキュメントをインポートします。",
           "import_testcases_option": "テストケース",
           "import_testcases_option_description": "テストケースとそのコメントをインポートします。",
+          "cycle_source": "サイクルのソース",
+          "cycle_source_description": "どのEVAエンティティをPlaneのサイクルにするか選択してください。",
+          "cycle_source_lists": "スプリント",
+          "cycle_source_fix_versions": "リリース",
+          "cycle_source_none": "サイクルを作成しない",
+          "create_modules_option": "リリースからモジュールを作成",
+          "create_modules_option_description": "EVAのリリースをPlaneのモジュールとしてインポートします。",
           "testcase_comments": "テストケースのコメント"
         },
         "progress": {

@@ -230,6 +230,13 @@
           "import_tasks_option_description": "导入任务、任务评论、附件和文档。",
           "import_testcases_option": "测试用例",
           "import_testcases_option_description": "导入测试用例及其评论。",
+          "cycle_source": "周期来源",
+          "cycle_source_description": "选择哪个 EVA 实体将成为 Plane 周期。",
+          "cycle_source_lists": "冲刺",
+          "cycle_source_fix_versions": "发布",
+          "cycle_source_none": "不创建周期",
+          "create_modules_option": "从发布创建模块",
+          "create_modules_option_description": "将 EVA 发布导入为 Plane 模块。",
           "testcase_comments": "测试用例评论"
         },
         "progress": {

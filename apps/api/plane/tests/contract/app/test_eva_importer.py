@@ -52,13 +52,17 @@ def _eva_payload(
     testcase_project_id: str | None = None,
     import_tasks: bool = True,
     import_testcases: bool = True,
+    cycle_source: str | None = None,
+    module_source: str | None = None,
 ) -> dict:
     config = {
-        "lists_as_cycles": True,
-        "fix_versions_as_modules": True,
         "import_tasks": import_tasks,
         "import_testcases": import_testcases,
     }
+    if cycle_source is not None:
+        config["cycle_source"] = cycle_source
+    if module_source is not None:
+        config["module_source"] = module_source
     if testcase_project_id is not None:
         config["testcase_project_id"] = testcase_project_id
     return {
@@ -207,4 +211,71 @@ class TestEvaImporterCreateEndpoint:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "At least one" in response.data["error"]
+        mock_delay.assert_not_called()
+
+    @patch("plane.app.views.importer.eva.eva_import_task.delay")
+    @patch("plane.app.views.importer.eva.EvaApiClient.test_connection")
+    def test_create_accepts_release_cycle_source(
+        self,
+        mock_test_connection,
+        mock_delay,
+        session_client,
+        workspace,
+        tasks_project,
+    ):
+        mock_test_connection.return_value = None
+
+        response = session_client.post(
+            f"/api/workspaces/{workspace.slug}/projects/{tasks_project.id}/importers/eva/",
+            _eva_payload(import_testcases=False, cycle_source="fix_versions", module_source="none"),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data["config"]["cycle_source"] == "fix_versions"
+        assert response.data["config"]["module_source"] == "none"
+        mock_delay.assert_called_once()
+
+    @patch("plane.app.views.importer.eva.eva_import_task.delay")
+    @patch("plane.app.views.importer.eva.EvaApiClient.test_connection")
+    def test_create_rejects_invalid_cycle_source(
+        self,
+        mock_test_connection,
+        mock_delay,
+        session_client,
+        workspace,
+        tasks_project,
+    ):
+        mock_test_connection.return_value = None
+
+        response = session_client.post(
+            f"/api/workspaces/{workspace.slug}/projects/{tasks_project.id}/importers/eva/",
+            _eva_payload(import_testcases=False, cycle_source="bogus"),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "cycle_source" in response.data["error"]
+        mock_delay.assert_not_called()
+
+    @patch("plane.app.views.importer.eva.eva_import_task.delay")
+    @patch("plane.app.views.importer.eva.EvaApiClient.test_connection")
+    def test_create_rejects_invalid_module_source(
+        self,
+        mock_test_connection,
+        mock_delay,
+        session_client,
+        workspace,
+        tasks_project,
+    ):
+        mock_test_connection.return_value = None
+
+        response = session_client.post(
+            f"/api/workspaces/{workspace.slug}/projects/{tasks_project.id}/importers/eva/",
+            _eva_payload(import_testcases=False, module_source="bogus"),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "module_source" in response.data["error"]
         mock_delay.assert_not_called()

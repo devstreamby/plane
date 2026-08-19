@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Importati sarcini, comentarii la sarcini, atasamente si documentatie.",
           "import_testcases_option": "Cazuri de test",
           "import_testcases_option_description": "Importati cazuri de test si comentariile acestora.",
+          "cycle_source": "Sursa ciclului",
+          "cycle_source_description": "Alegeți ce entitate EVA devine un ciclu Plane.",
+          "cycle_source_lists": "Sprinturi",
+          "cycle_source_fix_versions": "Versiuni",
+          "cycle_source_none": "Nu creați cicluri",
+          "create_modules_option": "Creați module din versiuni",
+          "create_modules_option_description": "Importați versiunile EVA ca module Plane.",
           "testcase_comments": "Comentarii la cazuri de test"
         },
         "progress": {

@@ -6,6 +6,21 @@ import os
 
 EVA_EXTERNAL_SOURCE = "eva"
 
+# EVA models sprints and releases as the same CmfList entity, distinguished only by task field
+# ("lists" vs "fix_versions") and code prefix (SPR-* vs REL-*). Which one becomes a Plane cycle
+# vs module is a per-import choice.
+CYCLE_SOURCE_LISTS = "lists"
+CYCLE_SOURCE_FIX_VERSIONS = "fix_versions"
+CYCLE_SOURCE_NONE = "none"
+CYCLE_SOURCE_CHOICES = (CYCLE_SOURCE_LISTS, CYCLE_SOURCE_FIX_VERSIONS, CYCLE_SOURCE_NONE)
+DEFAULT_CYCLE_SOURCE = CYCLE_SOURCE_LISTS
+
+MODULE_SOURCE_FIX_VERSIONS = "fix_versions"
+MODULE_SOURCE_LISTS = "lists"
+MODULE_SOURCE_NONE = "none"
+MODULE_SOURCE_CHOICES = (MODULE_SOURCE_FIX_VERSIONS, MODULE_SOURCE_LISTS, MODULE_SOURCE_NONE)
+DEFAULT_MODULE_SOURCE = MODULE_SOURCE_FIX_VERSIONS
+
 # Server-side EVA import bypasses the browser upload cap; screen recordings are often 10–200 MiB.
 EVA_IMPORT_VIDEO_SIZE_LIMIT = int(os.environ.get("EVA_IMPORT_VIDEO_SIZE_LIMIT", 209715200))
 EVA_IMPORT_DOWNLOAD_TIMEOUT = int(os.environ.get("EVA_IMPORT_DOWNLOAD_TIMEOUT", 300))

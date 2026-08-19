@@ -230,6 +230,13 @@
           "import_tasks_option_description": "匯入任務、任務留言、附件與文件。",
           "import_testcases_option": "測試案例",
           "import_testcases_option_description": "匯入測試案例及其留言。",
+          "cycle_source": "週期來源",
+          "cycle_source_description": "選擇哪個 EVA 實體將成為 Plane 週期。",
+          "cycle_source_lists": "衝刺",
+          "cycle_source_fix_versions": "發佈",
+          "cycle_source_none": "不建立週期",
+          "create_modules_option": "從發佈建立模組",
+          "create_modules_option_description": "將 EVA 發佈匯入為 Plane 模組。",
           "testcase_comments": "測試案例留言"
         },
         "progress": {

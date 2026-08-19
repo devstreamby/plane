@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Importer les taches, leurs commentaires, les pieces jointes et la documentation.",
           "import_testcases_option": "Cas de test",
           "import_testcases_option_description": "Importer les cas de test et leurs commentaires.",
+          "cycle_source": "Source du cycle",
+          "cycle_source_description": "Choisissez quelle entité EVA devient un cycle Plane.",
+          "cycle_source_lists": "Sprints",
+          "cycle_source_fix_versions": "Versions",
+          "cycle_source_none": "Ne pas créer de cycles",
+          "create_modules_option": "Créer des modules à partir des versions",
+          "create_modules_option_description": "Importer les versions EVA en tant que modules Plane.",
           "testcase_comments": "Commentaires des cas de test"
         },
         "progress": {
