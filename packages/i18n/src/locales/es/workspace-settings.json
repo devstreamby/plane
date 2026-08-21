@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Importar tareas, comentarios de tareas, adjuntos y documentacion.",
           "import_testcases_option": "Casos de prueba",
           "import_testcases_option_description": "Importar casos de prueba y sus comentarios.",
+          "cycle_source": "Origen del ciclo",
+          "cycle_source_description": "Elige qué entidad de EVA se convierte en un ciclo de Plane.",
+          "cycle_source_lists": "Sprints",
+          "cycle_source_fix_versions": "Lanzamientos",
+          "cycle_source_none": "No crear ciclos",
+          "create_modules_option": "Crear módulos a partir de lanzamientos",
+          "create_modules_option_description": "Importar los lanzamientos de EVA como módulos de Plane.",
           "testcase_comments": "Comentarios de casos de prueba"
         },
         "progress": {

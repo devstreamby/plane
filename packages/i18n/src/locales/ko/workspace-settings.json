@@ -230,6 +230,13 @@
           "import_tasks_option_description": "작업, 작업 댓글, 첨부 파일, 문서를 가져옵니다.",
           "import_testcases_option": "테스트 케이스",
           "import_testcases_option_description": "테스트 케이스와 해당 댓글을 가져옵니다.",
+          "cycle_source": "사이클 소스",
+          "cycle_source_description": "어떤 EVA 엔터티를 Plane 사이클로 만들지 선택하세요.",
+          "cycle_source_lists": "스프린트",
+          "cycle_source_fix_versions": "릴리스",
+          "cycle_source_none": "사이클을 생성하지 않음",
+          "create_modules_option": "릴리스에서 모듈 생성",
+          "create_modules_option_description": "EVA 릴리스를 Plane 모듈로 가져옵니다.",
           "testcase_comments": "테스트 케이스 댓글"
         },
         "progress": {

@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Gorevleri, gorev yorumlarini, ekleri ve dokumantasyonu ice aktar.",
           "import_testcases_option": "Test senaryolari",
           "import_testcases_option_description": "Test senaryolarini ve yorumlarini ice aktar.",
+          "cycle_source": "Döngü kaynağı",
+          "cycle_source_description": "Hangi EVA varlığının Plane döngüsüne dönüşeceğini seçin.",
+          "cycle_source_lists": "Sprintler",
+          "cycle_source_fix_versions": "Sürümler",
+          "cycle_source_none": "Döngü oluşturma",
+          "create_modules_option": "Sürümlerden modül oluştur",
+          "create_modules_option_description": "EVA sürümlerini Plane modülü olarak içe aktarın.",
           "testcase_comments": "Test senaryosu yorumlari"
         },
         "progress": {

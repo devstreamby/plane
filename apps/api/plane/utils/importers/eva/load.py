@@ -7,6 +7,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from collections.abc import Callable
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
@@ -34,7 +35,17 @@ from plane.db.models import (
     State,
     Workspace,
 )
-from plane.utils.importers.eva.constants import EVA_EXTERNAL_SOURCE
+from plane.utils.importers.eva.constants import (
+    CYCLE_SOURCE_CHOICES,
+    CYCLE_SOURCE_FIX_VERSIONS,
+    CYCLE_SOURCE_NONE,
+    DEFAULT_CYCLE_SOURCE,
+    DEFAULT_MODULE_SOURCE,
+    EVA_EXTERNAL_SOURCE,
+    MODULE_SOURCE_CHOICES,
+    MODULE_SOURCE_LISTS,
+    MODULE_SOURCE_NONE,
+)
 from plane.utils.importers.eva.client import EvaApiClient
 from plane.utils.importers.eva.media import (
     import_inline_media,
@@ -46,6 +57,44 @@ from plane.utils.importers.eva.transform import EvaTransformer
 
 logger = logging.getLogger("plane.worker")
 User = get_user_model()
+
+
+def release_cycle_dates(tasks: list[dict[str, Any]], transformer: EvaTransformer) -> dict[str, dict[str, Any]]:
+    """Approximate start/end dates for cycles sourced from EVA releases (fix_versions).
+
+    EVA release (CmfList) records carry no dates of their own (status_closed_at and
+    cmf_created_at are always null for them), unlike sprint records. Approximate each
+    release's end date as the median close date of its own tasks, then chain start dates
+    from the previous release's end date so consecutive releases don't overlap.
+
+    Shared between EvaLoader (live imports) and the remap_eva_cycles management command
+    (one-off remapping of an already-imported project) so both compute dates identically.
+    """
+    closures: dict[str, list[Any]] = defaultdict(list)
+    for task in tasks:
+        closed = transformer.parse_date(task.get("status_closed_at"))
+        if not closed:
+            continue
+        for item in task.get("fix_versions") or []:
+            code = item.get("code")
+            if code:
+                closures[code].append(closed)
+
+    medians = []
+    for code, dates in closures.items():
+        ordered = sorted(dates)
+        medians.append((ordered[len(ordered) // 2], code))
+    medians.sort()
+
+    result: dict[str, dict[str, Any]] = {}
+    previous_end = None
+    for median_date, code in medians:
+        start_date = previous_end + timedelta(days=1) if previous_end else median_date - timedelta(days=7)
+        if start_date > median_date:
+            start_date = median_date
+        result[code] = {"start_date": start_date, "end_date": median_date}
+        previous_end = median_date
+    return result
 
 
 class EvaLoader:
@@ -88,6 +137,16 @@ class EvaLoader:
     @property
     def import_testcases(self) -> bool:
         return bool(self.config.get("import_testcases", True))
+
+    @property
+    def cycle_source(self) -> str:
+        value = self.config.get("cycle_source", DEFAULT_CYCLE_SOURCE)
+        return value if value in CYCLE_SOURCE_CHOICES else DEFAULT_CYCLE_SOURCE
+
+    @property
+    def module_source(self) -> str:
+        value = self.config.get("module_source", DEFAULT_MODULE_SOURCE)
+        return value if value in MODULE_SOURCE_CHOICES else DEFAULT_MODULE_SOURCE
 
     def run(self, extracted: dict[str, Any]) -> dict[str, Any]:
         self._init_progress(extracted)
@@ -288,14 +347,38 @@ class EvaLoader:
             return {}
         return {"start_date": start_date, "end_date": end_date}
 
-    def _ensure_cycles(self, extracted: dict[str, Any]) -> dict[str, UUID]:
+    def _release_cycle_dates(self, extracted: dict[str, Any]) -> dict[str, dict[str, Any]]:
+        return release_cycle_dates(extracted.get("tasks", []), self.transformer)
+
+    def _cycle_name_collides_with_manual(self, name: str) -> bool:
+        return Cycle.objects.filter(
+            project=self.project,
+            name=name,
+            external_source__isnull=True,
+            deleted_at__isnull=True,
+        ).exists()
+
+    def _ensure_cycles(self, extracted: dict[str, Any]) -> dict[str, UUID | None]:
+        source = self.cycle_source
+        if source == CYCLE_SOURCE_NONE:
+            return {}
+        task_field = "fix_versions" if source == CYCLE_SOURCE_FIX_VERSIONS else "lists"
         lists_by_code = {item["code"]: item for item in extracted.get("cycle_lists", []) if item.get("code")}
-        cycle_map: dict[str, UUID] = {}
+        release_dates = self._release_cycle_dates(extracted) if source == CYCLE_SOURCE_FIX_VERSIONS else {}
+
+        cycle_map: dict[str, UUID | None] = {}
         for task in extracted.get("tasks", []):
-            for item in task.get("lists") or []:
+            for item in task.get(task_field) or []:
                 code = item.get("code")
                 name = item.get("name") or code
                 if not code or code in cycle_map:
+                    continue
+                if self._cycle_name_collides_with_manual(name):
+                    self.warnings.append(
+                        f"Skipped EVA cycle '{name}' ({code}): a manually created cycle with the "
+                        "same name already exists in this project."
+                    )
+                    cycle_map[code] = None
                     continue
                 existing = Cycle.objects.filter(
                     project=self.project,
@@ -306,6 +389,11 @@ class EvaLoader:
                 if existing:
                     cycle_map[code] = existing.id
                     continue
+                dates = (
+                    release_dates.get(code, {})
+                    if source == CYCLE_SOURCE_FIX_VERSIONS
+                    else self._cycle_dates(lists_by_code.get(code))
+                )
                 cycle = Cycle.objects.create(
                     name=name,
                     project=self.project,
@@ -314,16 +402,20 @@ class EvaLoader:
                     created_by=self.actor,
                     external_source=EVA_EXTERNAL_SOURCE,
                     external_id=code,
-                    **self._cycle_dates(lists_by_code.get(code)),
+                    **dates,
                 )
                 cycle_map[code] = cycle.id
                 self.stats["cycles"] += 1
         return cycle_map
 
     def _ensure_modules(self, extracted: dict[str, Any]) -> dict[str, UUID]:
+        source = self.module_source
+        if source == MODULE_SOURCE_NONE:
+            return {}
+        task_field = "lists" if source == MODULE_SOURCE_LISTS else "fix_versions"
         module_map: dict[str, UUID] = {}
         for task in extracted.get("tasks", []):
-            for item in task.get("fix_versions") or []:
+            for item in task.get(task_field) or []:
                 code = item.get("code")
                 name = item.get("name") or code
                 if not code or code in module_map:
@@ -497,9 +589,11 @@ class EvaLoader:
         self,
         tasks: list[dict[str, Any]],
         user_map: dict[str, UUID | None],
-        cycle_map: dict[str, UUID],
+        cycle_map: dict[str, UUID | None],
         module_map: dict[str, UUID],
     ) -> None:
+        cycle_task_field = "fix_versions" if self.cycle_source == CYCLE_SOURCE_FIX_VERSIONS else "lists"
+        module_task_field = "lists" if self.module_source == MODULE_SOURCE_LISTS else "fix_versions"
         self._update_progress("tasks", force=True)
         for task in tasks:
             external_id = task.get("id")
@@ -519,7 +613,7 @@ class EvaLoader:
                 user_map=user_map,
                 parent_issue_id=parent_issue_id,
             )
-            for item in task.get("lists") or []:
+            for item in task.get(cycle_task_field) or []:
                 cycle_id = cycle_map.get(item.get("code"))
                 if cycle_id:
                     CycleIssue.objects.get_or_create(
@@ -529,7 +623,7 @@ class EvaLoader:
                         workspace=self.workspace,
                         defaults={"created_by": self.actor},
                     )
-            for item in task.get("fix_versions") or []:
+            for item in task.get(module_task_field) or []:
                 module_id = module_map.get(item.get("code"))
                 if module_id:
                     ModuleIssue.objects.get_or_create(

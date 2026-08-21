@@ -12,7 +12,7 @@ import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { Button } from "@plane/propel/button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
-import type { IEvaImporterForm, IEvaPreviewResponse, IEvaProjectOption } from "@plane/types";
+import type { IEvaImporterForm, IEvaPreviewResponse, IEvaProjectOption, TEvaCycleSource } from "@plane/types";
 import { CustomSearchSelect, Input, Spinner, Checkbox } from "@plane/ui";
 import { SettingsBoxedControlItem } from "@/components/settings/boxed-control-item";
 import { IMPORTER_SERVICES_LIST } from "@plane/constants";
@@ -35,6 +35,8 @@ type FormData = {
   import_testcases: boolean;
   plane_tasks_project_id: string;
   plane_testcase_project_id: string;
+  cycle_source: TEvaCycleSource;
+  create_modules: boolean;
 };
 
 const getCredentialsKey = (url: string, token: string) => `${url}\0${token}`;
@@ -72,6 +74,8 @@ export const EvaImportForm = observer(function EvaImportForm(props: Props) {
       import_testcases: true,
       plane_tasks_project_id: "",
       plane_testcase_project_id: "",
+      cycle_source: "lists",
+      create_modules: true,
     },
   });
 
@@ -228,8 +232,8 @@ export const EvaImportForm = observer(function EvaImportForm(props: Props) {
       config: {
         import_tasks: formData.import_tasks,
         import_testcases: formData.import_testcases,
-        lists_as_cycles: true,
-        fix_versions_as_modules: true,
+        cycle_source: formData.cycle_source,
+        module_source: formData.create_modules ? "fix_versions" : "none",
         testcase_project_id:
           formData.import_tasks && formData.import_testcases ? formData.plane_testcase_project_id : undefined,
       },
@@ -373,6 +377,58 @@ export const EvaImportForm = observer(function EvaImportForm(props: Props) {
                   className="w-72"
                   optionsClassName="w-72"
                 />
+              )}
+            />
+          }
+        />
+      )}
+      {importTasks && (
+        <SettingsBoxedControlItem
+          title={t("workspace_settings.settings.imports.eva.cycle_source")}
+          description={t("workspace_settings.settings.imports.eva.cycle_source_description")}
+          control={
+            <Controller
+              control={control}
+              name="cycle_source"
+              render={({ field: { value, onChange } }) => {
+                const cycleSourceOptions = [
+                  {
+                    value: "lists",
+                    query: "",
+                    content: t("workspace_settings.settings.imports.eva.cycle_source_lists"),
+                  },
+                  {
+                    value: "fix_versions",
+                    query: "",
+                    content: t("workspace_settings.settings.imports.eva.cycle_source_fix_versions"),
+                  },
+                  { value: "none", query: "", content: t("workspace_settings.settings.imports.eva.cycle_source_none") },
+                ];
+                return (
+                  <CustomSearchSelect
+                    value={value}
+                    onChange={onChange}
+                    options={cycleSourceOptions}
+                    label={cycleSourceOptions.find((option) => option.value === value)?.content}
+                    className="w-72"
+                    optionsClassName="w-72"
+                  />
+                );
+              }}
+            />
+          }
+        />
+      )}
+      {importTasks && (
+        <SettingsBoxedControlItem
+          title={t("workspace_settings.settings.imports.eva.create_modules_option")}
+          description={t("workspace_settings.settings.imports.eva.create_modules_option_description")}
+          control={
+            <Controller
+              control={control}
+              name="create_modules"
+              render={({ field: { value, onChange } }) => (
+                <Checkbox id="eva-create-modules" checked={value} onChange={() => onChange(!value)} />
               )}
             />
           }

@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Importa attivita, commenti delle attivita, allegati e documentazione.",
           "import_testcases_option": "Casi di test",
           "import_testcases_option_description": "Importa casi di test e i relativi commenti.",
+          "cycle_source": "Origine del ciclo",
+          "cycle_source_description": "Scegli quale entità EVA diventa un ciclo Plane.",
+          "cycle_source_lists": "Sprint",
+          "cycle_source_fix_versions": "Release",
+          "cycle_source_none": "Non creare cicli",
+          "create_modules_option": "Crea moduli dalle release",
+          "create_modules_option_description": "Importa le release EVA come moduli Plane.",
           "testcase_comments": "Commenti dei casi di test"
         },
         "progress": {

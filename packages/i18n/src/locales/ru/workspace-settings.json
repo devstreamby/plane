@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Импортировать задачи, комментарии к задачам, вложения и документацию.",
           "import_testcases_option": "Тест-кейсы",
           "import_testcases_option_description": "Импортировать тест-кейсы и их комментарии.",
+          "cycle_source": "Источник циклов",
+          "cycle_source_description": "Выберите, какая сущность EVA станет циклом в Plane.",
+          "cycle_source_lists": "Спринты",
+          "cycle_source_fix_versions": "Релизы",
+          "cycle_source_none": "Не создавать циклы",
+          "create_modules_option": "Создавать модули из релизов",
+          "create_modules_option_description": "Импортировать релизы EVA как модули Plane.",
           "testcase_comments": "Комментарии к тест-кейсам"
         },
         "progress": {

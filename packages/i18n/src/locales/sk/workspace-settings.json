@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Importovat ulohy, komentare k uloham, prilohy a dokumentaciu.",
           "import_testcases_option": "Testovacie pripady",
           "import_testcases_option_description": "Importovat testovacie pripady a ich komentare.",
+          "cycle_source": "Zdroj cyklov",
+          "cycle_source_description": "Vyberte, ktorý subjekt EVA sa stane cyklom v Plane.",
+          "cycle_source_lists": "Sprinty",
+          "cycle_source_fix_versions": "Verzie",
+          "cycle_source_none": "Nevytvárať cykly",
+          "create_modules_option": "Vytvoriť moduly z verzií",
+          "create_modules_option_description": "Importovať verzie EVA ako moduly Plane.",
           "testcase_comments": "Komentare testovacich pripadov"
         },
         "progress": {

@@ -18,9 +18,12 @@ export interface IEvaImporterUser {
   plane_user_id?: string;
 }
 
+export type TEvaCycleSource = "lists" | "fix_versions" | "none";
+export type TEvaModuleSource = "fix_versions" | "lists" | "none";
+
 export interface IEvaImporterConfig {
-  lists_as_cycles?: boolean;
-  fix_versions_as_modules?: boolean;
+  cycle_source?: TEvaCycleSource;
+  module_source?: TEvaModuleSource;
   state_mappings?: Record<string, string>;
   testcase_project_id?: string;
   import_tasks?: boolean;

@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Impor tugas, komentar tugas, lampiran, dan dokumentasi.",
           "import_testcases_option": "Kasus uji",
           "import_testcases_option_description": "Impor kasus uji dan komentarnya.",
+          "cycle_source": "Sumber siklus",
+          "cycle_source_description": "Pilih entitas EVA mana yang akan menjadi siklus Plane.",
+          "cycle_source_lists": "Sprint",
+          "cycle_source_fix_versions": "Rilis",
+          "cycle_source_none": "Jangan buat siklus",
+          "create_modules_option": "Buat modul dari rilis",
+          "create_modules_option_description": "Impor rilis EVA sebagai modul Plane.",
           "testcase_comments": "Komentar kasus uji"
         },
         "progress": {

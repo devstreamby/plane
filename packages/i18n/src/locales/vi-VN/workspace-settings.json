@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Nhap tac vu, binh luan tac vu, tep dinh kem va tai lieu.",
           "import_testcases_option": "Test case",
           "import_testcases_option_description": "Nhap test case va binh luan cua chung.",
+          "cycle_source": "Nguồn chu kỳ",
+          "cycle_source_description": "Chọn thực thể EVA nào sẽ trở thành chu kỳ Plane.",
+          "cycle_source_lists": "Sprint",
+          "cycle_source_fix_versions": "Bản phát hành",
+          "cycle_source_none": "Không tạo chu kỳ",
+          "create_modules_option": "Tạo mô-đun từ các bản phát hành",
+          "create_modules_option_description": "Nhập các bản phát hành EVA dưới dạng mô-đun Plane.",
           "testcase_comments": "Binh luan test case"
         },
         "progress": {

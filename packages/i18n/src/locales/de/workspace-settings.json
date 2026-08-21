@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Aufgaben, Aufgabenkommentare, Anhaenge und Dokumentation importieren.",
           "import_testcases_option": "Testfaelle",
           "import_testcases_option_description": "Testfaelle und deren Kommentare importieren.",
+          "cycle_source": "Zyklusquelle",
+          "cycle_source_description": "Wählen Sie, welche EVA-Entität zu einem Plane-Zyklus wird.",
+          "cycle_source_lists": "Sprints",
+          "cycle_source_fix_versions": "Releases",
+          "cycle_source_none": "Keine Zyklen erstellen",
+          "create_modules_option": "Module aus Releases erstellen",
+          "create_modules_option_description": "EVA-Releases als Plane-Module importieren.",
           "testcase_comments": "Testfallkommentare"
         },
         "progress": {

@@ -230,6 +230,13 @@
           "import_tasks_option_description": "Importovat ukoly, komentare k ukolum, prilohy a dokumentaci.",
           "import_testcases_option": "Testovaci pripady",
           "import_testcases_option_description": "Importovat testovaci pripady a jejich komentare.",
+          "cycle_source": "Zdroj cyklů",
+          "cycle_source_description": "Vyberte, která entita EVA se stane cyklem v Plane.",
+          "cycle_source_lists": "Sprinty",
+          "cycle_source_fix_versions": "Vydání",
+          "cycle_source_none": "Nevytvářet cykly",
+          "create_modules_option": "Vytvořit moduly z vydání",
+          "create_modules_option_description": "Importovat vydání EVA jako moduly Plane.",
           "testcase_comments": "Komentare testovacich pripadu"
         },
         "progress": {
