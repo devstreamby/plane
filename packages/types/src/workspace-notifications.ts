@@ -29,15 +29,17 @@ export type TNotificationIssueLite = {
 
 export type TNotificationData = {
   issue: TNotificationIssueLite | undefined;
-  issue_activity: {
-    id: string | undefined;
-    actor: string | undefined;
-    field: string | undefined;
-    issue_comment: string | undefined;
-    verb: "created" | "updated" | "deleted";
-    new_value: string | undefined;
-    old_value: string | undefined;
-  };
+  issue_activity:
+    | {
+        id: string | undefined;
+        actor: string | undefined;
+        field: string | undefined;
+        issue_comment: string | undefined;
+        verb: "created" | "updated" | "deleted";
+        new_value: string | undefined;
+        old_value: string | undefined;
+      }
+    | undefined;
 };
 
 export type TNotification = {
