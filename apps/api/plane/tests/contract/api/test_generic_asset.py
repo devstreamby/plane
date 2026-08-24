@@ -141,3 +141,54 @@ class TestGenericAssetCrossWorkspaceIDOR:
         assert response.status_code == status.HTTP_204_NO_CONTENT, f"Got {response.status_code}: {response.data!r}"
         asset.refresh_from_db()
         assert asset.is_uploaded is True
+
+
+@pytest.mark.contract
+class TestGenericAssetDownloadDisposition:
+    """GenericAssetEndpoint.get must always force a download (never inline) --
+    this endpoint serves ISSUE_ATTACHMENT assets, whose allowlist now includes
+    text/html. Serving one inline on the app's own origin (MinIO is proxied
+    same-origin in the self-hosted CE deployment) would be a stored XSS."""
+
+    def detail_url(self, slug, asset_id):
+        return f"/api/v1/workspaces/{slug}/assets/{asset_id}/"
+
+    @pytest.fixture
+    def html_attachment(self, workspace, create_user):
+        return FileAsset.objects.create(
+            attributes={"name": "notes.html", "type": "text/html", "size": 10},
+            asset=f"{workspace.id}/notes.html",
+            size=10,
+            workspace=workspace,
+            created_by=create_user,
+            entity_type=FileAsset.EntityTypeContext.ISSUE_ATTACHMENT,
+            is_uploaded=True,
+            storage_metadata={"size": 10},
+        )
+
+    @pytest.mark.django_db
+    def test_download_presign_forces_attachment_disposition(self, api_key_client, workspace, html_attachment):
+        url = self.detail_url(workspace.slug, html_attachment.id)
+
+        with mock.patch("plane.api.views.asset.S3Storage") as mock_storage:
+            mock_storage.return_value.generate_presigned_url.return_value = "https://signed.example/download"
+            response = api_key_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK, f"Got {response.status_code}: {response.data!r}"
+        mock_storage.return_value.generate_presigned_url.assert_called_once()
+        _, call_kwargs = mock_storage.return_value.generate_presigned_url.call_args
+        assert call_kwargs.get("disposition") == "attachment"
+
+    @pytest.mark.django_db
+    def test_download_presign_exercises_the_real_storage_constructor(self, api_key_client, workspace, html_attachment):
+        """Mocks boto3 instead of the whole S3Storage class, so this test actually
+        constructs S3Storage(request=...) and would have caught the previous
+        `S3Storage(request=request, is_server=True)` TypeError (a bug that made
+        this endpoint 500 for every caller, unrelated to the IDOR fix above)."""
+        url = self.detail_url(workspace.slug, html_attachment.id)
+
+        with mock.patch("plane.settings.storage.boto3") as mock_boto3:
+            mock_boto3.client.return_value.generate_presigned_url.return_value = "https://signed.example/download"
+            response = api_key_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK, f"Got {response.status_code}: {response.data!r}"

@@ -37,3 +37,25 @@ export const DANGEROUS_EXTENSIONS = [
   "jar",
   "ps1",
 ];
+
+/**
+ * Extension -> MIME type fallback for files without a detectable binary signature
+ * (plain text formats have no magic bytes for signature-based sniffing to find).
+ * Only used when signature detection finds nothing, so it can never override a
+ * type actually detected from the file's bytes (e.g. a renamed executable still
+ * sniffs as its real binary type and never reaches this fallback).
+ * Keep in sync with `ATTACHMENT_MIME_TYPES` in apps/api/plane/settings/common.py.
+ */
+export const EXTENSION_MIME_TYPE_MAP: Record<string, string> = {
+  csv: "text/csv",
+  txt: "text/plain",
+  log: "text/plain",
+  css: "text/css",
+  json: "application/json",
+  har: "application/json",
+  md: "text/markdown",
+  markdown: "text/markdown",
+  xml: "text/xml",
+  html: "text/html",
+  htm: "text/html",
+};

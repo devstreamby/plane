@@ -17,6 +17,10 @@
 
 	reverse_proxy /static/* api:8000
 
+	# Defense in depth: stops a browser from sniffing a stored attachment's
+	# bytes into a different (executable) type than the Content-Type it was
+	# uploaded with, regardless of what Content-Disposition the app sent.
+	header /{$BUCKET_NAME}/* X-Content-Type-Options "nosniff"
 	reverse_proxy /{$BUCKET_NAME}/* plane-minio:9000
 	reverse_proxy /{$BUCKET_NAME} plane-minio:9000
 

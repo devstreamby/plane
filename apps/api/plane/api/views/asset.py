@@ -335,7 +335,7 @@ class UserServerAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request, is_server=True)
+        storage = S3Storage(request=request)
         # Generate a presigned URL to share an S3 object
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
         # Return the presigned URL
@@ -444,10 +444,16 @@ class GenericAssetEndpoint(BaseAPIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            # Generate presigned URL for GET
-            storage = S3Storage(request=request, is_server=True)
+            # Generate presigned URL for GET. Always force "attachment" -- this
+            # endpoint serves ISSUE_ATTACHMENT assets, which now include
+            # text/html; without this, an inline-served HTML attachment could
+            # execute script on the app's own origin (MinIO is proxied
+            # same-origin in the self-hosted CE deployment).
+            storage = S3Storage(request=request)
             presigned_url = storage.generate_presigned_url(
-                object_name=asset.asset.name, filename=asset.attributes.get("name")
+                object_name=asset.asset.name,
+                disposition="attachment",
+                filename=asset.attributes.get("name"),
             )
 
             return Response(
@@ -569,7 +575,7 @@ class GenericAssetEndpoint(BaseAPIView):
         )
 
         # Get the presigned URL
-        storage = S3Storage(request=request, is_server=True)
+        storage = S3Storage(request=request)
         presigned_url = storage.generate_presigned_post(object_name=asset_key, file_type=type, file_size=size_limit)
 
         return Response(
