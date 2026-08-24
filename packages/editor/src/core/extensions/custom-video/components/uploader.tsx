@@ -17,7 +17,7 @@ import type { EFileError } from "@/helpers/file";
 import { useUploader, useDropZone } from "@/hooks/use-file-upload";
 // local imports
 import { ECustomVideoStatus } from "../types";
-import { getVideoComponentFileMap } from "../utils";
+import { getVideoComponentFileMap, moveCursorAfterVideoNode } from "../utils";
 import { ImageUploadStatus } from "../../custom-image/components/upload-status";
 import type { CustomVideoNodeViewProps } from "./node-view";
 
@@ -34,8 +34,9 @@ export function CustomVideoUploader(props: CustomVideoNodeViewProps) {
       if (!url || !videoEntityId) return;
       updateAttributes({ src: url, status: ECustomVideoStatus.UPLOADED });
       videoComponentFileMap?.delete(videoEntityId);
+      moveCursorAfterVideoNode(editor, getPos);
     },
-    [videoComponentFileMap, videoEntityId, updateAttributes]
+    [videoComponentFileMap, videoEntityId, updateAttributes, editor, getPos]
   );
 
   const uploadVideoEditorCommand = useCallback(

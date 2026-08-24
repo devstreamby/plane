@@ -5,23 +5,22 @@
  */
 
 import { Link2 } from "lucide-react";
-import type { FormEvent } from "react";
+import type { FormEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 // plane imports
 import { cn, parseVideoUrl } from "@plane/utils";
 // local imports
 import { ECustomVideoAttributeNames, ECustomVideoProvider } from "../types";
-import { isValidProviderVideoId } from "../utils";
+import { isValidProviderVideoId, moveCursorAfterVideoNode } from "../utils";
 import type { CustomVideoNodeViewProps } from "./node-view";
 
 export function CustomVideoEmbedInput(props: CustomVideoNodeViewProps) {
-  const { editor, updateAttributes } = props;
+  const { editor, getPos, updateAttributes } = props;
   const [url, setUrl] = useState("");
   const [error, setError] = useState<string | undefined>(undefined);
   const isEditable = editor.isEditable;
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const submit = () => {
     if (!url.trim()) return;
 
     const parsed = parseVideoUrl(url);
@@ -39,6 +38,27 @@ export function CustomVideoEmbedInput(props: CustomVideoNodeViewProps) {
       [ECustomVideoAttributeNames.PROVIDER]: provider,
       [ECustomVideoAttributeNames.VIDEO_ID]: parsed.videoId,
     });
+    moveCursorAfterVideoNode(editor, getPos);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    submit();
+  };
+
+  // The editor's own keymap (e.g. "Enter splits the block") binds Enter on
+  // the ProseMirror view container, which sits between this input and the
+  // document root — its listener runs during the bubble phase, before a
+  // normal onKeyDown here would ever get a chance to stop it. Intercepting
+  // in the capture phase (which runs root-to-target, ahead of that bubble
+  // listener) is the only reliable way to make Enter submit this form
+  // instead of falling through to the editor.
+  const handleKeyDownCapture = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      submit();
+    }
   };
 
   if (!isEditable) {
@@ -68,8 +88,11 @@ export function CustomVideoEmbedInput(props: CustomVideoNodeViewProps) {
             setUrl(e.target.value);
             setError(undefined);
           }}
+          onKeyDownCapture={handleKeyDownCapture}
           placeholder="Paste a YouTube, Vimeo, Rutube, or VK link"
           className="flex-1 bg-transparent text-14 text-primary outline-none placeholder:text-tertiary"
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- this input only exists because the user just clicked "Embed link"; without autofocus, typing goes nowhere (matches the same pattern in components/links/link-edit-view.tsx)
+          autoFocus
         />
         <button
           type="submit"

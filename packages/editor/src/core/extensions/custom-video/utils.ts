@@ -4,7 +4,9 @@
  * See the LICENSE file for details.
  */
 
-import type { Editor } from "@tiptap/core";
+import type { Editor, NodeViewProps } from "@tiptap/core";
+// constants
+import { CORE_EXTENSIONS } from "@/constants/extension";
 // local imports
 import { ECustomVideoAttributeNames, ECustomVideoProvider } from "./types";
 import type { TCustomVideoAttributes } from "./types";
@@ -38,6 +40,21 @@ export const isValidProviderVideoId = (provider: ECustomVideoProvider | null, vi
   if (!provider || !videoId) return false;
   const pattern = PROVIDER_VIDEO_ID_PATTERN[provider];
   return pattern ? pattern.test(videoId) : false;
+};
+
+// After the video block finishes resolving (upload done, or embed link
+// submitted), move the cursor to the paragraph after it — creating one if
+// none exists yet — so the user isn't left with nowhere to type. Mirrors
+// the equivalent logic in custom-image's uploader.
+export const moveCursorAfterVideoNode = (editor: Editor, getPos: NodeViewProps["getPos"]) => {
+  const pos = getPos();
+  if (pos === undefined) return;
+  const nextNode = editor.state.doc.nodeAt(pos + 1);
+  if (nextNode && nextNode.type.name === CORE_EXTENSIONS.PARAGRAPH) {
+    editor.commands.setTextSelection(pos + 1);
+  } else {
+    editor.commands.createParagraphNear();
+  }
 };
 
 // Builds the embed src for iframe-based providers. Returns undefined for
