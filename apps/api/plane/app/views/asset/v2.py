@@ -23,6 +23,7 @@ from plane.settings.storage import S3Storage
 from plane.app.permissions import allow_permission, ROLE
 from plane.utils.cache import invalidate_cache_directly
 from plane.utils.path_validator import sanitize_filename
+from plane.utils.asset_validation import get_allowed_mime_types
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
 from plane.throttles.asset import AssetRateThrottle
 
@@ -339,17 +340,11 @@ class WorkspaceFileAssetEndpoint(BaseAPIView):
                 )
 
         # Check if the file type is allowed
-        allowed_types = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/jpg",
-            "image/gif",
-        ]
+        allowed_types = get_allowed_mime_types(entity_type)
         if type not in allowed_types:
             return Response(
                 {
-                    "error": "Invalid file type. Only JPEG, PNG, WebP, JPG and GIF files are allowed.",
+                    "error": "Invalid file type. Allowed types: " + ", ".join(allowed_types),
                     "status": False,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -541,17 +536,11 @@ class ProjectAssetEndpoint(BaseAPIView):
             )
 
         # Check if the file type is allowed
-        allowed_types = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/jpg",
-            "image/gif",
-        ]
+        allowed_types = get_allowed_mime_types(entity_type)
         if type not in allowed_types:
             return Response(
                 {
-                    "error": "Invalid file type. Only JPEG, PNG, WebP, JPG and GIF files are allowed.",
+                    "error": "Invalid file type. Allowed types: " + ", ".join(allowed_types),
                     "status": False,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -633,10 +622,14 @@ class ProjectAssetEndpoint(BaseAPIView):
 
         # Get the presigned URL
         storage = S3Storage(request=request)
+        # Videos need an inline disposition so <video> can play them back
+        # (and seek via range requests) instead of the browser downloading them.
+        mime_type = asset.attributes.get("type", "")
+        disposition = "inline" if mime_type.startswith("video/") else "attachment"
         # Generate a presigned URL to share an S3 object
         signed_url = storage.generate_presigned_url(
             object_name=asset.asset.name,
-            disposition="attachment",
+            disposition=disposition,
             filename=asset.attributes.get("name"),
         )
         # Redirect to the signed URL

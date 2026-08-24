@@ -7,7 +7,11 @@
 import type { Editor } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 // constants
-import { ACCEPTED_ATTACHMENT_MIME_TYPES, ACCEPTED_IMAGE_MIME_TYPES } from "@/constants/config";
+import {
+  ACCEPTED_ATTACHMENT_MIME_TYPES,
+  ACCEPTED_IMAGE_MIME_TYPES,
+  ACCEPTED_VIDEO_MIME_TYPES,
+} from "@/constants/config";
 // types
 import type { TEditorCommands, TExtensions } from "@/types";
 
@@ -97,7 +101,7 @@ type InsertFilesSafelyArgs = {
   event: "insert" | "drop";
   files: File[];
   initialPos: number;
-  type?: Extract<TEditorCommands, "attachment" | "image">;
+  type?: Extract<TEditorCommands, "attachment" | "image" | "video">;
 };
 
 export const insertFilesSafely = async (args: InsertFilesSafelyArgs) => {
@@ -109,19 +113,26 @@ export const insertFilesSafely = async (args: InsertFilesSafelyArgs) => {
     const docSize = editor.state.doc.content.size;
     pos = Math.min(pos, docSize);
 
-    let fileType: "image" | "attachment" | null = null;
+    let fileType: "image" | "video" | "attachment" | null = null;
 
     try {
       if (type) {
-        if (["image", "attachment"].includes(type)) fileType = type;
+        if (["image", "video", "attachment"].includes(type)) fileType = type;
         else throw new Error("Wrong file type passed");
       } else {
         if (ACCEPTED_IMAGE_MIME_TYPES.includes(file.type)) fileType = "image";
+        else if (ACCEPTED_VIDEO_MIME_TYPES.includes(file.type)) fileType = "video";
         else if (ACCEPTED_ATTACHMENT_MIME_TYPES.includes(file.type)) fileType = "attachment";
       }
       // insert file depending on the type at the current position
       if (fileType === "image" && !disabledExtensions?.includes("image")) {
         editor.commands.insertImageComponent({
+          file,
+          pos,
+          event,
+        });
+      } else if (fileType === "video" && !disabledExtensions?.includes("video")) {
+        editor.commands.insertVideoComponent({
           file,
           pos,
           event,

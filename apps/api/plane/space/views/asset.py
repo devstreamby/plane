@@ -19,6 +19,7 @@ from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
 from plane.db.models import DeployBoard, FileAsset
 from plane.settings.storage import S3Storage
 from plane.utils.path_validator import sanitize_filename
+from plane.utils.asset_validation import get_allowed_mime_types
 
 # Module imports
 from .base import BaseAPIView
@@ -89,17 +90,11 @@ class EntityAssetEndpoint(BaseAPIView):
             )
 
         # Check if the file type is allowed
-        allowed_types = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/jpg",
-            "image/gif",
-        ]
+        allowed_types = get_allowed_mime_types(entity_type)
         if type not in allowed_types:
             return Response(
                 {
-                    "error": "Invalid file type. Only JPEG, PNG, WebP, JPG and GIF files are allowed.",
+                    "error": "Invalid file type. Allowed types: " + ", ".join(allowed_types),
                     "status": False,
                 },
                 status=status.HTTP_400_BAD_REQUEST,

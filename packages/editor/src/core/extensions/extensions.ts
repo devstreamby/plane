@@ -7,8 +7,8 @@
 import type { HocuspocusProvider } from "@hocuspocus/provider";
 import type { Extensions } from "@tiptap/core";
 import { CharacterCount } from "@tiptap/extension-character-count";
-import TaskItem from "@tiptap/extension-task-item";
-import TaskList from "@tiptap/extension-task-list";
+import TiptapTaskItem from "@tiptap/extension-task-item";
+import TiptapTaskList from "@tiptap/extension-task-list";
 import { TextStyle } from "@tiptap/extension-text-style";
 import { Underline } from "@tiptap/extension-underline";
 import { Markdown } from "tiptap-markdown";
@@ -39,6 +39,7 @@ import { CoreEditorAdditionalExtensions } from "@/plane-editor/extensions";
 import type { IEditorProps } from "@/types";
 // local imports
 import { CustomImageExtension } from "./custom-image/extension";
+import { CustomVideoExtension } from "./custom-video/extension";
 import { EmojiExtension } from "./emoji/extension";
 import { CustomPlaceholderExtension } from "./placeholder";
 import { CustomStarterKitExtension } from "./starter-kit";
@@ -92,12 +93,12 @@ export const CoreEditorExtensions = (args: TArguments): Extensions => {
     CustomTypographyExtension,
     Underline,
     TextStyle,
-    TaskList.configure({
+    TiptapTaskList.configure({
       HTMLAttributes: {
         class: "not-prose pl-2 space-y-2",
       },
     }),
-    TaskItem.configure({
+    TiptapTaskItem.configure({
       HTMLAttributes: {
         class: "relative",
       },
@@ -146,6 +147,15 @@ export const CoreEditorExtensions = (args: TArguments): Extensions => {
         fileHandler,
       }),
       CustomImageExtension({
+        fileHandler,
+        isEditable: editable,
+      })
+    );
+  }
+
+  if (!disabledExtensions.includes("video")) {
+    extensions.push(
+      CustomVideoExtension({
         fileHandler,
         isEditable: editable,
       })

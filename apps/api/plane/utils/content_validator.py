@@ -75,6 +75,7 @@ CUSTOM_TAGS = {
     "label",
     "input",
     "image-component",
+    "video-component",
 }
 ALLOWED_TAGS = nh3.ALLOWED_TAGS | CUSTOM_TAGS
 
@@ -134,6 +135,7 @@ ATTRIBUTES = {
         "title",
         "data-attach-id",
     },
+    "video-component": {"id", "source", "src", "provider", "videoid", "status"},
     "mention-component": {"id", "entity_identifier", "entity_name"},
     "th": {
         "colspan",

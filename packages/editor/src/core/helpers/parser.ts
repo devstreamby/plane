@@ -32,6 +32,12 @@ const extractAssetsFromHTMLContent = (htmlContent: string): string[] => {
     const src = component.getAttribute("src");
     if (src) assetSources.add(src);
   });
+  // only uploaded videos carry an asset src — external embeds have none
+  const videoComponents = doc.querySelectorAll("video-component");
+  videoComponents.forEach((component) => {
+    const src = component.getAttribute("src");
+    if (src) assetSources.add(src);
+  });
   const additionalAssetIds = extractAdditionalAssetsFromHTMLContent(htmlContent);
   return [...Array.from(assetSources), ...additionalAssetIds];
 };
@@ -50,6 +56,13 @@ const replaceAssetsInHTMLContent = (props: { htmlContent: string; assetMap: Reco
   // replace sources in image components
   const imageComponents = doc.querySelectorAll("image-component");
   imageComponents.forEach((component) => {
+    const oldSrc = component.getAttribute("src");
+    if (oldSrc && assetMap[oldSrc]) {
+      component.setAttribute("src", assetMap[oldSrc]);
+    }
+  });
+  const videoComponents = doc.querySelectorAll("video-component");
+  videoComponents.forEach((component) => {
     const oldSrc = component.getAttribute("src");
     if (oldSrc && assetMap[oldSrc]) {
       component.setAttribute("src", assetMap[oldSrc]);

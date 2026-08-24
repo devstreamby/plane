@@ -26,6 +26,32 @@ export const parseCustomComponents = (args: TArgs): Record<string, Handle> => {
       if (!src || !fileAssetDetails) return createTextNode("");
       return createTextNode(`![${fileAssetDetails.name}](${fileAssetDetails.url})`);
     },
+    "video-component": (_state, node) => {
+      const properties = node.properties || {};
+      const source = String(properties.source);
+
+      if (source === "upload") {
+        const src = String(properties.src);
+        const fileAssetDetails = getFileAssetDetails(src);
+        if (!src || !fileAssetDetails) return createTextNode("");
+        return createTextNode(`[${fileAssetDetails.name}](${fileAssetDetails.url})`);
+      }
+
+      const provider = String(properties.provider);
+      const videoId = String(properties.videoid);
+      if (!provider || !videoId) return createTextNode("");
+
+      const providerUrls: Record<string, string> = {
+        youtube: `https://youtu.be/${videoId}`,
+        vimeo: `https://vimeo.com/${videoId}`,
+        rutube: `https://rutube.ru/video/${videoId}/`,
+        vk: `https://vk.com/video${videoId}`,
+        direct: videoId,
+      };
+      const url = providerUrls[provider];
+      if (!url) return createTextNode("");
+      return createTextNode(`[Video](${url})`);
+    },
     img: (_state, node) => {
       const properties = node.properties || {};
       const src = String(properties.src);

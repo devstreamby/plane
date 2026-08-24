@@ -10,6 +10,7 @@ import { CORE_EXTENSIONS } from "@/constants/extension";
 // extensions
 import { replaceCodeWithText } from "@/extensions/code/utils/replace-code-block-with-text";
 import type { InsertImageComponentProps } from "@/extensions/custom-image/types";
+import type { InsertVideoComponentProps } from "@/extensions/custom-video/types";
 // helpers
 import type { ExtendedEmojiStorage } from "@/extensions/emoji/emoji";
 import { findTableAncestor } from "@/helpers/common";
@@ -98,8 +99,8 @@ export const insertTableCommand = (editor: Editor, range?: Range) => {
     const selection = window.getSelection();
     if (selection) {
       if (selection.rangeCount !== 0) {
-        const range = selection.getRangeAt(0);
-        if (findTableAncestor(range.startContainer)) {
+        const domRange = selection.getRangeAt(0);
+        if (findTableAncestor(domRange.startContainer)) {
           return;
         }
       }
@@ -128,6 +129,27 @@ export const insertImage = ({
   if (pos) imageOptions.pos = pos;
   if (file) imageOptions.file = file;
   return editor?.chain().focus().insertImageComponent(imageOptions).run();
+};
+
+export const insertVideo = ({
+  editor,
+  event,
+  pos,
+  file,
+  range,
+}: {
+  editor: Editor;
+  event: "insert" | "drop";
+  pos?: number | null;
+  file?: File;
+  range?: Range;
+}) => {
+  if (range) editor.chain().focus().deleteRange(range).run();
+
+  const videoOptions: InsertVideoComponentProps = { event };
+  if (pos) videoOptions.pos = pos;
+  if (file) videoOptions.file = file;
+  return editor?.chain().focus().insertVideoComponent(videoOptions).run();
 };
 
 export const unsetLinkEditor = (editor: Editor) => {

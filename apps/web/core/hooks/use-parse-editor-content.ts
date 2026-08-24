@@ -154,13 +154,32 @@ export const useParseEditorContent = (args: TArgs) => {
       // remove all issue-embed-component elements
       const issueEmbedComponents = doc.querySelectorAll("issue-embed-component");
       issueEmbedComponents.forEach((component) => component.remove());
+      // video isn't playable outside the editor (PDF export, static HTML) —
+      // replace it with a plain link so the content isn't silently dropped
+      const videoComponents = doc.querySelectorAll("video-component");
+      videoComponents.forEach((component) => {
+        if (noAssets) {
+          component.remove();
+          return;
+        }
+        const source = component.getAttribute("source");
+        const assetId = component.getAttribute("src");
+        const href =
+          source === "upload"
+            ? ((assetId && getEditorAssetSrc({ assetId, projectId, workspaceSlug })) ?? "")
+            : (component.getAttribute("videoid") ?? "");
+        const link = doc.createElement("a");
+        link.href = href;
+        link.textContent = "Video";
+        component.replaceWith(link);
+      });
       // serialize the document back into a string
       let serializedDoc = doc.body.innerHTML;
       // remove null colors from table elements
       serializedDoc = serializedDoc.replace(/background-color: null/g, "").replace(/color: null/g, "");
       return serializedDoc;
     },
-    [getUserDetails, parseAdditionalEditorContent]
+    [getUserDetails, parseAdditionalEditorContent, projectId, workspaceSlug]
   );
 
   /**
@@ -212,9 +231,26 @@ export const useParseEditorContent = (args: TArgs) => {
       // remove all issue-embed components
       const issueEmbedRegex = /<issue-embed-component[^>]*>[^]*<\/issue-embed-component>/g;
       parsedMarkdownContent = parsedMarkdownContent.replace(issueEmbedRegex, "");
+      // replace video components with a plain link (or drop them, like images)
+      const videoComponentRegex = /<video-component([^>]*)><\/video-component>/g;
+      if (noAssets) {
+        parsedMarkdownContent = parsedMarkdownContent.replace(videoComponentRegex, "");
+      } else {
+        parsedMarkdownContent = parsedMarkdownContent.replace(videoComponentRegex, (_match, attrs: string) => {
+          const sourceMatch = /source="([^"]*)"/.exec(attrs);
+          const srcMatch = /src="([^"]*)"/.exec(attrs);
+          const videoIdMatch = /videoid="([^"]*)"/.exec(attrs);
+          const isUpload = sourceMatch?.[1] === "upload";
+          const href = isUpload
+            ? ((srcMatch?.[1] && getEditorAssetSrc({ assetId: srcMatch[1], projectId, workspaceSlug })) ?? "")
+            : (videoIdMatch?.[1] ?? "");
+          if (!href) return "";
+          return `[Video](${href})`;
+        });
+      }
       return parsedMarkdownContent;
     },
-    [getUserDetails, parseAdditionalEditorContent, workspaceSlug]
+    [getUserDetails, parseAdditionalEditorContent, projectId, workspaceSlug]
   );
 
   const getEditorMetaData = useCallback(
@@ -234,6 +270,26 @@ export const useParseEditorContent = (args: TArgs) => {
                 projectId,
                 workspaceSlug,
               });
+          if (assetSrc) {
+            filesMetaData.push({
+              id: src,
+              name: src,
+              url: assetSrc,
+            });
+          }
+        }
+      });
+      // process uploaded video components (external embeds have no asset)
+      const videoComponents = doc.querySelectorAll("video-component");
+      videoComponents.forEach((element) => {
+        if (element.getAttribute("source") !== "upload") return;
+        const src = element.getAttribute("src");
+        if (src) {
+          const assetSrc = getEditorAssetSrc({
+            assetId: src,
+            projectId,
+            workspaceSlug,
+          });
           if (assetSrc) {
             filesMetaData.push({
               id: src,
