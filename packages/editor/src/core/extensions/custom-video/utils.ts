@@ -78,6 +78,26 @@ export const buildProviderVideoUrl = (provider: ECustomVideoProvider, videoId: s
   }
 };
 
+// Builds the embed src for iframe-based providers, used to play a video
+// inline in place once the user clicks play on its preview card. Returns
+// undefined for providers that aren't rendered via an iframe (e.g. "direct").
+export const buildProviderEmbedSrc = (provider: ECustomVideoProvider, videoId: string): string | undefined => {
+  switch (provider) {
+    case ECustomVideoProvider.YOUTUBE:
+      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+    case ECustomVideoProvider.VIMEO:
+      return `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+    case ECustomVideoProvider.RUTUBE:
+      return `https://rutube.ru/play/embed/${videoId}?autoStart=true`;
+    case ECustomVideoProvider.VK: {
+      const [oid, id] = videoId.split("_");
+      return `https://vk.com/video_ext.php?oid=${oid}&id=${id}&hd=2&autoplay=1`;
+    }
+    default:
+      return undefined;
+  }
+};
+
 export type TVideoOEmbedResult = {
   title: string;
   authorName?: string;

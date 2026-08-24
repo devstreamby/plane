@@ -8,7 +8,7 @@ import { AlertTriangle, ExternalLink, Film, PlayCircle, Youtube } from "lucide-r
 import { useEffect, useState } from "react";
 // local imports
 import { ECustomVideoProvider, ECustomVideoSource } from "../types";
-import { buildProviderVideoUrl, fetchVideoOEmbed, isValidProviderVideoId } from "../utils";
+import { buildProviderEmbedSrc, buildProviderVideoUrl, fetchVideoOEmbed, isValidProviderVideoId } from "../utils";
 import type { TVideoOEmbedResult } from "../utils";
 import type { CustomVideoNodeViewProps } from "./node-view";
 
@@ -34,9 +34,36 @@ function VideoErrorState({ message }: { message: string }) {
 
 type TOEmbedState = { status: "loading" } | { status: "loaded"; data: TVideoOEmbedResult } | { status: "error" };
 
+function InlineVideoEmbed({ embedSrc, title }: { embedSrc: string; title: string }) {
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-lg bg-black"
+      style={{ aspectRatio: "16 / 9" }}
+      contentEditable={false}
+    >
+      <iframe
+        src={embedSrc}
+        className="absolute inset-0 h-full w-full"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        referrerPolicy="strict-origin-when-cross-origin"
+        // allow-same-origin is safe to combine with allow-scripts here because the
+        // src is always one of our own hardcoded provider embed URLs (never
+        // user-controlled HTML/markup) — without it, third-party players like
+        // YouTube's can't use their own origin's storage and fail to render at all.
+        // eslint-disable-next-line react/iframe-missing-sandbox -- see comment above; cross-origin fixed src, not user content
+        sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+        title={title}
+      />
+    </div>
+  );
+}
+
 function VideoLinkPreviewCard({ provider, videoId }: { provider: ECustomVideoProvider; videoId: string }) {
   const [state, setState] = useState<TOEmbedState>({ status: "loading" });
+  const [isPlaying, setIsPlaying] = useState(false);
   const pageUrl = buildProviderVideoUrl(provider, videoId);
+  const embedSrc = buildProviderEmbedSrc(provider, videoId);
   const providerLabel = PROVIDER_LABELS[provider];
 
   useEffect(() => {
@@ -57,15 +84,26 @@ function VideoLinkPreviewCard({ provider, videoId }: { provider: ECustomVideoPro
     };
   }, [provider, videoId]);
 
+  const title = state.status === "loaded" ? state.data.title : "Embedded video";
+
+  if (isPlaying && embedSrc) {
+    return <InlineVideoEmbed embedSrc={embedSrc} title={title} />;
+  }
+
+  const cardTitleText = state.status === "loading" ? "Loading video…" : state.status === "loaded" ? title : pageUrl;
+
   return (
-    <a
-      href={pageUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <div
       contentEditable={false}
-      className="video-link-preview-card group/video-card flex h-28 items-stretch overflow-hidden rounded-lg border border-subtle bg-layer-3 no-underline transition-colors hover:border-strong"
+      className="video-link-preview-card flex h-28 items-stretch overflow-hidden rounded-lg border border-subtle bg-layer-3"
     >
-      <div className="relative h-full w-48 flex-shrink-0 bg-layer-2">
+      <button
+        type="button"
+        onClick={() => setIsPlaying(true)}
+        disabled={!embedSrc}
+        aria-label={`Play ${title}`}
+        className="group/video-card relative h-full w-48 flex-shrink-0 cursor-pointer bg-layer-2"
+      >
         {state.status === "loaded" && state.data.thumbnailUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- external, unregistered thumbnail host; next/image can't optimize it
           <img src={state.data.thumbnailUrl} alt="" className="h-full w-full object-cover" />
@@ -78,16 +116,19 @@ function VideoLinkPreviewCard({ provider, videoId }: { provider: ECustomVideoPro
             )}
           </div>
         )}
-        {state.status !== "error" && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 transition-opacity group-hover/video-card:opacity-100">
+        {embedSrc && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover/video-card:bg-black/30">
             <PlayCircle className="size-9 text-white drop-shadow" />
           </div>
         )}
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-2">
-        <div className="line-clamp-2 text-14 font-medium text-primary">
-          {state.status === "loaded" ? state.data.title : state.status === "loading" ? "Loading video…" : pageUrl}
-        </div>
+      </button>
+      <a
+        href={pageUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-2 no-underline"
+      >
+        <div className="line-clamp-2 text-14 font-medium text-primary">{cardTitleText}</div>
         {state.status === "loaded" && state.data.authorName && (
           <div className="truncate text-12 text-tertiary">{state.data.authorName}</div>
         )}
@@ -95,8 +136,8 @@ function VideoLinkPreviewCard({ provider, videoId }: { provider: ECustomVideoPro
           <ExternalLink className="size-3" />
           Watch on {providerLabel}
         </div>
-      </div>
-    </a>
+      </a>
+    </div>
   );
 }
 
