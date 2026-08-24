@@ -55,6 +55,12 @@ export type InsertVideoComponentProps = {
   event: "insert" | "drop";
 };
 
+export type InsertVideoEmbedProps = {
+  provider: ECustomVideoProvider;
+  videoId: string;
+  pos?: number;
+};
+
 export type CustomVideoExtensionOptions = {
   getVideoSource: TFileHandler["getAssetSrc"];
   getVideoDownloadSource: TFileHandler["getAssetDownloadSrc"];

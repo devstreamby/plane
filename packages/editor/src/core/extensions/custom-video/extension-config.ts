@@ -15,6 +15,7 @@ import type {
   CustomVideoExtensionType,
   CustomVideoExtensionStorage,
   InsertVideoComponentProps,
+  InsertVideoEmbedProps,
 } from "./types";
 import { DEFAULT_CUSTOM_VIDEO_ATTRIBUTES } from "./utils";
 
@@ -22,6 +23,7 @@ declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     [CORE_EXTENSIONS.CUSTOM_VIDEO]: {
       insertVideoComponent: ({ file, pos, event }: InsertVideoComponentProps) => ReturnType;
+      insertVideoEmbed: ({ provider, videoId, pos }: InsertVideoEmbedProps) => ReturnType;
     };
   }
   interface Storage {

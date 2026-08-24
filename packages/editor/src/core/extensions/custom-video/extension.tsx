@@ -106,6 +106,31 @@ export function CustomVideoExtension(extensionProps: Props) {
               attrs: attributes,
             });
           },
+
+        // Used when a bare video-provider URL is pasted anywhere in the
+        // document (see DropHandlerPlugin) — skips the chooser/embed-input
+        // states entirely and lands directly on a resolved embed.
+        insertVideoEmbed:
+          (props) =>
+          ({ commands }) => {
+            const attributes: Partial<Record<ECustomVideoAttributeNames, unknown>> = {
+              [ECustomVideoAttributeNames.ID]: uuidv4(),
+              [ECustomVideoAttributeNames.SOURCE]: ECustomVideoSource.EXTERNAL,
+              [ECustomVideoAttributeNames.PROVIDER]: props.provider,
+              [ECustomVideoAttributeNames.VIDEO_ID]: props.videoId,
+            };
+
+            if (props.pos !== undefined) {
+              return commands.insertContentAt(props.pos, {
+                type: this.name,
+                attrs: attributes,
+              });
+            }
+            return commands.insertContent({
+              type: this.name,
+              attrs: attributes,
+            });
+          },
       };
     },
 

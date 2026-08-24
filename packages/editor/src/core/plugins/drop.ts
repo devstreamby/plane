@@ -6,12 +6,17 @@
 
 import type { Editor } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
+// plane imports
+import { parseVideoUrl } from "@plane/utils";
 // constants
 import {
   ACCEPTED_ATTACHMENT_MIME_TYPES,
   ACCEPTED_IMAGE_MIME_TYPES,
   ACCEPTED_VIDEO_MIME_TYPES,
 } from "@/constants/config";
+// extensions
+import type { ECustomVideoProvider } from "@/extensions/custom-video/types";
+import { isValidProviderVideoId } from "@/extensions/custom-video/utils";
 // types
 import type { TEditorCommands, TExtensions } from "@/types";
 
@@ -53,6 +58,29 @@ export const DropHandlerPlugin = (props: Props): Plugin => {
           }
           return true;
         }
+
+        // A bare video-provider link, pasted on its own with nothing else
+        // selected — auto-embed it instead of leaving it as plain link
+        // text. Anywhere else in the document is where a user will
+        // naturally try to paste a video link (not just inside the video
+        // node's own "embed link" input), so this is the paste path that
+        // actually needs to work.
+        if (editor.isEditable && !disabledExtensions?.includes("video") && event.clipboardData) {
+          const text = event.clipboardData.getData("text/plain")?.trim();
+          if (text && !text.includes("\n") && !(event.clipboardData.files && event.clipboardData.files.length > 0)) {
+            const parsed = parseVideoUrl(text);
+            const provider = parsed?.provider as ECustomVideoProvider | undefined;
+            if (parsed && provider && isValidProviderVideoId(provider, parsed.videoId)) {
+              const pos = view.state.selection.from;
+              const inserted = editor.commands.insertVideoEmbed({ provider, videoId: parsed.videoId, pos });
+              if (inserted) {
+                event.preventDefault();
+                return true;
+              }
+            }
+          }
+        }
+
         return false;
       },
       handleDrop: (view, event, _slice, moved) => {
