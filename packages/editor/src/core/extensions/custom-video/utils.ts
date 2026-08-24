@@ -57,21 +57,70 @@ export const moveCursorAfterVideoNode = (editor: Editor, getPos: NodeViewProps["
   }
 };
 
-// Builds the embed src for iframe-based providers. Returns undefined for
-// providers that aren't rendered via an iframe (e.g. "direct").
-export const getVideoEmbedSrc = (provider: ECustomVideoProvider, videoId: string): string | undefined => {
+// Reconstructs the canonical, human-visitable page URL for a provider video
+// — used both as the oEmbed request target and as the "watch on X" link in
+// the preview card. For "direct" links, videoId already *is* the URL.
+export const buildProviderVideoUrl = (provider: ECustomVideoProvider, videoId: string): string => {
   switch (provider) {
     case ECustomVideoProvider.YOUTUBE:
-      return `https://www.youtube-nocookie.com/embed/${videoId}`;
+      return `https://www.youtube.com/watch?v=${videoId}`;
     case ECustomVideoProvider.VIMEO:
-      return `https://player.vimeo.com/video/${videoId}`;
+      return `https://vimeo.com/${videoId}`;
     case ECustomVideoProvider.RUTUBE:
-      return `https://rutube.ru/play/embed/${videoId}`;
+      return `https://rutube.ru/video/${videoId}/`;
     case ECustomVideoProvider.VK: {
       const [oid, id] = videoId.split("_");
-      return `https://vk.com/video_ext.php?oid=${oid}&id=${id}&hd=2`;
+      return `https://vk.com/video${oid}_${id}`;
     }
+    case ECustomVideoProvider.DIRECT:
     default:
-      return undefined;
+      return videoId;
   }
+};
+
+export type TVideoOEmbedResult = {
+  title: string;
+  authorName?: string;
+  thumbnailUrl?: string;
+};
+
+// Public, CORS-enabled oEmbed endpoints — no API key needed, fetchable
+// straight from the browser. VK has no equivalent without an authenticated
+// API call, so it's intentionally absent here; the card falls back to a
+// plain link for it.
+const OEMBED_ENDPOINT_BUILDERS: Partial<Record<ECustomVideoProvider, (pageUrl: string) => string>> = {
+  [ECustomVideoProvider.YOUTUBE]: (pageUrl) =>
+    `https://www.youtube.com/oembed?url=${encodeURIComponent(pageUrl)}&format=json`,
+  [ECustomVideoProvider.VIMEO]: (pageUrl) => `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(pageUrl)}`,
+  [ECustomVideoProvider.RUTUBE]: (pageUrl) =>
+    `https://rutube.ru/api/oembed/?url=${encodeURIComponent(pageUrl)}&format=json`,
+};
+
+// Renders the video as a static link-preview card (title/thumbnail/author,
+// fetched once via the provider's public oEmbed endpoint) instead of a live
+// iframe player — avoids sandbox/CSP embed-player failures entirely and
+// matches the "smart link" pattern from tools like Jira/Confluence.
+export const fetchVideoOEmbed = async (
+  provider: ECustomVideoProvider,
+  videoId: string
+): Promise<TVideoOEmbedResult | undefined> => {
+  const buildEndpoint = OEMBED_ENDPOINT_BUILDERS[provider];
+  if (!buildEndpoint) return undefined;
+
+  const pageUrl = buildProviderVideoUrl(provider, videoId);
+  const response = await fetch(buildEndpoint(pageUrl));
+  if (!response.ok) throw new Error(`oEmbed request failed with status ${response.status}`);
+
+  const data: unknown = await response.json();
+  const title = (data as { title?: unknown } | null)?.title;
+  if (typeof title !== "string") throw new Error("oEmbed response missing a title");
+
+  const authorName = (data as { author_name?: unknown }).author_name;
+  const thumbnailUrl = (data as { thumbnail_url?: unknown }).thumbnail_url;
+
+  return {
+    title,
+    authorName: typeof authorName === "string" ? authorName : undefined,
+    thumbnailUrl: typeof thumbnailUrl === "string" ? thumbnailUrl : undefined,
+  };
 };

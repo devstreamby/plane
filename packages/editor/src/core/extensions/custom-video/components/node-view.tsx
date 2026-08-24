@@ -9,8 +9,6 @@ import type { NodeViewProps } from "@tiptap/react";
 // local imports
 import type { CustomVideoExtensionType, TCustomVideoAttributes } from "../types";
 import { ECustomVideoAttributeNames, ECustomVideoSource, ECustomVideoStatus } from "../types";
-import { CustomVideoChooser } from "./chooser";
-import { CustomVideoEmbedInput } from "./embed-input";
 import { CustomVideoPlayer } from "./player";
 import { CustomVideoUploader } from "./uploader";
 
@@ -24,17 +22,17 @@ export type CustomVideoNodeViewProps = Omit<NodeViewProps, "extension" | "update
 
 export function CustomVideoNodeView(props: CustomVideoNodeViewProps) {
   const { node } = props;
-  const { source, status, provider, videoid: videoId } = node.attrs;
+  const { source, status } = node.attrs;
 
-  let content: React.ReactNode;
-  if (source === ECustomVideoSource.UPLOAD) {
-    content =
-      status === ECustomVideoStatus.UPLOADED ? <CustomVideoPlayer {...props} /> : <CustomVideoUploader {...props} />;
-  } else if (source === ECustomVideoSource.EXTERNAL) {
-    content = provider && videoId ? <CustomVideoPlayer {...props} /> : <CustomVideoEmbedInput {...props} />;
-  } else {
-    content = <CustomVideoChooser {...props} />;
-  }
+  // "external" nodes only ever get created fully-resolved (provider +
+  // videoId set together, see insertVideoEmbed) — there's no in-between
+  // state to render here.
+  const content =
+    source === ECustomVideoSource.EXTERNAL || status === ECustomVideoStatus.UPLOADED ? (
+      <CustomVideoPlayer {...props} />
+    ) : (
+      <CustomVideoUploader {...props} />
+    );
 
   return (
     <NodeViewWrapper key={node.attrs[ECustomVideoAttributeNames.ID]}>

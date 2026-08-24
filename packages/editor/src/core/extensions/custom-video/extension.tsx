@@ -66,8 +66,14 @@ export function CustomVideoExtension(extensionProps: Props) {
           (props) =>
           ({ commands }) => {
             const videoId = uuidv4();
+            // Always starts as an upload — a bare link pasted anywhere in the
+            // document is auto-embedded on its own (see DropHandlerPlugin +
+            // insertVideoEmbed below), so this command no longer needs a
+            // separate "choose upload or embed" step.
             const attributes: Partial<Record<ECustomVideoAttributeNames, unknown>> = {
               [ECustomVideoAttributeNames.ID]: videoId,
+              [ECustomVideoAttributeNames.SOURCE]: ECustomVideoSource.UPLOAD,
+              [ECustomVideoAttributeNames.STATUS]: ECustomVideoStatus.PENDING,
             };
 
             // A file is only present for drag-and-drop / paste — in that case
@@ -88,12 +94,9 @@ export function CustomVideoExtension(extensionProps: Props) {
               if (videoComponentFileMap && props.event === "drop") {
                 videoComponentFileMap.set(videoId, { file: props.file, event: "drop" });
               }
-
-              attributes[ECustomVideoAttributeNames.SOURCE] = ECustomVideoSource.UPLOAD;
-              attributes[ECustomVideoAttributeNames.STATUS] = ECustomVideoStatus.PENDING;
             }
-            // Otherwise (toolbar/slash-command insert) the node starts in a
-            // "choose upload or embed" state — the NodeView renders a chooser.
+            // Otherwise (toolbar/slash-command insert, no file yet) the
+            // uploader NodeView renders its dropzone/"click to browse" state.
 
             if (props.pos !== undefined) {
               return commands.insertContentAt(props.pos, {
