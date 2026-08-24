@@ -5,7 +5,7 @@
  */
 
 import { Link2 } from "lucide-react";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
 import { useState } from "react";
 // plane imports
 import { cn, parseVideoUrl } from "@plane/utils";
@@ -13,6 +13,16 @@ import { cn, parseVideoUrl } from "@plane/utils";
 import { ECustomVideoAttributeNames, ECustomVideoProvider } from "../types";
 import { isValidProviderVideoId, moveCursorAfterVideoNode } from "../utils";
 import type { CustomVideoNodeViewProps } from "./node-view";
+
+// Same story as Enter: the editor's own paste handler (for turning
+// dropped/pasted files into image or video blocks) is bound on the
+// ProseMirror view container and runs in the bubble phase, so it swallows a
+// paste before it ever reaches this input's native paste behavior. Stopping
+// it here in the capture phase lets the browser paste clipboard text into
+// the field like a normal input.
+const handlePasteCapture = (e: ClipboardEvent<HTMLInputElement>) => {
+  e.stopPropagation();
+};
 
 export function CustomVideoEmbedInput(props: CustomVideoNodeViewProps) {
   const { editor, getPos, updateAttributes } = props;
@@ -89,6 +99,7 @@ export function CustomVideoEmbedInput(props: CustomVideoNodeViewProps) {
             setError(undefined);
           }}
           onKeyDownCapture={handleKeyDownCapture}
+          onPasteCapture={handlePasteCapture}
           placeholder="Paste a YouTube, Vimeo, Rutube, or VK link"
           className="flex-1 bg-transparent text-14 text-primary outline-none placeholder:text-tertiary"
           // eslint-disable-next-line jsx-a11y/no-autofocus -- this input only exists because the user just clicked "Embed link"; without autofocus, typing goes nowhere (matches the same pattern in components/links/link-edit-view.tsx)
