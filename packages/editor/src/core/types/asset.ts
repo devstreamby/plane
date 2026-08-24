@@ -17,4 +17,12 @@ export type TEditorImageAsset = {
   type: CORE_EXTENSIONS.IMAGE | CORE_EXTENSIONS.CUSTOM_IMAGE;
 };
 
-export type TEditorAsset = TEditorImageAsset | TAdditionalEditorAsset;
+export type TEditorVideoAsset = {
+  href: string;
+  id: string;
+  name: string;
+  src: string;
+  type: CORE_EXTENSIONS.CUSTOM_VIDEO;
+};
+
+export type TEditorAsset = TEditorImageAsset | TEditorVideoAsset | TAdditionalEditorAsset;

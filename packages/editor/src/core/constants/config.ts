@@ -16,6 +16,10 @@ export const DEFAULT_DISPLAY_CONFIG: TDisplayConfig = {
 
 export const ACCEPTED_IMAGE_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
 
+// Restricted to formats browsers can play back natively via <video> — kept in
+// sync with EDITOR_VIDEO_MIME_TYPES in apps/api/plane/utils/asset_validation.py.
+export const ACCEPTED_VIDEO_MIME_TYPES = ["video/mp4", "video/webm", "video/ogg"];
+
 export const ACCEPTED_ATTACHMENT_MIME_TYPES = [
   "image/jpeg",
   "image/png",

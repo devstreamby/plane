@@ -57,6 +57,68 @@ export const isEditorEmpty = (description: string | undefined): boolean =>
   description === `<p class="editor-paragraph-block"></p>` ||
   description.trim() === "";
 
+export type TVideoEmbedProvider = "youtube" | "vimeo" | "rutube" | "vk" | "direct";
+
+export type TParsedVideoEmbed = {
+  provider: TVideoEmbedProvider;
+  videoId: string;
+};
+
+/**
+ * @description parse a pasted URL into a {provider, videoId} pair the video
+ * node can embed. Returns undefined for URLs that don't match a known
+ * provider or a direct video file link — those are left as plain text/links.
+ * @param {string} rawUrl
+ */
+export const parseVideoUrl = (rawUrl: string): TParsedVideoEmbed | undefined => {
+  let url: URL;
+  try {
+    url = new URL(rawUrl.trim());
+  } catch {
+    return undefined;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
+  const host = url.hostname.replace(/^www\./, "").toLowerCase();
+
+  if (host === "youtu.be") {
+    const videoId = url.pathname.slice(1).split("/")[0];
+    if (videoId) return { provider: "youtube", videoId };
+  }
+  if (host === "youtube.com" || host === "m.youtube.com") {
+    if (url.pathname === "/watch") {
+      const videoId = url.searchParams.get("v");
+      if (videoId) return { provider: "youtube", videoId };
+    }
+    const embedMatch = url.pathname.match(/^\/(embed|shorts|live)\/([^/]+)/);
+    if (embedMatch) return { provider: "youtube", videoId: embedMatch[2] };
+  }
+
+  if (host === "vimeo.com") {
+    const match = url.pathname.match(/^\/(\d+)/);
+    if (match) return { provider: "vimeo", videoId: match[1] };
+  }
+  if (host === "player.vimeo.com") {
+    const match = url.pathname.match(/^\/video\/(\d+)/);
+    if (match) return { provider: "vimeo", videoId: match[1] };
+  }
+
+  if (host === "rutube.ru") {
+    const match = url.pathname.match(/^\/video\/([a-z0-9]+)/i);
+    if (match) return { provider: "rutube", videoId: match[1] };
+  }
+
+  if (host === "vk.com" || host === "vkvideo.ru") {
+    const match = url.pathname.match(/\/video(-?\d+_\d+)/);
+    if (match) return { provider: "vk", videoId: match[1] };
+  }
+
+  if (/\.(mp4|webm|ogg)$/i.test(url.pathname)) {
+    return { provider: "direct", videoId: url.toString() };
+  }
+
+  return undefined;
+};
+
 export enum CORE_EXTENSIONS {
   BLOCKQUOTE = "blockquote",
   BOLD = "bold",
@@ -68,6 +130,7 @@ export enum CORE_EXTENSIONS {
   CUSTOM_COLOR = "customColor",
   CUSTOM_IMAGE = "imageComponent",
   CUSTOM_LINK = "link",
+  CUSTOM_VIDEO = "videoComponent",
   DOCUMENT = "doc",
   DROP_CURSOR = "dropCursor",
   ENTER_KEY = "enterKey",

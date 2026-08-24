@@ -27,6 +27,8 @@ const generalSelectors = [
   ".issue-embed",
   ".image-component",
   ".image-upload-component",
+  ".video-component",
+  ".video-upload-component",
   ".editor-callout-component",
   ".editor-embed-component",
   ".editor-drawio-component",
@@ -221,12 +223,12 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
       dragHandleElement?.classList.add("drag-handle-hidden");
   };
 
-  const view = (view: EditorView, sideMenu: HTMLDivElement | null) => {
+  const view = (editorView: EditorView, sideMenu: HTMLDivElement | null) => {
     dragHandleElement = createDragHandleElement();
-    dragHandleElement.addEventListener("dragstart", (e) => handleDragStart(e, view));
-    dragHandleElement.addEventListener("dragend", (e) => handleDragEnd(e, view));
-    dragHandleElement.addEventListener("click", (e) => handleClick(e, view));
-    dragHandleElement.addEventListener("contextmenu", (e) => handleClick(e, view));
+    dragHandleElement.addEventListener("dragstart", (e) => handleDragStart(e, editorView));
+    dragHandleElement.addEventListener("dragend", (e) => handleDragEnd(e, editorView));
+    dragHandleElement.addEventListener("click", (e) => handleClick(e, editorView));
+    dragHandleElement.addEventListener("contextmenu", (e) => handleClick(e, editorView));
 
     const dragOverHandler = (e: DragEvent) => {
       e.preventDefault();
@@ -237,7 +239,7 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
 
     const mouseMoveHandler = (e: MouseEvent) => {
       if (isMouseInsideWhileDragging) {
-        handleDragEnd(e, view);
+        handleDragEnd(e, editorView);
       }
     };
 
@@ -287,28 +289,28 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
   };
   const domEvents = {
     mousemove: () => showDragHandle(),
-    dragenter: (view: EditorView) => {
-      view.dom.classList.add("dragging");
+    dragenter: (pmView: EditorView) => {
+      pmView.dom.classList.add("dragging");
       hideDragHandle();
     },
-    drop: (view: EditorView, event: DragEvent) => {
-      view.dom.classList.remove("dragging");
+    drop: (pmView: EditorView, event: DragEvent) => {
+      pmView.dom.classList.remove("dragging");
       hideDragHandle();
       let droppedNode: Node | null = null;
-      const dropPos = view.posAtCoords({
+      const dropPos = pmView.posAtCoords({
         left: event.clientX,
         top: event.clientY,
       });
 
       if (!dropPos) return;
 
-      if (view.state.selection instanceof NodeSelection) {
-        droppedNode = view.state.selection.node;
+      if (pmView.state.selection instanceof NodeSelection) {
+        droppedNode = pmView.state.selection.node;
       }
 
       if (!droppedNode) return;
 
-      const resolvedPos = view.state.doc.resolve(dropPos.pos);
+      const resolvedPos = pmView.state.doc.resolve(dropPos.pos);
       let isDroppedInsideList = false;
       let dropDepth = 0;
 
@@ -323,28 +325,28 @@ export const DragHandlePlugin = (options: SideMenuPluginProps): SideMenuHandleOp
 
       // Handle nested list items and task items
       if (droppedNode.type.name === CORE_EXTENSIONS.LIST_ITEM) {
-        let slice = view.state.selection.content();
+        let slice = pmView.state.selection.content();
         let newFragment = slice.content;
 
         // If dropping outside a list or at a different depth, adjust the structure
         if (!isDroppedInsideList || dropDepth !== resolvedPos.depth) {
           // Flatten the structure if needed
-          newFragment = flattenListStructure(newFragment, view.state.schema);
+          newFragment = flattenListStructure(newFragment, pmView.state.schema);
         }
 
         // Wrap in appropriate list type if dropped outside a list
         if (!isDroppedInsideList) {
           const listNodeType =
-            listType === "OL" ? view.state.schema.nodes.orderedList : view.state.schema.nodes.bulletList;
+            listType === "OL" ? pmView.state.schema.nodes.orderedList : pmView.state.schema.nodes.bulletList;
           newFragment = Fragment.from(listNodeType.create(null, newFragment));
         }
 
         slice = new Slice(newFragment, slice.openStart, slice.openEnd);
-        view.dragging = { slice, move: event.ctrlKey };
+        pmView.dragging = { slice, move: event.ctrlKey };
       }
     },
-    dragend: (view: EditorView) => {
-      view.dom.classList.remove("dragging");
+    dragend: (pmView: EditorView) => {
+      pmView.dom.classList.remove("dragging");
     },
   };
 

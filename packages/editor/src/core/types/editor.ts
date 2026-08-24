@@ -56,6 +56,7 @@ export type TEditorCommands =
   | "code"
   | "table"
   | "image"
+  | "video"
   | "divider"
   | "link"
   | "issue-embed"
@@ -70,6 +71,9 @@ export type TEditorCommands =
 
 export type TCommandExtraProps = {
   image: {
+    savedSelection: Selection | null;
+  };
+  video: {
     savedSelection: Selection | null;
   };
   attachment: {

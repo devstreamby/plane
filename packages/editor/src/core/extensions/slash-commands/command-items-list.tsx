@@ -23,6 +23,7 @@ import {
   Smile,
   Table,
   TextQuote,
+  Video,
 } from "lucide-react";
 // constants
 import { COLORS_LIST } from "@/constants/common";
@@ -37,6 +38,7 @@ import {
   toggleTextColor,
   toggleBackgroundColor,
   insertImage,
+  insertVideo,
   insertCallout,
   setText,
   openEmojiPicker,
@@ -301,6 +303,19 @@ export const getSlashCommandFilteredSections =
         pushAfter: "code",
       });
     }
+    if (!disabledExtensions?.includes("video")) {
+      internalAdditionalOptions.push({
+        commandKey: "video",
+        key: "video",
+        title: "Video",
+        icon: <Video className="size-3.5" />,
+        description: "Upload or embed a video",
+        searchTerms: ["video", "youtube", "vimeo", "embed", "media", "upload"],
+        command: ({ editor, range }: CommandProps) => insertVideo({ editor, event: "insert", range }),
+        section: "general",
+        pushAfter: "image",
+      });
+    }
 
     [
       ...internalAdditionalOptions,
@@ -319,6 +334,7 @@ export const getSlashCommandFilteredSections =
       }
     });
 
+    // eslint-disable-next-line oxc/no-map-spread -- copy-on-write is required here: SLASH_COMMAND_SECTIONS is a shared constant, Object.assign would mutate it
     const filteredSlashSections = SLASH_COMMAND_SECTIONS.map((section) => ({
       ...section,
       items: section.items.filter((item) => {

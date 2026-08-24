@@ -10,6 +10,7 @@ import type { ADDITIONAL_EXTENSIONS } from "@plane/utils";
 import { CORE_EXTENSIONS } from "@plane/utils";
 // extensions
 import { getImageBlockId } from "@/extensions/custom-image/utils";
+import { getVideoBlockId } from "@/extensions/custom-video/utils";
 // plane editor imports
 import { ADDITIONAL_ASSETS_META_DATA_RECORD } from "@/plane-editor/constants/assets";
 // types
@@ -40,6 +41,19 @@ export const CORE_ASSETS_META_DATA_RECORD: Partial<
       size: 0,
       src: attrs?.src,
       type: CORE_EXTENSIONS.CUSTOM_IMAGE,
+    };
+  },
+  [CORE_EXTENSIONS.CUSTOM_VIDEO]: (attrs) => {
+    // only uploaded videos have an asset src; external embeds have nothing to
+    // list here since there's no Plane-owned asset behind them.
+    if (!attrs?.src) return;
+    return {
+      href: `#${getVideoBlockId(attrs?.id ?? "")}`,
+      id: attrs?.id,
+      name: `video-${attrs?.id}`,
+      size: 0,
+      src: attrs?.src,
+      type: CORE_EXTENSIONS.CUSTOM_VIDEO,
     };
   },
   ...ADDITIONAL_ASSETS_META_DATA_RECORD,

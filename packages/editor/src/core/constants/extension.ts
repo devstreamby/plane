@@ -15,6 +15,7 @@ export enum CORE_EXTENSIONS {
   CUSTOM_COLOR = "customColor",
   CUSTOM_IMAGE = "imageComponent",
   CUSTOM_LINK = "link",
+  CUSTOM_VIDEO = "videoComponent",
   DOCUMENT = "doc",
   DROP_CURSOR = "dropCursor",
   ENTER_KEY = "enterKey",
@@ -72,6 +73,7 @@ export const BLOCK_NODE_TYPES = [
   // Media and embed nodes
   CORE_EXTENSIONS.IMAGE,
   CORE_EXTENSIONS.CUSTOM_IMAGE,
+  CORE_EXTENSIONS.CUSTOM_VIDEO,
   CORE_EXTENSIONS.CALLOUT,
   CORE_EXTENSIONS.WORK_ITEM_EMBED,
 ];

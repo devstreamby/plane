@@ -6,6 +6,7 @@
 
 import { v4 as uuidv4 } from "uuid";
 import { ECustomImageAttributeNames, ECustomImageStatus } from "@/extensions/custom-image/types";
+import { ECustomVideoAttributeNames } from "@/extensions/custom-video/types";
 
 export type AssetDuplicationContext = {
   element: Element;
@@ -41,6 +42,20 @@ const imageComponentHandler: AssetDuplicationHandler = ({ element, originalHtml 
   return { modifiedHtml, shouldProcess: true };
 };
 
+// Only re-stamps the block id so two pasted copies don't collide on their
+// anchor/scroll id. Video assets themselves aren't duplicated in S3 on paste
+// (unlike images) — pasting a video into a different workspace is out of
+// scope for now.
+const videoComponentHandler: AssetDuplicationHandler = ({ element, originalHtml }) => {
+  const originalTag = element.outerHTML;
+  const newId = uuidv4();
+  element.setAttribute(ECustomVideoAttributeNames.ID, newId);
+  const modifiedTag = element.outerHTML;
+  const modifiedHtml = originalHtml.replaceAll(originalTag, modifiedTag);
+  return { modifiedHtml, shouldProcess: true };
+};
+
 export const assetDuplicationHandlers: Record<string, AssetDuplicationHandler> = {
   "image-component": imageComponentHandler,
+  "video-component": videoComponentHandler,
 };

@@ -325,6 +325,42 @@ export const nodeRenderers: NodeRendererRegistry = {
     );
   },
 
+  // PDF has no video playback support — render an uploaded video as a
+  // placeholder note, and an external embed as a clickable link.
+  videoComponent: (node: TipTapNode, _children: ReactElement[], ctx: PDFRenderContext): ReactElement => {
+    if (ctx.metadata?.noAssets) {
+      return <View key={ctx.getKey()} />;
+    }
+
+    const source = node.attrs?.source as string | undefined;
+    if (source === "external") {
+      const provider = (node.attrs?.provider as string) || "video";
+      const videoId = (node.attrs?.videoid as string) || "";
+      const providerUrls: Record<string, string> = {
+        youtube: `https://youtu.be/${videoId}`,
+        vimeo: `https://vimeo.com/${videoId}`,
+        rutube: `https://rutube.ru/video/${videoId}/`,
+        vk: `https://vk.com/video${videoId}`,
+        direct: videoId,
+      };
+      const url = providerUrls[provider];
+      if (!url) return <View key={ctx.getKey()} />;
+      return (
+        <View key={ctx.getKey()} style={pdfStyles.imagePlaceholder}>
+          <Link src={url} style={pdfStyles.imagePlaceholderText}>
+            [Video: {url}]
+          </Link>
+        </View>
+      );
+    }
+
+    return (
+      <View key={ctx.getKey()} style={pdfStyles.imagePlaceholder}>
+        <Text style={pdfStyles.imagePlaceholderText}>[Video attachment — open in Plane to watch]</Text>
+      </View>
+    );
+  },
+
   calloutComponent: (node: TipTapNode, children: ReactElement[], ctx: PDFRenderContext): ReactElement => {
     const backgroundKey = (node.attrs?.["data-background"] as string) || "gray";
     const backgroundColor =

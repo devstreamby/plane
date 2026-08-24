@@ -6,5 +6,8 @@
 
 // extensions
 import type { ImageExtensionStorage } from "@/extensions/image";
+import type { CustomVideoExtensionStorage } from "@/extensions/custom-video/types";
 
-export type ExtensionFileSetStorageKey = Extract<keyof ImageExtensionStorage, "deletedImageSet">;
+export type ExtensionFileSetStorageKey =
+  | Extract<keyof ImageExtensionStorage, "deletedImageSet">
+  | Extract<keyof CustomVideoExtensionStorage, "deletedVideoSet">;

@@ -6,8 +6,17 @@
 
 import type { Editor } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
+// plane imports
+import { parseVideoUrl } from "@plane/utils";
 // constants
-import { ACCEPTED_ATTACHMENT_MIME_TYPES, ACCEPTED_IMAGE_MIME_TYPES } from "@/constants/config";
+import {
+  ACCEPTED_ATTACHMENT_MIME_TYPES,
+  ACCEPTED_IMAGE_MIME_TYPES,
+  ACCEPTED_VIDEO_MIME_TYPES,
+} from "@/constants/config";
+// extensions
+import type { ECustomVideoProvider } from "@/extensions/custom-video/types";
+import { isValidProviderVideoId } from "@/extensions/custom-video/utils";
 // types
 import type { TEditorCommands, TExtensions } from "@/types";
 
@@ -49,6 +58,29 @@ export const DropHandlerPlugin = (props: Props): Plugin => {
           }
           return true;
         }
+
+        // A bare video-provider link, pasted on its own with nothing else
+        // selected — auto-embed it instead of leaving it as plain link
+        // text. Anywhere else in the document is where a user will
+        // naturally try to paste a video link (not just inside the video
+        // node's own "embed link" input), so this is the paste path that
+        // actually needs to work.
+        if (editor.isEditable && !disabledExtensions?.includes("video") && event.clipboardData) {
+          const text = event.clipboardData.getData("text/plain")?.trim();
+          if (text && !text.includes("\n") && !(event.clipboardData.files && event.clipboardData.files.length > 0)) {
+            const parsed = parseVideoUrl(text);
+            const provider = parsed?.provider as ECustomVideoProvider | undefined;
+            if (parsed && provider && isValidProviderVideoId(provider, parsed.videoId)) {
+              const pos = view.state.selection.from;
+              const inserted = editor.commands.insertVideoEmbed({ provider, videoId: parsed.videoId, pos });
+              if (inserted) {
+                event.preventDefault();
+                return true;
+              }
+            }
+          }
+        }
+
         return false;
       },
       handleDrop: (view, event, _slice, moved) => {
@@ -97,7 +129,7 @@ type InsertFilesSafelyArgs = {
   event: "insert" | "drop";
   files: File[];
   initialPos: number;
-  type?: Extract<TEditorCommands, "attachment" | "image">;
+  type?: Extract<TEditorCommands, "attachment" | "image" | "video">;
 };
 
 export const insertFilesSafely = async (args: InsertFilesSafelyArgs) => {
@@ -109,19 +141,26 @@ export const insertFilesSafely = async (args: InsertFilesSafelyArgs) => {
     const docSize = editor.state.doc.content.size;
     pos = Math.min(pos, docSize);
 
-    let fileType: "image" | "attachment" | null = null;
+    let fileType: "image" | "video" | "attachment" | null = null;
 
     try {
       if (type) {
-        if (["image", "attachment"].includes(type)) fileType = type;
+        if (["image", "video", "attachment"].includes(type)) fileType = type;
         else throw new Error("Wrong file type passed");
       } else {
         if (ACCEPTED_IMAGE_MIME_TYPES.includes(file.type)) fileType = "image";
+        else if (ACCEPTED_VIDEO_MIME_TYPES.includes(file.type)) fileType = "video";
         else if (ACCEPTED_ATTACHMENT_MIME_TYPES.includes(file.type)) fileType = "attachment";
       }
       // insert file depending on the type at the current position
       if (fileType === "image" && !disabledExtensions?.includes("image")) {
         editor.commands.insertImageComponent({
+          file,
+          pos,
+          event,
+        });
+      } else if (fileType === "video" && !disabledExtensions?.includes("video")) {
+        editor.commands.insertVideoComponent({
           file,
           pos,
           event,
