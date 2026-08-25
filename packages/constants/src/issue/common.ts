@@ -33,6 +33,7 @@ export enum EIssueGroupByToServerOptions {
   "assignees" = "assignees__id",
   "cycle" = "cycle_id",
   "module" = "issue_module__module_id",
+  "work_item_type" = "type_id",
   "target_date" = "target_date",
   // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
   "project" = "project_id",
@@ -49,6 +50,7 @@ export enum EIssueGroupBYServerToProperty {
   "assignees__id" = "assignee_ids",
   "cycle_id" = "cycle_id",
   "issue_module__module_id" = "module_ids",
+  "type_id" = "type_id",
   "target_date" = "target_date",
   "project_id" = "project_id",
   "created_by" = "created_by",
@@ -124,6 +126,7 @@ export const ISSUE_GROUP_BY_OPTIONS: {
   { key: "project", titleTranslationKey: "common.project" }, // required this on my issues
   { key: "cycle", titleTranslationKey: "common.cycle" }, // required this on my issues
   { key: "module", titleTranslationKey: "common.module" }, // required this on my issues
+  { key: "work_item_type", titleTranslationKey: "work_item_types.label" },
   { key: "labels", titleTranslationKey: "common.labels" },
   { key: "assignees", titleTranslationKey: "common.assignees" },
   { key: "created_by", titleTranslationKey: "common.created_by" },
@@ -140,6 +143,7 @@ export const ISSUE_ORDER_BY_OPTIONS: {
   { key: "start_date", titleTranslationKey: "common.order_by.start_date" },
   { key: "target_date", titleTranslationKey: "common.order_by.due_date" },
   { key: "-priority", titleTranslationKey: "common.priority" },
+  { key: "type__level", titleTranslationKey: "work_item_types.label_singular" },
 ];
 
 export const ISSUE_DISPLAY_PROPERTIES_KEYS: (keyof IIssueDisplayProperties)[] = [

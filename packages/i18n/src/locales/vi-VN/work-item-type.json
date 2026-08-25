@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "Loại mục công việc",
+    "label_singular": "Loại mục công việc",
     "label_lowercase": "loại mục công việc",
     "switcher": {
       "tooltip": "Thay đổi loại mục công việc"

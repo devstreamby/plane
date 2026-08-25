@@ -12,7 +12,7 @@ import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { EIconSize, ISSUE_PRIORITIES, STATE_GROUPS } from "@plane/constants";
 import { Logo } from "@plane/propel/emoji-icon-picker";
 import type { ISvgIcons } from "@plane/propel/icons";
-import { CycleGroupIcon, CycleIcon, ModuleIcon, PriorityIcon, StateGroupIcon } from "@plane/propel/icons";
+import { CycleGroupIcon, CycleIcon, LayersIcon, ModuleIcon, PriorityIcon, StateGroupIcon } from "@plane/propel/icons";
 import type {
   GroupByColumnTypes,
   IGroupByColumn,
@@ -120,6 +120,7 @@ export const getGroupByColumns = ({
     labels: getLabelsColumns,
     assignees: getAssigneeColumns,
     created_by: getCreatedByColumns,
+    work_item_type: getWorkItemTypeColumns,
     team_project: getTeamProjectColumns,
   };
 
@@ -222,6 +223,29 @@ const getStateColumns = ({ projectId }: TGetColumns): IGroupByColumn[] | undefin
     ),
     payload: { state_id: state.id },
   }));
+};
+
+const getWorkItemTypeColumns = ({ projectId }: TGetColumns): IGroupByColumn[] | undefined => {
+  const currentProjectId = projectId ?? store.router.projectId;
+  if (!currentProjectId) return;
+  // Already ordered by the project's own type order, so the columns line up with
+  // Settings -> Work item types.
+  const workItemTypes = store.issueType.getProjectIssueTypes(currentProjectId);
+  if (workItemTypes.length === 0) return;
+
+  const columns: IGroupByColumn[] = workItemTypes.map((workItemType) => ({
+    id: workItemType.id,
+    name: workItemType.name,
+    icon: <Logo logo={workItemType.logo_props} size={14} />,
+    payload: { type_id: workItemType.id },
+  }));
+  columns.push({
+    id: "None",
+    name: "None",
+    icon: <LayersIcon className="h-3.5 w-3.5" />,
+    payload: {},
+  });
+  return columns;
 };
 
 const getBoardColumnColumns = ({ projectId }: TGetColumns): IGroupByColumn[] | undefined => {

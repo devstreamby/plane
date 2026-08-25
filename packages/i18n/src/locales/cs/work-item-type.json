@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "Typy pracovních položek",
+    "label_singular": "Typ pracovní položky",
     "label_lowercase": "typy pracovních položek",
     "switcher": {
       "tooltip": "Změnit typ pracovní položky"

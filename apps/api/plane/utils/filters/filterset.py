@@ -154,6 +154,9 @@ class IssueFilterSet(BaseFilterSet):
     board_column_id = filters.UUIDFilter(field_name="state__board_column_id")
     board_column_id__in = UUIDInFilter(field_name="state__board_column_id", lookup_expr="in")
 
+    type_id = filters.UUIDFilter(field_name="type_id")
+    type_id__in = UUIDInFilter(field_name="type_id", lookup_expr="in")
+
     project_id = filters.UUIDFilter(field_name="project_id")
     project_id__in = UUIDInFilter(field_name="project_id", lookup_expr="in")
 

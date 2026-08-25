@@ -63,6 +63,8 @@ export const ISSUE_FILTER_DEFAULT_DATA: Record<TIssueDisplayFilterOptions, keyof
   state: "state_id",
   // Board columns are a project-level concept, the public board never groups by them.
   board_column: "state_id",
+  // Same for work item types: the public board has no type data on its issues.
+  work_item_type: "type_id" as keyof IIssue,
   "state_detail.group": "state_group" as keyof IIssue, // state_detail.group is only being used for state_group display,
   priority: "priority",
   labels: "label_ids",

@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "工作項目類型",
+    "label_singular": "工作項目類型",
     "label_lowercase": "工作項目類型",
     "switcher": {
       "tooltip": "更改工作項目類型"

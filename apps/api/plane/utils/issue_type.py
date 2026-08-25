@@ -39,7 +39,10 @@ def ensure_default_issue_types(project: Project) -> None:
     # function runs concurrently (project PATCH + type-list fetch), and without a
     # constraint backing the SELECT-then-INSERT both callers insert their own row.
     with transaction.atomic():
-        for name, is_default, is_epic, logo_props in DEFAULT_ISSUE_TYPES:
+        # The list index becomes the link's level, which is what orders types in
+        # project settings and in group-by / order-by responses. There is no UI to
+        # reorder them, so this ordering is the project's ordering.
+        for level, (name, is_default, is_epic, logo_props) in enumerate(DEFAULT_ISSUE_TYPES):
             issue_type, _ = IssueType.objects.get_or_create(
                 workspace_id=project.workspace_id,
                 name=name,
@@ -47,5 +50,5 @@ def ensure_default_issue_types(project: Project) -> None:
             )
 
             ProjectIssueType.objects.get_or_create(
-                project=project, issue_type=issue_type, defaults={"is_default": is_default}
+                project=project, issue_type=issue_type, defaults={"is_default": is_default, "level": level}
             )

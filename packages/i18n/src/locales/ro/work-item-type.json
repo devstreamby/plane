@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "Tipuri de Elemente de Lucru",
+    "label_singular": "Tip de element de lucru",
     "label_lowercase": "tipuri de elemente de lucru",
     "switcher": {
       "tooltip": "Schimbă tipul elementului de lucru"

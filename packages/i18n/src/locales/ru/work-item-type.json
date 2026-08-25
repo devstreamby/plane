@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "Типы рабочих элементов",
+    "label_singular": "Тип рабочего элемента",
     "label_lowercase": "типы рабочих элементов",
     "switcher": {
       "tooltip": "Изменить тип рабочего элемента"

@@ -14,6 +14,7 @@ import {
   CalendarLayoutIcon,
   CycleGroupIcon,
   CycleIcon,
+  LayersIcon,
   ModuleIcon,
   StatePropertyIcon,
   PriorityIcon,
@@ -33,6 +34,7 @@ import type {
   IIssueLabel,
   IModule,
   IProject,
+  TIssueType,
   TWorkItemFilterProperty,
 } from "@plane/types";
 import { Avatar } from "@plane/ui";
@@ -54,10 +56,12 @@ import {
   getSubscriberFilterConfig,
   getTargetDateFilterConfig,
   getUpdatedAtFilterConfig,
+  getWorkItemTypeFilterConfig,
   isLoaderReady,
 } from "@plane/utils";
 // store hooks
 import { useCycle } from "@/hooks/store/use-cycle";
+import { useIssueType } from "@/hooks/store/use-issue-type";
 import { useLabel } from "@/hooks/store/use-label";
 import { useMember } from "@/hooks/store/use-member";
 import { useModule } from "@/hooks/store/use-module";
@@ -75,6 +79,7 @@ export type TWorkItemFiltersEntityProps = {
   projectId?: string;
   projectIds?: string[];
   stateIds?: string[];
+  workItemTypeIds?: string[];
 };
 
 export type TUseWorkItemFiltersConfigProps = {
@@ -92,12 +97,23 @@ export type TWorkItemFiltersConfig = {
 };
 
 export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps): TWorkItemFiltersConfig => {
-  const { allowedFilters, cycleIds, labelIds, memberIds, moduleIds, projectId, projectIds, stateIds, workspaceSlug } =
-    props;
+  const {
+    allowedFilters,
+    cycleIds,
+    labelIds,
+    memberIds,
+    moduleIds,
+    projectId,
+    projectIds,
+    stateIds,
+    workItemTypeIds,
+    workspaceSlug,
+  } = props;
   // store hooks
   const { t } = useTranslation();
   const { loader: projectLoader, getProjectById } = useProject();
   const { getCycleById } = useCycle();
+  const { getIssueTypeById } = useIssueType();
   const { getLabelById } = useLabel();
   const { getModuleById } = useModule();
   const { getProjectBoardColumns, getStateById } = useProjectState();
@@ -135,10 +151,21 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       moduleIds ? (moduleIds.map((moduleId) => getModuleById(moduleId)).filter((module) => module) as IModule[]) : [],
     [moduleIds, getModuleById]
   );
+  const workItemTypes: TIssueType[] | undefined = useMemo(
+    () =>
+      workItemTypeIds
+        ? (workItemTypeIds
+            .map((workItemTypeId) => getIssueTypeById(projectId, workItemTypeId))
+            .filter((workItemType) => workItemType) as TIssueType[])
+        : undefined,
+    [workItemTypeIds, getIssueTypeById, projectId]
+  );
   const projects = useMemo(
     () =>
       projectIds
-        ? (projectIds.map((projectId) => getProjectById(projectId)).filter((project) => project) as IProject[])
+        ? (projectIds
+            .map((currentProjectId) => getProjectById(currentProjectId))
+            .filter((currentProject) => currentProject) as IProject[])
         : [],
     [projectIds, getProjectById]
   );
@@ -367,6 +394,22 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
     [operatorConfigs]
   );
 
+  // work item type filter config
+  const workItemTypeFilterConfig = useMemo(
+    () =>
+      getWorkItemTypeFilterConfig<TWorkItemFilterProperty>("type_id")({
+        // Hidden entirely when the project has no types, the same way the cycle
+        // filter hides itself when cycles are turned off for the project.
+        isEnabled: isFilterEnabled("type_id") && workItemTypes !== undefined && workItemTypes.length > 0,
+        filterIcon: LayersIcon,
+        getOptionIcon: (logoProps) => <Logo logo={logoProps} size={12} />,
+        workItemTypes: workItemTypes ?? [],
+        label: t("work_item_types.label_singular"),
+        ...operatorConfigs,
+      }),
+    [isFilterEnabled, workItemTypes, operatorConfigs, t]
+  );
+
   // project filter config
   const projectFilterConfig = useMemo(
     () =>
@@ -374,7 +417,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
         isEnabled: isFilterEnabled("project_id") && projects !== undefined,
         filterIcon: Briefcase,
         projects: projects,
-        getOptionIcon: (project) => <Logo logo={project.logo_props} size={12} />,
+        getOptionIcon: (projectOption) => <Logo logo={projectOption.logo_props} size={12} />,
         ...operatorConfigs,
       }),
     [isFilterEnabled, projects, operatorConfigs]
@@ -393,6 +436,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       labelFilterConfig,
       cycleFilterConfig,
       moduleFilterConfig,
+      workItemTypeFilterConfig,
       startDateFilterConfig,
       targetDateFilterConfig,
       createdAtFilterConfig,
@@ -408,6 +452,7 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
       label_id: labelFilterConfig,
       cycle_id: cycleFilterConfig,
       module_id: moduleFilterConfig,
+      type_id: workItemTypeFilterConfig,
       assignee_id: assigneeFilterConfig,
       mention_id: mentionFilterConfig,
       created_by_id: createdByFilterConfig,
