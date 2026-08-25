@@ -15,6 +15,7 @@ import type { EditorRefApi } from "@plane/editor";
 import { Button } from "@plane/propel/button";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 import { CustomSelect, EModalPosition, EModalWidth, ModalCore } from "@plane/ui";
+import { downloadBlob } from "@plane/utils";
 // components
 import { PDFDocument } from "@/components/editor/pdf";
 // hooks
@@ -133,17 +134,6 @@ export function ExportPageModal(props: Props) {
     }, 300);
   };
 
-  const initiateDownload = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    link.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 1000);
-  };
-
   // handle export as a PDF
   const handleExportAsPDF = async () => {
     try {
@@ -154,9 +144,9 @@ export function ExportPageModal(props: Props) {
       });
 
       const blob = await pdf(<PDFDocument content={parsedPageContent} pageFormat={selectedPageFormat} />).toBlob();
-      initiateDownload(blob, `${fileName}-${selectedPageFormat.toString().toLowerCase()}.pdf`);
+      downloadBlob(blob, `${fileName}-${selectedPageFormat.toString().toLowerCase()}.pdf`);
     } catch (error) {
-      throw new Error(`Error in exporting as a PDF: ${error}`);
+      throw new Error(`Error in exporting as a PDF: ${error}`, { cause: error });
     }
   };
   // handle export as markdown
@@ -169,9 +159,9 @@ export function ExportPageModal(props: Props) {
       });
 
       const blob = new Blob([parsedMarkdownContent], { type: "text/markdown" });
-      initiateDownload(blob, `${fileName}.md`);
+      downloadBlob(blob, `${fileName}.md`);
     } catch (error) {
-      throw new Error(`Error in exporting as markdown: ${error}`);
+      throw new Error(`Error in exporting as markdown: ${error}`, { cause: error });
     }
   };
   // handle export

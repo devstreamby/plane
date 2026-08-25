@@ -15,6 +15,7 @@ from plane.app.views import (
     TransferCycleIssueEndpoint,
     CycleUserPropertiesEndpoint,
     CycleArchiveUnarchiveEndpoint,
+    CycleIssueExportEndpoint,
 )
 
 
@@ -102,5 +103,10 @@ urlpatterns = [
         "workspaces/<str:slug>/projects/<uuid:project_id>/cycles/<uuid:cycle_id>/analytics/",
         CycleAnalyticsEndpoint.as_view(),
         name="project-cycle",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/cycles/<uuid:cycle_id>/export/",
+        CycleIssueExportEndpoint.as_view(),
+        name="cycle-issue-export",
     ),
 ]

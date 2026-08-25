@@ -190,6 +190,10 @@ else:
     secure_origins = False
 
 CORS_ALLOW_HEADERS = [*default_headers, "X-API-Key"]
+# Exposes the filename on file-download responses (e.g. cycle issue export) to
+# frontend JS — browsers hide response headers on cross-origin requests unless
+# the server explicitly opts them into CORS_EXPOSE_HEADERS.
+CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 
 # Application Settings
 WSGI_APPLICATION = "plane.wsgi.application"

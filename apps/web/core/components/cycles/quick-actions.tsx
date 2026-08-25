@@ -23,6 +23,7 @@ import { useAppRouter } from "@/hooks/use-app-router";
 // local imports
 import { ArchiveCycleModal } from "./archived-cycles/modal";
 import { CycleDeleteModal } from "./delete-modal";
+import { CycleExportModal } from "./export-modal";
 import { CycleCreateUpdateModal } from "./modal";
 
 type Props = {
@@ -41,6 +42,7 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
   const [updateModal, setUpdateModal] = useState(false);
   const [archiveCycleModal, setArchiveCycleModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [exportModal, setExportModal] = useState(false);
   // store hooks
   const { allowPermissions } = useUserPermissions();
   const { getCycleById, restoreCycle } = useCycle();
@@ -63,6 +65,7 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
         title: t("common.link_copied"),
         message: t("common.link_copied_to_clipboard"),
       });
+      return;
     });
   const handleOpenInNewTab = () => window.open(`/${cycleLink}`, "_blank");
 
@@ -75,6 +78,7 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
           message: t("project_cycles.action.restore.success.description"),
         });
         router.push(`/${workspaceSlug}/projects/${projectId}/archives/cycles`);
+        return;
       })
       .catch(() => {
         setToast({
@@ -96,6 +100,7 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
     handleDelete: () => setDeleteModal(true),
     handleCopyLink: handleCopyText,
     handleOpenInNewTab,
+    handleExport: () => setExportModal(true),
   });
 
   const MENU_ITEMS: TContextMenuItem[] = Array.isArray(menuResult) ? menuResult : menuResult.items;
@@ -134,6 +139,14 @@ export const CycleQuickActions = observer(function CycleQuickActions(props: Prop
             handleClose={() => setDeleteModal(false)}
             workspaceSlug={workspaceSlug}
             projectId={projectId}
+          />
+          <CycleExportModal
+            isOpen={exportModal}
+            handleClose={() => setExportModal(false)}
+            workspaceSlug={workspaceSlug}
+            projectId={projectId}
+            cycleId={cycleId}
+            cycleName={cycleDetails.name}
           />
           {additionalModals}
         </div>
