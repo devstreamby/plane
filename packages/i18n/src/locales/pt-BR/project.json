@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Você já tem um ciclo nas datas fornecidas, se você quiser criar um ciclo de rascunho, você pode fazer isso removendo ambas as datas."
         }
+      },
+      "export": {
+        "title": "Exportar"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Nenhum ciclo arquivado ainda",
         "description": "Para organizar seu projeto, arquive os ciclos concluídos. Encontre-os aqui quando forem arquivados."
+      }
+    },
+    "export_modal": {
+      "title": "Exportar itens de trabalho do ciclo",
+      "format": "Formato",
+      "columns": "Colunas",
+      "export": "Exportar",
+      "exporting": "Exportando",
+      "fields": {
+        "identifier": "ID do item de trabalho",
+        "name": "Nome",
+        "description": "Descrição",
+        "state_name": "Estado",
+        "priority": "Prioridade",
+        "assignees": "Responsáveis",
+        "subscribers": "Inscritos",
+        "labels": "Etiquetas",
+        "cycles": "Ciclos",
+        "modules": "Módulos",
+        "estimate": "Estimativa",
+        "start_date": "Data de início",
+        "target_date": "Data de vencimento",
+        "completed_at": "Concluído em",
+        "created_at": "Criado em",
+        "updated_at": "Atualizado em",
+        "created_by_name": "Criado por",
+        "parent": "Pai",
+        "links": "Links",
+        "relations": "Relações",
+        "comments": "Comentários",
+        "sub_issues_count": "Contagem de sub-itens de trabalho",
+        "link_count": "Contagem de links",
+        "attachment_count": "Contagem de anexos"
+      },
+      "toasts": {
+        "success": {
+          "title": "Sucesso!",
+          "message": "Os itens de trabalho do ciclo foram exportados com sucesso."
+        },
+        "error": {
+          "message": "Não foi possível exportar os itens de trabalho. Por favor, tente novamente."
+        }
       }
     }
   },

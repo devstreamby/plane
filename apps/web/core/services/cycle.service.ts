@@ -194,4 +194,36 @@ export class CycleService extends APIService {
         throw error?.response?.data;
       });
   }
+
+  async exportIssues(
+    workspaceSlug: string,
+    projectId: string,
+    cycleId: string,
+    params: {
+      export_format: "csv" | "markdown";
+      fields?: string[];
+    }
+  ): Promise<{ blob: Blob; filename: string }> {
+    return this.get(
+      `/api/workspaces/${workspaceSlug}/projects/${projectId}/cycles/${cycleId}/export/`,
+      {},
+      {
+        params: {
+          export_format: params.export_format,
+          ...(params.fields && params.fields.length > 0 ? { fields: params.fields.join(",") } : {}),
+        },
+        responseType: "blob",
+      }
+    )
+      .then((response) => {
+        const disposition: string = response.headers["content-disposition"] ?? "";
+        const filename =
+          disposition.match(/filename="?([^"]+)"?/)?.[1] ??
+          `cycle-export.${params.export_format === "markdown" ? "md" : "csv"}`;
+        return { blob: response.data as Blob, filename };
+      })
+      .catch((error) => {
+        throw error?.response?.data;
+      });
+  }
 }

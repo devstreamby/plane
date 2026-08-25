@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Ai deja un ciclu în datele selectate. Dacă vrei să creezi o schiță, poți face asta eliminând ambele date."
         }
+      },
+      "export": {
+        "title": "Exportă"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Niciun ciclu arhivat încă",
         "description": "Pentru a păstra proiectul ordonat, arhivează ciclurile completate. Le vei găsi aici după arhivare."
+      }
+    },
+    "export_modal": {
+      "title": "Exportă activitățile ciclului",
+      "format": "Format",
+      "columns": "Coloane",
+      "export": "Exportă",
+      "exporting": "Se exportă",
+      "fields": {
+        "identifier": "ID activitate",
+        "name": "Nume",
+        "description": "Descriere",
+        "state_name": "Stare",
+        "priority": "Prioritate",
+        "assignees": "Responsabili",
+        "subscribers": "Abonați",
+        "labels": "Etichete",
+        "cycles": "Cicluri",
+        "modules": "Module",
+        "estimate": "Estimare",
+        "start_date": "Data de început",
+        "target_date": "Data limită",
+        "completed_at": "Finalizat la",
+        "created_at": "Creat la",
+        "updated_at": "Actualizat la",
+        "created_by_name": "Creat de",
+        "parent": "Părinte",
+        "links": "Linkuri",
+        "relations": "Relații",
+        "comments": "Comentarii",
+        "sub_issues_count": "Număr de sub-activități",
+        "link_count": "Număr de linkuri",
+        "attachment_count": "Număr de atașamente"
+      },
+      "toasts": {
+        "success": {
+          "title": "Succes!",
+          "message": "Activitățile ciclului au fost exportate cu succes."
+        },
+        "error": {
+          "message": "Activitățile nu au putut fi exportate. Te rugăm să încerci din nou."
+        }
       }
     }
   },

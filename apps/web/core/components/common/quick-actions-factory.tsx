@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import { Pencil, ExternalLink, Link, Trash2, ArchiveRestoreIcon } from "lucide-react";
+import { Pencil, ExternalLink, Link, Trash2, ArchiveRestoreIcon, Download } from "lucide-react";
 import { useTranslation } from "@plane/i18n";
 import { ArchiveIcon } from "@plane/propel/icons";
 import type { TContextMenuItem } from "@plane/ui";
@@ -52,6 +52,14 @@ export const useQuickActionsFactory = () => {
       description: opts.description,
       disabled: opts.disabled,
       shouldRender: opts.shouldRender,
+    }),
+
+    createExportMenuItem: (handler: () => void, shouldRender: boolean = true): TContextMenuItem => ({
+      key: "export",
+      title: t("project_cycles.action.export.title"),
+      icon: Download,
+      action: handler,
+      shouldRender,
     }),
 
     createRestoreMenuItem: (handler: () => void, shouldRender: boolean = true): TContextMenuItem => ({

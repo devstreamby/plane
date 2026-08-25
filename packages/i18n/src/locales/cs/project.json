@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Cyklus s těmito daty již existuje. Pro koncept odstraňte data."
         }
+      },
+      "export": {
+        "title": "Exportovat"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Žádné archivované cykly",
         "description": "Archivujte dokončené cykly pro úklid."
+      }
+    },
+    "export_modal": {
+      "title": "Export pracovních položek cyklu",
+      "format": "Formát",
+      "columns": "Sloupce",
+      "export": "Exportovat",
+      "exporting": "Exportování",
+      "fields": {
+        "identifier": "ID pracovní položky",
+        "name": "Název",
+        "description": "Popis",
+        "state_name": "Stav",
+        "priority": "Priorita",
+        "assignees": "Přiřazení",
+        "subscribers": "Odběratelé",
+        "labels": "Štítky",
+        "cycles": "Cykly",
+        "modules": "Moduly",
+        "estimate": "Odhad",
+        "start_date": "Datum začátku",
+        "target_date": "Termín",
+        "completed_at": "Dokončeno dne",
+        "created_at": "Vytvořeno dne",
+        "updated_at": "Aktualizováno dne",
+        "created_by_name": "Vytvořil",
+        "parent": "Nadřazený",
+        "links": "Odkazy",
+        "relations": "Vztahy",
+        "comments": "Komentáře",
+        "sub_issues_count": "Počet podřízených položek",
+        "link_count": "Počet odkazů",
+        "attachment_count": "Počet příloh"
+      },
+      "toasts": {
+        "success": {
+          "title": "Úspěch!",
+          "message": "Pracovní položky cyklu byly úspěšně exportovány."
+        },
+        "error": {
+          "message": "Pracovní položky se nepodařilo exportovat. Zkuste to prosím znovu."
+        }
       }
     }
   },

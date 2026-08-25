@@ -23,6 +23,7 @@ interface UseCycleMenuItemsProps {
   handleDelete: () => void;
   handleCopyLink: () => void;
   handleOpenInNewTab: () => void;
+  handleExport: () => void;
 }
 
 interface UseModuleMenuItemsProps {
@@ -76,6 +77,7 @@ export const useCycleMenuItems = (props: UseCycleMenuItemsProps): MenuResult => 
     factory.createEditMenuItem(handlers.handleEdit, isEditingAllowed && !isCompleted && !isArchived),
     factory.createOpenInNewTabMenuItem(handlers.handleOpenInNewTab),
     factory.createCopyLinkMenuItem(handlers.handleCopyLink),
+    factory.createExportMenuItem(handlers.handleExport),
     factory.createArchiveMenuItem(handlers.handleArchive, {
       shouldRender: isEditingAllowed && !isArchived,
       disabled: !isCompleted,

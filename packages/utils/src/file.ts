@@ -44,7 +44,7 @@ export const getBase64Image = async (url: string): Promise<string> => {
 
   // Try to create a URL object to validate the URL
   try {
-    new URL(url);
+    const _parsedUrl = new URL(url);
   } catch {
     throw new Error("Invalid URL format");
   }
@@ -67,9 +67,9 @@ export const getBase64Image = async (url: string): Promise<string> => {
       }
     };
 
-    reader.onerror = () => {
+    reader.addEventListener("error", () => {
       reject(new Error("Failed to read the image file."));
-    };
+    });
 
     reader.readAsDataURL(blob);
   });
@@ -93,4 +93,18 @@ export const csvDownload = (data: Array<Array<string>> | { [key: string]: string
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+/**
+ * @description triggers a browser download for an in-memory Blob (e.g. a file fetched from the API)
+ * @param {Blob} blob - the file contents
+ * @param {string} filename - the name the downloaded file should have
+ */
+export const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 };

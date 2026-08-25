@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Vous avez déjà un cycle aux dates indiquées. Si vous souhaitez créer un cycle en brouillon, vous pouvez le faire en supprimant les deux dates."
         }
+      },
+      "export": {
+        "title": "Exporter"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Aucun cycle archivé pour le moment",
         "description": "Pour organiser votre projet, archivez les cycles terminés. Retrouvez-les ici une fois archivés."
+      }
+    },
+    "export_modal": {
+      "title": "Exporter les éléments de travail du cycle",
+      "format": "Format",
+      "columns": "Colonnes",
+      "export": "Exporter",
+      "exporting": "Exportation",
+      "fields": {
+        "identifier": "ID de l’élément de travail",
+        "name": "Nom",
+        "description": "Description",
+        "state_name": "État",
+        "priority": "Priorité",
+        "assignees": "Acteurs",
+        "subscribers": "Abonnés",
+        "labels": "Étiquettes",
+        "cycles": "Cycles",
+        "modules": "Modules",
+        "estimate": "Estimation",
+        "start_date": "Date de début",
+        "target_date": "Date d’échéance",
+        "completed_at": "Terminé le",
+        "created_at": "Créé le",
+        "updated_at": "Mis à jour le",
+        "created_by_name": "Créé par",
+        "parent": "Parent",
+        "links": "Liens",
+        "relations": "Relations",
+        "comments": "Commentaires",
+        "sub_issues_count": "Nombre de sous-éléments",
+        "link_count": "Nombre de liens",
+        "attachment_count": "Nombre de pièces jointes"
+      },
+      "toasts": {
+        "success": {
+          "title": "Succès !",
+          "message": "Les éléments de travail du cycle ont été exportés avec succès."
+        },
+        "error": {
+          "message": "Impossible d’exporter les éléments de travail. Veuillez réessayer."
+        }
       }
     }
   },

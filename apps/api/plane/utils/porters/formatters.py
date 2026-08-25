@@ -272,3 +272,65 @@ class XLSXFormatter(BaseFormatter):
     @property
     def extension(self) -> str:
         return "xlsx"
+
+
+class MarkdownFormatter(BaseFormatter):
+    """
+    Renders rows as a release-notes style Markdown draft: each row becomes a
+    heading (identifier + name), an optional metadata line for any other
+    selected columns, and the description as body text. Export-only.
+    """
+
+    def __init__(self, prettify_headers: bool = True):
+        self.prettify_headers = prettify_headers
+
+    def _prettify_header(self, header: str) -> str:
+        return header.replace("_", " ").title()
+
+    def _format_value(self, value: Any) -> str:
+        if value is None:
+            return ""
+        if isinstance(value, list):
+            return ", ".join(str(v) for v in value)
+        if isinstance(value, dict):
+            return json.dumps(value)
+        return str(value)
+
+    def encode(self, data: List[Dict]) -> str:
+        if not data:
+            return ""
+
+        sections = []
+        for row in data:
+            heading_parts = [p for p in (row.get("identifier"), row.get("name")) if p]
+            heading = "### " + " — ".join(heading_parts) if heading_parts else "### (untitled)"
+
+            meta_parts = []
+            for key, value in row.items():
+                if key in ("identifier", "name", "description"):
+                    continue
+                formatted = self._format_value(value)
+                if not formatted:
+                    continue
+                label = self._prettify_header(key) if self.prettify_headers else key
+                meta_parts.append(f"{label}: {formatted}")
+
+            block = [heading]
+            if meta_parts:
+                block.append(f"_{' · '.join(meta_parts)}_")
+
+            description = row.get("description", "")
+            if description:
+                block.append("")
+                block.append(str(description))
+
+            sections.append("\n".join(block))
+
+        return "\n\n---\n\n".join(sections) + "\n"
+
+    def decode(self, content: str) -> List[Dict]:
+        raise NotImplementedError("MarkdownFormatter is export-only")
+
+    @property
+    def extension(self) -> str:
+        return "md"

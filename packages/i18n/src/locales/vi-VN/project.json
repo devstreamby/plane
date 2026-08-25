@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Đã tồn tại chu kỳ trong khoảng thời gian đã cho, nếu bạn muốn tạo chu kỳ nháp, bạn có thể làm vậy bằng cách xóa cả hai ngày."
         }
+      },
+      "export": {
+        "title": "Xuất"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Chưa có chu kỳ đã lưu trữ",
         "description": "Để tổ chức dự án của bạn, hãy lưu trữ chu kỳ đã hoàn thành. Bạn có thể tìm thấy chúng ở đây sau khi lưu trữ."
+      }
+    },
+    "export_modal": {
+      "title": "Xuất mục công việc của chu kỳ",
+      "format": "Định dạng",
+      "columns": "Cột",
+      "export": "Xuất",
+      "exporting": "Đang xuất",
+      "fields": {
+        "identifier": "ID mục công việc",
+        "name": "Tên",
+        "description": "Mô tả",
+        "state_name": "Trạng thái",
+        "priority": "Ưu tiên",
+        "assignees": "Người phụ trách",
+        "subscribers": "Người đăng ký",
+        "labels": "Nhãn",
+        "cycles": "Chu kỳ",
+        "modules": "Mô-đun",
+        "estimate": "Ước tính",
+        "start_date": "Ngày bắt đầu",
+        "target_date": "Ngày hết hạn",
+        "completed_at": "Hoàn thành vào",
+        "created_at": "Được tạo vào",
+        "updated_at": "Thời gian cập nhật",
+        "created_by_name": "Người tạo",
+        "parent": "Mục cha",
+        "links": "Liên kết",
+        "relations": "Mối quan hệ",
+        "comments": "Bình luận",
+        "sub_issues_count": "Số lượng mục công việc con",
+        "link_count": "Số lượng liên kết",
+        "attachment_count": "Số lượng tệp đính kèm"
+      },
+      "toasts": {
+        "success": {
+          "title": "Thành công!",
+          "message": "Các mục công việc của chu kỳ đã được xuất thành công."
+        },
+        "error": {
+          "message": "Không thể xuất các mục công việc. Vui lòng thử lại."
+        }
       }
     }
   },

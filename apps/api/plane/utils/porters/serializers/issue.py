@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 # Module imports
 from plane.app.serializers import IssueSerializer
+from plane.utils.html_to_markdown import html_to_markdown
 
 
 class IssueExportSerializer(IssueSerializer):
@@ -14,6 +15,9 @@ class IssueExportSerializer(IssueSerializer):
     Export-optimized serializer that extends IssueSerializer with human-readable fields.
 
     Converts UUIDs to readable values for CSV/JSON export.
+
+    Pass ``fields=[...]`` to restrict output to a subset of ``Meta.fields`` (e.g. for
+    the cycle export endpoint, where the caller picks which columns to include).
     """
 
     identifier = serializers.SerializerMethodField()
@@ -22,6 +26,7 @@ class IssueExportSerializer(IssueSerializer):
     state_name = serializers.CharField(source='state.name', read_only=True, default="")
     created_by_name = serializers.CharField(source='created_by.full_name', read_only=True, default="")
 
+    description = serializers.SerializerMethodField()
     assignees = serializers.SerializerMethodField()
     parent = serializers.SerializerMethodField()
     labels = serializers.SerializerMethodField()
@@ -41,6 +46,7 @@ class IssueExportSerializer(IssueSerializer):
             "identifier",
             "sequence_id",
             "name",
+            "description",
             "state_name",
             "priority",
             "assignees",
@@ -65,8 +71,18 @@ class IssueExportSerializer(IssueSerializer):
             "is_draft",
         ]
 
+    def __init__(self, *args, fields=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if fields is not None:
+            allowed = set(fields)
+            for field_name in set(self.fields) - allowed:
+                self.fields.pop(field_name)
+
     def get_identifier(self, obj):
         return f"{obj.project.identifier}-{obj.sequence_id}"
+
+    def get_description(self, obj):
+        return html_to_markdown(obj.description_html)
 
     def get_assignees(self, obj):
         return [u.full_name for u in obj.assignees.all() if u.is_active]

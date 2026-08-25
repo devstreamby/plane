@@ -3,7 +3,7 @@
 # See the LICENSE file for details.
 
 from typing import Dict, List, Union
-from .formatters import BaseFormatter, CSVFormatter, JSONFormatter, XLSXFormatter
+from .formatters import BaseFormatter, CSVFormatter, JSONFormatter, MarkdownFormatter, XLSXFormatter
 
 
 class DataExporter:
@@ -25,6 +25,7 @@ class DataExporter:
         "csv": CSVFormatter,
         "json": JSONFormatter,
         "xlsx": XLSXFormatter,
+        "markdown": MarkdownFormatter,
     }
 
     def __init__(self, serializer_class, format_type: str = None, **serializer_kwargs):

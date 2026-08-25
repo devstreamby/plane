@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Cyklus s týmito dátami už existuje. Pre koncept odstráňte dáta."
         }
+      },
+      "export": {
+        "title": "Exportovať"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Žiadne archivované cykly",
         "description": "Archivujte dokončené cykly pre poriadok."
+      }
+    },
+    "export_modal": {
+      "title": "Exportovať pracovné položky cyklu",
+      "format": "Formát",
+      "columns": "Stĺpce",
+      "export": "Exportovať",
+      "exporting": "Exportovanie",
+      "fields": {
+        "identifier": "ID pracovnej položky",
+        "name": "Názov",
+        "description": "Popis",
+        "state_name": "Stav",
+        "priority": "Priorita",
+        "assignees": "Priradení",
+        "subscribers": "Odberatelia",
+        "labels": "Štítky",
+        "cycles": "Cykly",
+        "modules": "Moduly",
+        "estimate": "Odhad",
+        "start_date": "Dátum začiatku",
+        "target_date": "Termín",
+        "completed_at": "Dokončené dňa",
+        "created_at": "Vytvorené dňa",
+        "updated_at": "Aktualizované dňa",
+        "created_by_name": "Vytvoril",
+        "parent": "Nadradený",
+        "links": "Odkazy",
+        "relations": "Vzťahy",
+        "comments": "Komentáre",
+        "sub_issues_count": "Počet podriadených položiek",
+        "link_count": "Počet odkazov",
+        "attachment_count": "Počet príloh"
+      },
+      "toasts": {
+        "success": {
+          "title": "Úspech!",
+          "message": "Pracovné položky cyklu boli úspešne exportované."
+        },
+        "error": {
+          "message": "Pracovné položky sa nepodarilo exportovať. Skúste to prosím znova."
+        }
       }
     }
   },

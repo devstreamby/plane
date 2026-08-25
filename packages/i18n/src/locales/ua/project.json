@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Цикл із цими датами вже існує. Для чернетки видаліть дати."
         }
+      },
+      "export": {
+        "title": "Експортувати"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Немає заархівованих циклів",
         "description": "Заархівуйте завершені цикли, щоб не захаращувати список."
+      }
+    },
+    "export_modal": {
+      "title": "Експорт одиниць циклу",
+      "format": "Формат",
+      "columns": "Стовпці",
+      "export": "Експортувати",
+      "exporting": "Експорт",
+      "fields": {
+        "identifier": "ID робочої одиниці",
+        "name": "Назва",
+        "description": "Опис",
+        "state_name": "Стан",
+        "priority": "Пріоритет",
+        "assignees": "Призначені",
+        "subscribers": "Підписники",
+        "labels": "Мітки",
+        "cycles": "Цикли",
+        "modules": "Модулі",
+        "estimate": "Оцінка",
+        "start_date": "Дата початку",
+        "target_date": "Крайній термін",
+        "completed_at": "Завершено",
+        "created_at": "Створено",
+        "updated_at": "Оновлено",
+        "created_by_name": "Створено",
+        "parent": "Батьківська",
+        "links": "Посилання",
+        "relations": "Зв'язки",
+        "comments": "Коментарі",
+        "sub_issues_count": "Кількість похідних",
+        "link_count": "Кількість посилань",
+        "attachment_count": "Кількість вкладень"
+      },
+      "toasts": {
+        "success": {
+          "title": "Успіх!",
+          "message": "Одиниці циклу успішно експортовано."
+        },
+        "error": {
+          "message": "Не вдалося експортувати одиниці. Будь ласка, спробуйте ще раз."
+        }
       }
     }
   },

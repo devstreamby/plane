@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "You already have a cycle on the given dates, if you want to create a draft cycle, you can do that by removing both the dates."
         }
+      },
+      "export": {
+        "title": "Export"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "No archived cycles yet",
         "description": "To tidy up your project, archive completed cycles. Find them here once archived."
+      }
+    },
+    "export_modal": {
+      "title": "Export cycle work items",
+      "format": "Format",
+      "columns": "Columns",
+      "export": "Export",
+      "exporting": "Exporting",
+      "fields": {
+        "identifier": "Work item ID",
+        "name": "Name",
+        "description": "Description",
+        "state_name": "State",
+        "priority": "Priority",
+        "assignees": "Assignees",
+        "subscribers": "Subscribers",
+        "labels": "Labels",
+        "cycles": "Cycles",
+        "modules": "Modules",
+        "estimate": "Estimate",
+        "start_date": "Start date",
+        "target_date": "Due date",
+        "completed_at": "Completed at",
+        "created_at": "Created at",
+        "updated_at": "Updated at",
+        "created_by_name": "Created by",
+        "parent": "Parent",
+        "links": "Links",
+        "relations": "Relations",
+        "comments": "Comments",
+        "sub_issues_count": "Sub-work-items count",
+        "link_count": "Link count",
+        "attachment_count": "Attachment count"
+      },
+      "toasts": {
+        "success": {
+          "title": "Success!",
+          "message": "Cycle work items exported successfully."
+        },
+        "error": {
+          "message": "Work items could not be exported. Please try again later."
+        }
       }
     }
   },
