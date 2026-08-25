@@ -48,7 +48,10 @@ class TestIssueAttachmentMimeTypes:
         payload = {"name": "notes.dat", "type": mime_type, "size": 1024}
 
         with mock.patch("plane.app.views.issue.attachment.S3Storage") as mock_storage:
-            mock_storage.return_value.generate_presigned_post.return_value = {"url": "https://signed.example", "fields": {}}
+            mock_storage.return_value.generate_presigned_post.return_value = {
+                "url": "https://signed.example",
+                "fields": {},
+            }
             response = session_client.post(
                 self.url(workspace.slug, attachment_context["project"].id, attachment_context["issue"].id),
                 payload,
