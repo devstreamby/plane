@@ -13,7 +13,9 @@ class TestMarkdownFormatter:
         assert MarkdownFormatter().encode([]) == ""
 
     def test_heading_and_description_body(self):
-        content = MarkdownFormatter().encode([{"identifier": "TP-1", "name": "Fix bug", "description": "It **broke**."}])
+        content = MarkdownFormatter().encode(
+            [{"identifier": "TP-1", "name": "Fix bug", "description": "It **broke**."}]
+        )
         assert content.startswith("### TP-1 — Fix bug\n\nIt **broke**.")
 
     def test_metadata_line_included_for_extra_fields(self):
@@ -23,7 +25,9 @@ class TestMarkdownFormatter:
         assert "_State Name: Done · Priority: high_" in content
 
     def test_empty_extra_field_omitted_from_metadata(self):
-        content = MarkdownFormatter().encode([{"identifier": "TP-1", "name": "Fix bug", "description": "", "priority": ""}])
+        content = MarkdownFormatter().encode(
+            [{"identifier": "TP-1", "name": "Fix bug", "description": "", "priority": ""}]
+        )
         assert "_" not in content
 
     def test_missing_identifier_falls_back_to_name_only(self):

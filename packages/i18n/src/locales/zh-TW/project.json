@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "給定日期範圍內已有週期，如果您要建立草稿週期，可以移除兩個日期來執行此操作。"
         }
+      },
+      "export": {
+        "title": "匯出"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "尚無已封存的週期",
         "description": "為了整理您的專案，可以封存已完成的週期。一旦封存，您可以在這裡找到它們。"
+      }
+    },
+    "export_modal": {
+      "title": "匯出週期工作事項",
+      "format": "格式",
+      "columns": "欄位",
+      "export": "匯出",
+      "exporting": "匯出中",
+      "fields": {
+        "identifier": "工作事項 ID",
+        "name": "名稱",
+        "description": "描述",
+        "state_name": "狀態",
+        "priority": "優先順序",
+        "assignees": "指派對象",
+        "subscribers": "訂閱者",
+        "labels": "標籤",
+        "cycles": "週期",
+        "modules": "模組",
+        "estimate": "評估",
+        "start_date": "開始日期",
+        "target_date": "截止日期",
+        "completed_at": "完成於",
+        "created_at": "建立於",
+        "updated_at": "更新時間",
+        "created_by_name": "建立者",
+        "parent": "上層",
+        "links": "連結",
+        "relations": "關聯",
+        "comments": "留言",
+        "sub_issues_count": "子工作事項數量",
+        "link_count": "連結數量",
+        "attachment_count": "附件數量"
+      },
+      "toasts": {
+        "success": {
+          "title": "成功！",
+          "message": "週期工作事項已成功匯出。"
+        },
+        "error": {
+          "message": "無法匯出工作事項。請再試一次。"
+        }
       }
     }
   },

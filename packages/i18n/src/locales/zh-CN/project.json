@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "在给定日期范围内已存在周期，如果您想创建草稿周期，可以通过移除两个日期来实现。"
         }
+      },
+      "export": {
+        "title": "导出"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "尚无已归档的周期",
         "description": "为了整理您的项目，归档已完成的周期。归档后可以在这里找到它们。"
+      }
+    },
+    "export_modal": {
+      "title": "导出周期工作项",
+      "format": "格式",
+      "columns": "列",
+      "export": "导出",
+      "exporting": "导出中",
+      "fields": {
+        "identifier": "工作项ID",
+        "name": "名称",
+        "description": "描述",
+        "state_name": "状态",
+        "priority": "优先级",
+        "assignees": "负责人",
+        "subscribers": "订阅者",
+        "labels": "标签",
+        "cycles": "周期",
+        "modules": "模块",
+        "estimate": "估算",
+        "start_date": "开始日期",
+        "target_date": "截止日期",
+        "completed_at": "完成于",
+        "created_at": "创建于",
+        "updated_at": "更新时间",
+        "created_by_name": "创建者",
+        "parent": "父项",
+        "links": "链接",
+        "relations": "关系",
+        "comments": "评论",
+        "sub_issues_count": "子工作项数量",
+        "link_count": "链接数量",
+        "attachment_count": "附件数量"
+      },
+      "toasts": {
+        "success": {
+          "title": "成功！",
+          "message": "周期工作项已成功导出。"
+        },
+        "error": {
+          "message": "无法导出工作项。请重试。"
+        }
       }
     }
   },

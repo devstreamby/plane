@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Cykl o tych datach już istnieje. Aby mieć szkic, usuń daty."
         }
+      },
+      "export": {
+        "title": "Eksportuj"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Brak zarchiwizowanych cykli",
         "description": "Archiwizuj ukończone cykle, aby zachować porządek."
+      }
+    },
+    "export_modal": {
+      "title": "Eksportuj elementy pracy cyklu",
+      "format": "Format",
+      "columns": "Kolumny",
+      "export": "Eksportuj",
+      "exporting": "Eksportowanie",
+      "fields": {
+        "identifier": "ID elementu pracy",
+        "name": "Nazwa",
+        "description": "Opis",
+        "state_name": "Stan",
+        "priority": "Priorytet",
+        "assignees": "Przypisani",
+        "subscribers": "Subskrybenci",
+        "labels": "Etykiety",
+        "cycles": "Cykle",
+        "modules": "Moduły",
+        "estimate": "Szacowanie",
+        "start_date": "Data rozpoczęcia",
+        "target_date": "Termin",
+        "completed_at": "Zakończono dnia",
+        "created_at": "Utworzono dnia",
+        "updated_at": "Zaktualizowano dnia",
+        "created_by_name": "Utworzone przez",
+        "parent": "Nadrzędny",
+        "links": "Linki",
+        "relations": "Relacje",
+        "comments": "Komentarze",
+        "sub_issues_count": "Liczba elementów podrzędnych",
+        "link_count": "Liczba linków",
+        "attachment_count": "Liczba załączników"
+      },
+      "toasts": {
+        "success": {
+          "title": "Sukces!",
+          "message": "Elementy pracy cyklu zostały pomyślnie wyeksportowane."
+        },
+        "error": {
+          "message": "Nie udało się wyeksportować elementów pracy. Spróbuj ponownie."
+        }
       }
     }
   },

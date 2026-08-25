@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Anda sudah memiliki siklus pada tanggal yang diberikan, jika Anda ingin membuat siklus draf, Anda dapat melakukannya dengan menghapus kedua tanggal tersebut."
         }
+      },
+      "export": {
+        "title": "Ekspor"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Belum ada siklus yang diarsipkan",
         "description": "Untuk membersihkan proyek Anda, arsipkan siklus yang telah diselesaikan. Temukan di sini setelah diarsipkan."
+      }
+    },
+    "export_modal": {
+      "title": "Ekspor item kerja siklus",
+      "format": "Format",
+      "columns": "Kolom",
+      "export": "Ekspor",
+      "exporting": "Mengekspor",
+      "fields": {
+        "identifier": "ID item kerja",
+        "name": "Nama",
+        "description": "Deskripsi",
+        "state_name": "Negara",
+        "priority": "Prioritas",
+        "assignees": "Penugas",
+        "subscribers": "Pelanggan",
+        "labels": "Label",
+        "cycles": "Siklus",
+        "modules": "Modul",
+        "estimate": "Perkiraan",
+        "start_date": "Tanggal mulai",
+        "target_date": "Tanggal jatuh tempo",
+        "completed_at": "Selesai pada",
+        "created_at": "Dibuat pada",
+        "updated_at": "Diperbarui pada",
+        "created_by_name": "Dibuat oleh",
+        "parent": "Induk",
+        "links": "Tautan",
+        "relations": "Hubungan",
+        "comments": "Komentar",
+        "sub_issues_count": "Jumlah sub-item kerja",
+        "link_count": "Jumlah tautan",
+        "attachment_count": "Jumlah lampiran"
+      },
+      "toasts": {
+        "success": {
+          "title": "Sukses!",
+          "message": "Item kerja siklus berhasil diekspor."
+        },
+        "error": {
+          "message": "Item kerja tidak dapat diekspor. Silakan coba lagi."
+        }
       }
     }
   },

@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Ein Zyklus mit diesen Daten existiert bereits. Entfernen Sie das Datum für einen Entwurf."
         }
+      },
+      "export": {
+        "title": "Exportieren"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Keine archivierten Zyklen",
         "description": "Archivieren Sie abgeschlossene Zyklen, um Ordnung zu halten."
+      }
+    },
+    "export_modal": {
+      "title": "Zyklus-Arbeitselemente exportieren",
+      "format": "Format",
+      "columns": "Spalten",
+      "export": "Exportieren",
+      "exporting": "Wird exportiert",
+      "fields": {
+        "identifier": "Arbeitselement-ID",
+        "name": "Name",
+        "description": "Beschreibung",
+        "state_name": "Status",
+        "priority": "Priorität",
+        "assignees": "Zugewiesene",
+        "subscribers": "Abonnenten",
+        "labels": "Labels",
+        "cycles": "Zyklen",
+        "modules": "Module",
+        "estimate": "Schätzung",
+        "start_date": "Startdatum",
+        "target_date": "Fälligkeitsdatum",
+        "completed_at": "Abgeschlossen am",
+        "created_at": "Erstellt am",
+        "updated_at": "Aktualisiert am",
+        "created_by_name": "Erstellt von",
+        "parent": "Übergeordnet",
+        "links": "Links",
+        "relations": "Beziehungen",
+        "comments": "Kommentare",
+        "sub_issues_count": "Anzahl untergeordneter Elemente",
+        "link_count": "Anzahl Links",
+        "attachment_count": "Anzahl Anhänge"
+      },
+      "toasts": {
+        "success": {
+          "title": "Erfolg!",
+          "message": "Arbeitselemente des Zyklus wurden erfolgreich exportiert."
+        },
+        "error": {
+          "message": "Arbeitselemente konnten nicht exportiert werden. Bitte versuchen Sie es erneut."
+        }
       }
     }
   },

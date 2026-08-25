@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Belirtilen tarihlerde zaten bir döngünüz var, taslak bir döngü oluşturmak istiyorsanız, her iki tarihi de kaldırarak oluşturabilirsiniz."
         }
+      },
+      "export": {
+        "title": "Dışa aktar"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Henüz arşivlenmiş döngü yok",
         "description": "Projenizi düzenli tutmak için tamamlanmış döngüleri arşivleyin. Arşivlendikten sonra burada bulabilirsiniz."
+      }
+    },
+    "export_modal": {
+      "title": "Döngü iş öğelerini dışa aktar",
+      "format": "Biçim",
+      "columns": "Sütunlar",
+      "export": "Dışa aktar",
+      "exporting": "Dışa aktarılıyor",
+      "fields": {
+        "identifier": "İş öğesi ID",
+        "name": "Ad",
+        "description": "Açıklama",
+        "state_name": "Durum",
+        "priority": "Öncelik",
+        "assignees": "Atananlar",
+        "subscribers": "Aboneler",
+        "labels": "Etiketler",
+        "cycles": "Döngüler",
+        "modules": "Modüller",
+        "estimate": "Tahmin",
+        "start_date": "Başlangıç tarihi",
+        "target_date": "Son tarih",
+        "completed_at": "Tamamlanma tarihi",
+        "created_at": "Oluşturulma tarihi",
+        "updated_at": "Güncelleme tarihi",
+        "created_by_name": "Oluşturan",
+        "parent": "Üst",
+        "links": "Bağlantılar",
+        "relations": "İlişkiler",
+        "comments": "Yorumlar",
+        "sub_issues_count": "Alt iş öğesi sayısı",
+        "link_count": "Bağlantı sayısı",
+        "attachment_count": "Ek sayısı"
+      },
+      "toasts": {
+        "success": {
+          "title": "Başarılı!",
+          "message": "Döngü iş öğeleri başarıyla dışa aktarıldı."
+        },
+        "error": {
+          "message": "İş öğeleri dışa aktarılamadı. Lütfen tekrar deneyin."
+        }
       }
     }
   },

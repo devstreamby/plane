@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "指定した日付のサイクルは既に存在します。下書きサイクルを作成する場合は、両方の日付を削除してください。"
         }
+      },
+      "export": {
+        "title": "エクスポート"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "アーカイブされたサイクルがまだありません",
         "description": "プロジェクトを整理するために、完了したサイクルをアーカイブします。アーカイブ後はここで確認できます。"
+      }
+    },
+    "export_modal": {
+      "title": "サイクルの作業項目をエクスポート",
+      "format": "フォーマット",
+      "columns": "列",
+      "export": "エクスポート",
+      "exporting": "エクスポート中",
+      "fields": {
+        "identifier": "作業項目ID",
+        "name": "名前",
+        "description": "説明",
+        "state_name": "ステータス",
+        "priority": "優先度",
+        "assignees": "担当者",
+        "subscribers": "購読者",
+        "labels": "ラベル",
+        "cycles": "サイクル",
+        "modules": "モジュール",
+        "estimate": "見積もり",
+        "start_date": "開始日",
+        "target_date": "期限日",
+        "completed_at": "完了日時",
+        "created_at": "作成日時",
+        "updated_at": "更新日時",
+        "created_by_name": "作成者",
+        "parent": "親",
+        "links": "リンク",
+        "relations": "関連",
+        "comments": "コメント",
+        "sub_issues_count": "サブ作業項目数",
+        "link_count": "リンク数",
+        "attachment_count": "添付ファイル数"
+      },
+      "toasts": {
+        "success": {
+          "title": "成功！",
+          "message": "サイクルの作業項目がエクスポートされました。"
+        },
+        "error": {
+          "message": "作業項目をエクスポートできませんでした。もう一度お試しください。"
+        }
       }
     }
   },

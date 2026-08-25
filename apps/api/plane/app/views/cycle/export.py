@@ -66,7 +66,9 @@ _EXPORT_FIELD_REQUIREMENTS = {
     "parent": {"select_related": ("parent", "parent__project")},
     "assignees": {"prefetch_related": ("assignees",)},
     "subscribers": {
-        "prefetch_related": (Prefetch("issue_subscribers", queryset=IssueSubscriber.objects.select_related("subscriber")),)
+        "prefetch_related": (
+            Prefetch("issue_subscribers", queryset=IssueSubscriber.objects.select_related("subscriber")),
+        )
     },
     "labels": {"prefetch_related": ("label_issue__label",)},
     "cycles": {"prefetch_related": ("issue_cycle__cycle",)},
@@ -74,7 +76,10 @@ _EXPORT_FIELD_REQUIREMENTS = {
     "links": {"prefetch_related": ("issue_link",)},
     "relations": {
         "prefetch_related": (
-            Prefetch("issue_relation", queryset=IssueRelation.objects.select_related("related_issue", "related_issue__project")),
+            Prefetch(
+                "issue_relation",
+                queryset=IssueRelation.objects.select_related("related_issue", "related_issue__project"),
+            ),
             Prefetch("issue_related", queryset=IssueRelation.objects.select_related("issue", "issue__project")),
         )
     },
@@ -156,7 +161,11 @@ class CycleIssueExportEndpoint(BaseAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        cycle = Cycle.objects.filter(workspace__slug=slug, project_id=project_id, id=cycle_id).select_related("project").first()
+        cycle = (
+            Cycle.objects.filter(workspace__slug=slug, project_id=project_id, id=cycle_id)
+            .select_related("project")
+            .first()
+        )
         if not cycle:
             return Response({"error": "Cycle not found"}, status=status.HTTP_404_NOT_FOUND)
 

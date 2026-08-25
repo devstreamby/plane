@@ -56,7 +56,9 @@ def _export_url(workspace_slug, project_id, cycle_id, **params):
 @pytest.mark.contract
 @pytest.mark.django_db
 class TestCycleIssueExportEndpoint:
-    def test_default_csv_export_has_three_mandatory_columns(self, session_client, workspace, project, cycle, cycle_issue):
+    def test_default_csv_export_has_three_mandatory_columns(
+        self, session_client, workspace, project, cycle, cycle_issue
+    ):
         response = session_client.get(_export_url(workspace.slug, project.id, cycle.id))
 
         assert response.status_code == 200
@@ -78,7 +80,9 @@ class TestCycleIssueExportEndpoint:
         assert f"### {project.identifier}-{cycle_issue.sequence_id} — Fix login bug" in content
         assert "**log in**" in content
 
-    def test_custom_fields_are_included_and_others_excluded(self, session_client, workspace, project, cycle, cycle_issue):
+    def test_custom_fields_are_included_and_others_excluded(
+        self, session_client, workspace, project, cycle, cycle_issue
+    ):
         response = session_client.get(
             _export_url(workspace.slug, project.id, cycle.id, fields="identifier,name,description,priority")
         )
@@ -96,9 +100,7 @@ class TestCycleIssueExportEndpoint:
         assert response.status_code == 400
 
     def test_missing_cycle_returns_404(self, session_client, workspace, project):
-        response = session_client.get(
-            _export_url(workspace.slug, project.id, "00000000-0000-0000-0000-000000000000")
-        )
+        response = session_client.get(_export_url(workspace.slug, project.id, "00000000-0000-0000-0000-000000000000"))
         assert response.status_code == 404
 
     def test_draft_issues_are_excluded(self, session_client, workspace, project, cycle, cycle_issue, create_user):

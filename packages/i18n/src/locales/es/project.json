@@ -98,6 +98,9 @@
         "error": {
           "already_exists": "Ya tienes un ciclo en las fechas dadas, si quieres crear un ciclo en borrador, puedes hacerlo eliminando ambas fechas."
         }
+      },
+      "export": {
+        "title": "Exportar"
       }
     },
     "empty_state": {
@@ -133,6 +136,48 @@
       "archived": {
         "title": "Aún no hay ciclos archivados",
         "description": "Para mantener ordenado tu proyecto, archiva los ciclos completados. Encuéntralos aquí una vez archivados."
+      }
+    },
+    "export_modal": {
+      "title": "Exportar elementos de trabajo del ciclo",
+      "format": "Formato",
+      "columns": "Columnas",
+      "export": "Exportar",
+      "exporting": "Exportando",
+      "fields": {
+        "identifier": "ID del elemento de trabajo",
+        "name": "Nombre",
+        "description": "Descripción",
+        "state_name": "Estado",
+        "priority": "Prioridad",
+        "assignees": "Asignados",
+        "subscribers": "Suscriptores",
+        "labels": "Etiquetas",
+        "cycles": "Ciclos",
+        "modules": "Módulos",
+        "estimate": "Estimación",
+        "start_date": "Fecha de inicio",
+        "target_date": "Fecha de vencimiento",
+        "completed_at": "Completado en",
+        "created_at": "Creado en",
+        "updated_at": "Actualizado el",
+        "created_by_name": "Creado por",
+        "parent": "Padre",
+        "links": "Enlaces",
+        "relations": "Relaciones",
+        "comments": "Comentarios",
+        "sub_issues_count": "Cantidad de sub-elementos",
+        "link_count": "Cantidad de enlaces",
+        "attachment_count": "Cantidad de archivos adjuntos"
+      },
+      "toasts": {
+        "success": {
+          "title": "¡Éxito!",
+          "message": "Los elementos de trabajo del ciclo se exportaron correctamente."
+        },
+        "error": {
+          "message": "No se pudieron exportar los elementos de trabajo. Por favor intenta de nuevo."
+        }
       }
     }
   },
