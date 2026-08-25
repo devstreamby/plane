@@ -124,49 +124,59 @@ export const useWorkItemFiltersConfig = (props: TUseWorkItemFiltersConfigProps):
   const project = useMemo(() => getProjectById(projectId), [projectId, getProjectById]);
   const members: IUserLite[] | undefined = useMemo(
     () =>
-      memberIds
-        ? (memberIds.map((memberId) => getUserDetails(memberId)).filter((member) => member) as IUserLite[])
-        : undefined,
+      memberIds?.flatMap((memberId) => {
+        const member = getUserDetails(memberId);
+        return member ? [member] : [];
+      }),
     [memberIds, getUserDetails]
   );
   const workItemStates: IState[] | undefined = useMemo(
     () =>
-      stateIds ? (stateIds.map((stateId) => getStateById(stateId)).filter((state) => state) as IState[]) : undefined,
+      stateIds?.flatMap((stateId) => {
+        const state = getStateById(stateId);
+        return state ? [state] : [];
+      }),
     [stateIds, getStateById]
   );
   const boardColumns = getProjectBoardColumns(projectId);
   const workItemLabels: IIssueLabel[] | undefined = useMemo(
     () =>
-      labelIds
-        ? (labelIds.map((labelId) => getLabelById(labelId)).filter((label) => label) as IIssueLabel[])
-        : undefined,
+      labelIds?.flatMap((labelId) => {
+        const label = getLabelById(labelId);
+        return label ? [label] : [];
+      }),
     [labelIds, getLabelById]
   );
-  const cycles = useMemo(
-    () => (cycleIds ? (cycleIds.map((cycleId) => getCycleById(cycleId)).filter((cycle) => cycle) as ICycle[]) : []),
+  const cycles: ICycle[] = useMemo(
+    () =>
+      cycleIds?.flatMap((cycleId) => {
+        const cycle = getCycleById(cycleId);
+        return cycle ? [cycle] : [];
+      }) ?? [],
     [cycleIds, getCycleById]
   );
-  const modules = useMemo(
+  const modules: IModule[] = useMemo(
     () =>
-      moduleIds ? (moduleIds.map((moduleId) => getModuleById(moduleId)).filter((module) => module) as IModule[]) : [],
+      moduleIds?.flatMap((moduleId) => {
+        const module = getModuleById(moduleId);
+        return module ? [module] : [];
+      }) ?? [],
     [moduleIds, getModuleById]
   );
   const workItemTypes: TIssueType[] | undefined = useMemo(
     () =>
-      workItemTypeIds
-        ? (workItemTypeIds
-            .map((workItemTypeId) => getIssueTypeById(projectId, workItemTypeId))
-            .filter((workItemType) => workItemType) as TIssueType[])
-        : undefined,
+      workItemTypeIds?.flatMap((workItemTypeId) => {
+        const workItemType = getIssueTypeById(projectId, workItemTypeId);
+        return workItemType ? [workItemType] : [];
+      }),
     [workItemTypeIds, getIssueTypeById, projectId]
   );
-  const projects = useMemo(
+  const projects: IProject[] = useMemo(
     () =>
-      projectIds
-        ? (projectIds
-            .map((currentProjectId) => getProjectById(currentProjectId))
-            .filter((currentProject) => currentProject) as IProject[])
-        : [],
+      projectIds?.flatMap((currentProjectId) => {
+        const currentProject = getProjectById(currentProjectId);
+        return currentProject ? [currentProject] : [];
+      }) ?? [],
     [projectIds, getProjectById]
   );
   const areAllConfigsInitialized = useMemo(() => isLoaderReady(projectLoader), [projectLoader]);
