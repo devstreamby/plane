@@ -95,9 +95,17 @@ class TestIssueTypeEndpoint:
     @pytest.mark.django_db
     def test_duplicate_active_name_rejected(self, session_client, workspace, type_context):
         ctx = type_context
-        response = session_client.post(
-            self.list_url(workspace.slug, ctx["project"].id), {"name": "Bug"}, format="json"
-        )
+        response = session_client.post(self.list_url(workspace.slug, ctx["project"].id), {"name": "Bug"}, format="json")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @pytest.mark.django_db
+    def test_duplicate_inactive_name_rejected(self, session_client, workspace, type_context):
+        """A deactivated type still holds its name, so reusing it must 400, not 500."""
+        ctx = type_context
+        ctx["bug_type"].is_active = False
+        ctx["bug_type"].save(update_fields=["is_active"])
+
+        response = session_client.post(self.list_url(workspace.slug, ctx["project"].id), {"name": "Bug"}, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.django_db
@@ -124,12 +132,80 @@ class TestIssueTypeEndpoint:
         assert response.data["issues_count"] == 1
 
     @pytest.mark.django_db
-    def test_delete_unused_non_default_type_deactivates(self, session_client, workspace, type_context):
+    def test_delete_unused_non_default_type_removes_it_from_the_list(self, session_client, workspace, type_context):
         ctx = type_context
         response = session_client.delete(self.detail_url(workspace.slug, ctx["project"].id, ctx["bug_type"].id))
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        ctx["bug_type"].refresh_from_db()
-        assert ctx["bug_type"].is_active is False
+
+        # The project link is soft-deleted, and with no other project using the type
+        # the workspace-level row goes too.
+        assert not ProjectIssueType.objects.filter(project=ctx["project"], issue_type=ctx["bug_type"]).exists()
+        assert not IssueType.objects.filter(pk=ctx["bug_type"].id).exists()
+
+        listed = session_client.get(self.list_url(workspace.slug, ctx["project"].id))
+        assert {row["name"] for row in listed.data} == {"Task"}
+
+    @pytest.mark.django_db
+    def test_delete_only_unlinks_the_current_project(self, session_client, workspace, type_context, create_user):
+        """Types are workspace-scoped and shared, so a delete must not touch siblings."""
+        ctx = type_context
+        other_project = Project.objects.create(name="Other project", identifier="OTH", workspace=workspace)
+        ProjectMember.objects.create(project=other_project, member=create_user, role=20)
+        ProjectIssueType.objects.create(project=other_project, issue_type=ctx["bug_type"], is_default=False)
+
+        response = session_client.delete(self.detail_url(workspace.slug, ctx["project"].id, ctx["bug_type"].id))
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        assert not ProjectIssueType.objects.filter(project=ctx["project"], issue_type=ctx["bug_type"]).exists()
+        assert ProjectIssueType.objects.filter(project=other_project, issue_type=ctx["bug_type"]).exists()
+        assert IssueType.objects.filter(pk=ctx["bug_type"].id).exists()
+
+    @pytest.mark.django_db
+    def test_deleted_name_can_be_created_again(self, session_client, workspace, type_context):
+        ctx = type_context
+        assert (
+            session_client.delete(self.detail_url(workspace.slug, ctx["project"].id, ctx["bug_type"].id)).status_code
+            == status.HTTP_204_NO_CONTENT
+        )
+
+        response = session_client.post(self.list_url(workspace.slug, ctx["project"].id), {"name": "Bug"}, format="json")
+        assert response.status_code == status.HTTP_201_CREATED, response.data
+
+    @pytest.mark.django_db
+    def test_enabling_the_feature_seeds_the_defaults_once(self, session_client, workspace, create_user):
+        project = Project.objects.create(name="Fresh project", identifier="FRSH", workspace=workspace)
+        ProjectMember.objects.create(project=project, member=create_user, role=20)
+        url = f"/api/workspaces/{workspace.slug}/projects/{project.id}/"
+
+        assert (
+            session_client.patch(url, {"is_issue_type_enabled": True}, format="json").status_code == status.HTTP_200_OK
+        )
+        assert ProjectIssueType.objects.filter(project=project).count() == 6
+
+        # A second fetch used to race the enabling PATCH and seed a duplicate set.
+        assert session_client.get(self.list_url(workspace.slug, project.id)).status_code == status.HTTP_200_OK
+        assert IssueType.objects.filter(workspace=workspace).count() == 6
+        assert ProjectIssueType.objects.filter(project=project).count() == 6
+
+    @pytest.mark.django_db
+    def test_project_save_does_not_resurrect_a_deleted_type(self, session_client, workspace, create_user):
+        project = Project.objects.create(name="Fresh project", identifier="FRSH", workspace=workspace)
+        ProjectMember.objects.create(project=project, member=create_user, role=20)
+        url = f"/api/workspaces/{workspace.slug}/projects/{project.id}/"
+        session_client.patch(url, {"is_issue_type_enabled": True}, format="json")
+
+        spike = IssueType.objects.get(workspace=workspace, name="Spike")
+        assert (
+            session_client.delete(self.detail_url(workspace.slug, project.id, spike.id)).status_code
+            == status.HTTP_204_NO_CONTENT
+        )
+
+        # The defaults are seeded on the off -> on transition only, so an unrelated
+        # settings save must not bring Spike back.
+        assert session_client.patch(url, {"name": "Renamed project"}, format="json").status_code == status.HTTP_200_OK
+
+        listed = session_client.get(self.list_url(workspace.slug, project.id))
+        assert "Spike" not in {row["name"] for row in listed.data}
 
     @pytest.mark.django_db
     def test_mark_as_default_moves_flag(self, session_client, workspace, type_context):

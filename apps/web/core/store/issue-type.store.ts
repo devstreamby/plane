@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import { set } from "lodash-es";
+import { set, unset } from "lodash-es";
 import { action, computed, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 // types
@@ -141,8 +141,10 @@ export class IssueTypeStore implements IIssueTypeStore {
   deleteIssueType = async (workspaceSlug: string, projectId: string, issueTypeId: string) => {
     await this.issueTypeService.deleteIssueType(workspaceSlug, projectId, issueTypeId);
     runInAction(() => {
-      const existing = this.issueTypeMap[projectId]?.[issueTypeId];
-      if (existing) set(this.issueTypeMap, [projectId, issueTypeId], { ...existing, is_active: false });
+      // Drop the entry outright. Marking it `is_active: false` used to leave the row
+      // on screen, because neither this store nor the list endpoint filters on
+      // `is_active` — that flag is the activate/deactivate toggle, not a delete marker.
+      unset(this.issueTypeMap, [projectId, issueTypeId]);
     });
   };
 
