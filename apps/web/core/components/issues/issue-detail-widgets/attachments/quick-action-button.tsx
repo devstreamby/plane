@@ -59,13 +59,9 @@ export const IssueAttachmentActionButton = observer(function IssueAttachmentActi
         setIsLoading(true);
         attachmentOperations
           .create(currentFile)
-          .catch(() => {
-            setToast({
-              type: TOAST_TYPE.ERROR,
-              title: "Error!",
-              message: "File could not be attached. Try uploading again.",
-            });
-          })
+          // Already surfaced via the promise-toast in useAttachmentOperations -- swallow
+          // here only to avoid an unhandled rejection, don't show a second toast.
+          .catch(() => {})
           .finally(() => {
             handleFetchPropertyActivities();
             setLastWidgetAction("attachments");
@@ -93,18 +89,26 @@ export const IssueAttachmentActionButton = observer(function IssueAttachmentActi
     multiple: false,
     disabled: isLoading || disabled,
   });
+  const rootProps = getRootProps();
 
   return (
-    <div
-      onClick={(e) => {
-        // TODO: Remove extra div and move event propagation to button
-        e.stopPropagation();
-      }}
-    >
-      <button {...getRootProps()} type="button" disabled={disabled}>
-        <input {...getInputProps()} />
+    <>
+      {/* react-dropzone opens this via a ref, not DOM nesting -- kept outside the button
+          so a focusable input isn't nested inside another focusable control. */}
+      <input {...getInputProps()} />
+      <button
+        {...rootProps}
+        type="button"
+        disabled={disabled}
+        onClick={(e) => {
+          // Stop the click from bubbling to the issue row (which opens the issue), then
+          // run react-dropzone's own click handler to open the file picker.
+          e.stopPropagation();
+          rootProps.onClick?.(e);
+        }}
+      >
         {customButton ? customButton : <PlusIcon className="h-4 w-4" />}
       </button>
-    </div>
+    </>
   );
 });

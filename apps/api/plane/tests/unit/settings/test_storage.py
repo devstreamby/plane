@@ -231,3 +231,49 @@ class TestS3StorageSignedURLExpiration:
         assert mock_boto3.client.call_args_list[0][1]["endpoint_url"] == "http://plane-minio:9000"
         assert mock_boto3.client.call_args_list[1][1]["endpoint_url"] == "http://localhost:9000"
         public_client.generate_presigned_post.assert_called_once()
+
+
+@pytest.mark.unit
+class TestS3StoragePresignedURLDisposition:
+    """Test that generate_presigned_url's Content-Disposition default and override
+    behave correctly -- this is the only control standing between an inline-served
+    attachment (e.g. text/html, added to ATTACHMENT_MIME_TYPES) and script execution
+    on the app's own origin, since MinIO is proxied same-origin in the self-hosted
+    CE deployment. See GenericAssetEndpoint.get in plane/api/views/asset.py."""
+
+    _ENV = {
+        "AWS_ACCESS_KEY_ID": "test-key",
+        "AWS_SECRET_ACCESS_KEY": "test-secret",
+        "AWS_S3_BUCKET_NAME": "test-bucket",
+        "AWS_REGION": "us-east-1",
+    }
+
+    @patch.dict(os.environ, _ENV, clear=True)
+    @patch("plane.settings.storage.boto3")
+    def test_default_disposition_is_inline(self, mock_boto3):
+        """Documents the default that made the GenericAssetEndpoint hole possible --
+        callers MUST opt into "attachment" explicitly, it is never the safe default."""
+        mock_s3_client = Mock()
+        mock_s3_client.generate_presigned_url.return_value = "https://test-url.com"
+        mock_boto3.client.return_value = mock_s3_client
+
+        storage = S3Storage()
+        storage.generate_presigned_url("test-object")
+
+        call_kwargs = mock_s3_client.generate_presigned_url.call_args[1]
+        assert call_kwargs["Params"]["ResponseContentDisposition"].startswith("inline;")
+
+    @patch.dict(os.environ, _ENV, clear=True)
+    @patch("plane.settings.storage.boto3")
+    def test_attachment_disposition_forces_download(self, mock_boto3):
+        mock_s3_client = Mock()
+        mock_s3_client.generate_presigned_url.return_value = "https://test-url.com"
+        mock_boto3.client.return_value = mock_s3_client
+
+        storage = S3Storage()
+        storage.generate_presigned_url("test-object.html", disposition="attachment", filename="test-object.html")
+
+        call_kwargs = mock_s3_client.generate_presigned_url.call_args[1]
+        disposition = call_kwargs["Params"]["ResponseContentDisposition"]
+        assert disposition.startswith("attachment;")
+        assert "test-object.html" in disposition

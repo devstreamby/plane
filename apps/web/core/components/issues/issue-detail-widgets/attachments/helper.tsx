@@ -5,6 +5,7 @@
  */
 
 import { useMemo } from "react";
+import { useTranslation } from "@plane/i18n";
 import { setPromiseToast, TOAST_TYPE, setToast } from "@plane/propel/toast";
 import type { TIssueServiceType } from "@plane/types";
 import { EIssueServiceType } from "@plane/types";
@@ -12,6 +13,17 @@ import { EIssueServiceType } from "@plane/types";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 // types
 import type { TAttachmentUploadStatus } from "@/store/issue/issue-details/attachment.store";
+
+// The service layer rethrows the backend's parsed error body as-is (see
+// issue_attachment.service.ts), which is normally `{error: string, status: false}`
+// -- but a network failure throws `undefined`, and a raw S3/MinIO POST failure
+// throws an XML string, neither of which is safe to render directly. Only
+// surface the field we know is a plain user-facing string.
+const extractAttachmentErrorMessage = (error: unknown): string | undefined => {
+  if (typeof error !== "object" || error === null) return undefined;
+  const { error: message } = error as { error?: unknown };
+  return typeof message === "string" ? message : undefined;
+};
 
 export type TAttachmentOperations = {
   create: (file: File) => Promise<void>;
@@ -33,6 +45,7 @@ export const useAttachmentOperations = (
   issueId: string,
   issueServiceType: TIssueServiceType = EIssueServiceType.ISSUES
 ): TAttachmentHelpers => {
+  const { t } = useTranslation();
   const {
     attachment: { createAttachment, removeAttachment, getAttachmentsUploadStatusByIssueId },
   } = useIssueDetail(issueServiceType);
@@ -50,7 +63,7 @@ export const useAttachmentOperations = (
           },
           error: {
             title: "Attachment not uploaded",
-            message: () => "The attachment could not be uploaded",
+            message: (error: unknown) => extractAttachmentErrorMessage(error) ?? t("attachment.error"),
           },
         });
 
@@ -74,7 +87,7 @@ export const useAttachmentOperations = (
         }
       },
     }),
-    [workspaceSlug, projectId, issueId, createAttachment, removeAttachment]
+    [workspaceSlug, projectId, issueId, createAttachment, removeAttachment, t]
   );
   const attachmentsUploadStatus = getAttachmentsUploadStatusByIssueId(issueId);
 

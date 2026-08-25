@@ -464,6 +464,8 @@ ATTACHMENT_MIME_TYPES = [
     "image/webp",
     "image/tiff",
     "image/bmp",
+    "image/heic",
+    "image/heif",
     # Documents
     "application/pdf",
     "application/msword",
@@ -520,7 +522,6 @@ ATTACHMENT_MIME_TYPES = [
     "application/x-compressed-tar-zip",
     "application/x-compressed-tar-7z",
     "application/x-compressed-tar-rar",
-    "application/x-compressed-tar-zip",
     # 3D Models
     "model/gltf-binary",
     "model/gltf+json",
@@ -537,12 +538,14 @@ ATTACHMENT_MIME_TYPES = [
     "text/xml",
     "text/csv",
     "application/xml",
+    # HTML attachments are always served with Content-Disposition: attachment
+    # (never inline) -- see S3Storage.generate_presigned_url callers -- so a
+    # stored HTML file can't execute script on the app's origin.
+    "text/html",
     # SQL
     "application/x-sql",
     # Gzip
     "application/x-gzip",
-    # Markdown
-    "text/markdown",
 ]
 
 # Seed directory path

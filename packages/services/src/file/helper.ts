@@ -8,7 +8,13 @@
 import { fileTypeFromBuffer } from "file-type";
 // plane imports
 import type { TFileMetaDataLite, TFileSignedURLResponse } from "@plane/types";
-import { DANGEROUS_EXTENSIONS } from "@plane/constants";
+import { DANGEROUS_EXTENSIONS, EXTENSION_MIME_TYPE_MAP } from "@plane/constants";
+
+// A last-resort fallback (the browser's own File.type) is rejected if it comes back
+// as this value -- it's already reachable via a legitimate server-allowed MIME
+// (e.g. .obj files), so trusting it here would turn the fallback into a wildcard
+// that accepts anything the OS couldn't identify either.
+const GENERIC_BINARY_MIME_TYPE = "application/octet-stream";
 
 /**
  * @description Filename validation - checks for double extensions and dangerous patterns
@@ -50,6 +56,20 @@ const validateFilename = (filename: string): string | null => {
 };
 
 /**
+ * @description Look up a MIME type from a filename's extension using a hardcoded
+ * map, for formats that have no binary signature to sniff (plain text formats:
+ * csv, txt, css, json, html, ...).
+ * @param {string} filename
+ * @returns {string} the mapped MIME type, or an empty string if the extension isn't mapped
+ */
+const getMimeTypeFromExtension = (filename: string): string => {
+  const parts = filename.split(".");
+  if (parts.length < 2) return "";
+  const extension = parts[parts.length - 1]?.toLowerCase() ?? "";
+  return EXTENSION_MIME_TYPE_MAP[extension] ?? "";
+};
+
+/**
  * @description from the provided signed URL response, generate a payload to be used to upload the file
  * @param {TFileSignedURLResponse} signedURLResponse
  * @param {File} file
@@ -82,8 +102,12 @@ const detectMimeTypeFromSignature = async (file: File): Promise<string> => {
 };
 
 /**
- * @description Validate and detect the MIME type of a file using signature detection
- * Also performs basic security checks on filename
+ * @description Validate and detect the MIME type of a file. Tries, in order: binary
+ * signature sniffing (authoritative -- catches renamed executables etc.), a
+ * hardcoded extension map (for text formats with no signature to sniff), and
+ * finally the browser's own `File.type` (best-effort, OS-dependent, so it's only
+ * a last resort and never overrides an earlier match).
+ * Also performs basic security checks on filename.
  * @param {File} file
  * @returns {Promise<string>} validated and detected MIME type
  */
@@ -101,6 +125,15 @@ const validateAndDetectFileType = async (file: File): Promise<string> => {
     }
   } catch (_error) {
     console.warn("Error detecting file type from signature:", _error);
+  }
+
+  const extensionType = getMimeTypeFromExtension(file.name);
+  if (extensionType) {
+    return extensionType;
+  }
+
+  if (file.type && file.type !== GENERIC_BINARY_MIME_TYPE) {
+    return file.type;
   }
 
   // fallback for unknown files

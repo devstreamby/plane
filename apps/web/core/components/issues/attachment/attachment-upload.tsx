@@ -33,7 +33,12 @@ export const IssueAttachmentUpload = observer(function IssueAttachmentUpload(pro
       if (!currentFile || !workspaceSlug) return;
 
       setIsLoading(true);
-      attachmentOperations.create(currentFile).finally(() => setIsLoading(false));
+      attachmentOperations
+        .create(currentFile)
+        // Already surfaced via the promise-toast in useAttachmentOperations -- swallow
+        // here only to avoid an unhandled rejection, don't show a second toast.
+        .catch(() => {})
+        .finally(() => setIsLoading(false));
     },
     [attachmentOperations, workspaceSlug]
   );
