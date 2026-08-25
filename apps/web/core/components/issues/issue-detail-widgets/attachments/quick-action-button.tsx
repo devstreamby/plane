@@ -92,19 +92,23 @@ export const IssueAttachmentActionButton = observer(function IssueAttachmentActi
   const rootProps = getRootProps();
 
   return (
-    <button
-      {...rootProps}
-      type="button"
-      disabled={disabled}
-      onClick={(e) => {
-        // Stop the click from bubbling to the issue row (which opens the issue), then
-        // run react-dropzone's own click handler to open the file picker.
-        e.stopPropagation();
-        rootProps.onClick?.(e);
-      }}
-    >
+    <>
+      {/* react-dropzone opens this via a ref, not DOM nesting -- kept outside the button
+          so a focusable input isn't nested inside another focusable control. */}
       <input {...getInputProps()} />
-      {customButton ? customButton : <PlusIcon className="h-4 w-4" />}
-    </button>
+      <button
+        {...rootProps}
+        type="button"
+        disabled={disabled}
+        onClick={(e) => {
+          // Stop the click from bubbling to the issue row (which opens the issue), then
+          // run react-dropzone's own click handler to open the file picker.
+          e.stopPropagation();
+          rootProps.onClick?.(e);
+        }}
+      >
+        {customButton ? customButton : <PlusIcon className="h-4 w-4" />}
+      </button>
+    </>
   );
 });
