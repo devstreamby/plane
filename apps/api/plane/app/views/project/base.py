@@ -339,6 +339,10 @@ class ProjectViewSet(BaseViewSet):
         workspace = Workspace.objects.get(slug=slug)
 
         project = Project.objects.get(pk=pk, workspace__slug=slug)
+        # Captured before serializer.save() mutates the instance: the default work
+        # item types are seeded only on the off -> on transition, so a type an admin
+        # deleted does not come back on the next unrelated project settings save.
+        was_issue_type_enabled = project.is_issue_type_enabled
         intake_view = request.data.get("inbox_view", project.intake_view)
         current_instance = json.dumps(ProjectSerializer(project).data, cls=DjangoJSONEncoder)
         if project.archived_at:
@@ -367,7 +371,7 @@ class ProjectViewSet(BaseViewSet):
 
             project = self.get_queryset().filter(pk=serializer.data["id"]).first()
 
-            if serializer.data.get("is_issue_type_enabled"):
+            if serializer.data.get("is_issue_type_enabled") and not was_issue_type_enabled:
                 ensure_default_issue_types(project)
 
             model_activity.delay(

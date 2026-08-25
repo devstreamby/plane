@@ -36,11 +36,14 @@ class IssueTypeSerializer(BaseSerializer):
 
     def validate_name(self, value):
         workspace_id = self.context.get("workspace_id")
-        queryset = IssueType.objects.filter(workspace_id=workspace_id, name__iexact=value, is_active=True)
+        # Deliberately not filtered on is_active: a deactivated type still holds the
+        # name at the DB level, so accepting it here would surface as a 500 from the
+        # workspace/name unique constraint instead of a validation error.
+        queryset = IssueType.objects.filter(workspace_id=workspace_id, name__iexact=value)
         if self.instance is not None:
             queryset = queryset.exclude(pk=self.instance.pk)
         if queryset.exists():
-            raise serializers.ValidationError("An active work item type with this name already exists.")
+            raise serializers.ValidationError("A work item type with this name already exists in this workspace.")
         return value
 
 

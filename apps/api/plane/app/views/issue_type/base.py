@@ -5,6 +5,7 @@
 # Django imports
 from django.db import transaction
 from django.db.models import F
+from django.utils import timezone
 
 # Third party imports
 from rest_framework.response import Response
@@ -116,8 +117,23 @@ class IssueTypeViewSet(BaseViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        issue_type.is_active = False
-        issue_type.save(update_fields=["is_active"])
+        # `is_active` is the activate/deactivate toggle, not a delete marker, and
+        # nothing filters the list on it — flipping it here made the trash icon a
+        # silent no-op. Soft-delete the project link instead, which is what
+        # get_queryset() actually filters on.
+        with transaction.atomic():
+            ProjectIssueType.objects.filter(project_id=project_id, issue_type_id=pk, deleted_at__isnull=True).update(
+                deleted_at=timezone.now()
+            )
+
+            # The type row is workspace-scoped and shared by every project that links
+            # it, so it only goes away once no project uses it. Set deleted_at
+            # directly rather than calling delete(): that queues a cascading soft
+            # delete which would null out `type` on work items in other projects.
+            is_orphaned = not ProjectIssueType.objects.filter(issue_type_id=pk, deleted_at__isnull=True).exists()
+            if is_orphaned:
+                IssueType.objects.filter(pk=pk).update(deleted_at=timezone.now())
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @allow_permission([ROLE.ADMIN])

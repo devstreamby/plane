@@ -35,6 +35,9 @@ def ensure_default_issue_types(project: Project) -> None:
     Idempotently create the six default work item types for a
     workspace and link them to the given project. Safe to call repeatedly.
     """
+    # Both get_or_create calls rely on a unique constraint to stay atomic: this
+    # function runs concurrently (project PATCH + type-list fetch), and without a
+    # constraint backing the SELECT-then-INSERT both callers insert their own row.
     with transaction.atomic():
         for name, is_default, is_epic, logo_props in DEFAULT_ISSUE_TYPES:
             issue_type, _ = IssueType.objects.get_or_create(
@@ -43,8 +46,6 @@ def ensure_default_issue_types(project: Project) -> None:
                 defaults={"is_active": True, "is_epic": is_epic, "logo_props": logo_props},
             )
 
-            project_issue_type = ProjectIssueType.objects.filter(
-                project=project, issue_type=issue_type, deleted_at__isnull=True
-            ).first()
-            if project_issue_type is None:
-                ProjectIssueType.objects.create(project=project, issue_type=issue_type, is_default=is_default)
+            ProjectIssueType.objects.get_or_create(
+                project=project, issue_type=issue_type, defaults={"is_default": is_default}
+            )

@@ -3,6 +3,7 @@
 # See the LICENSE file for details.
 
 import pytest
+from django.db import IntegrityError, transaction
 
 from plane.db.models import IssueType, Project, ProjectIssueType, ProjectMember
 from plane.utils.issue_type import ensure_default_issue_types
@@ -67,3 +68,34 @@ class TestEnsureDefaultIssueTypes:
         # Same workspace-level IssueType rows are linked to both projects, not duplicated.
         assert IssueType.objects.filter(workspace=workspace, name="Task").count() == 1
         assert ProjectIssueType.objects.filter(issue_type__name="Task").count() == 2
+
+    @pytest.mark.django_db
+    def test_workspace_name_pair_is_unique(self, workspace, project):
+        """The constraint is what makes get_or_create above atomic under a race."""
+        ensure_default_issue_types(project)
+
+        with pytest.raises(IntegrityError), transaction.atomic():
+            IssueType.objects.create(workspace=workspace, name="Task")
+
+    @pytest.mark.django_db
+    def test_soft_deleted_name_can_be_reused(self, workspace, project):
+        ensure_default_issue_types(project)
+
+        bug = IssueType.objects.get(workspace=workspace, name="Bug")
+        IssueType.objects.filter(pk=bug.pk).update(deleted_at="2026-08-19T08:05:32Z")
+
+        # The constraint is scoped to live rows, so the freed name is available again.
+        recreated = IssueType.objects.create(workspace=workspace, name="Bug")
+        assert recreated.pk != bug.pk
+
+    @pytest.mark.django_db
+    def test_relinks_a_type_the_project_had_unlinked(self, workspace, project):
+        """Re-enabling the feature must reuse the existing workspace type row."""
+        ensure_default_issue_types(project)
+        bug = IssueType.objects.get(workspace=workspace, name="Bug")
+        ProjectIssueType.objects.filter(project=project, issue_type=bug).delete()
+
+        ensure_default_issue_types(project)
+
+        assert IssueType.objects.filter(workspace=workspace, name="Bug").count() == 1
+        assert ProjectIssueType.objects.filter(project=project, issue_type=bug).exists()

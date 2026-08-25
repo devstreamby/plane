@@ -24,6 +24,17 @@ class IssueType(BaseModel):
     external_id = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
+        constraints = [
+            # Work item types are workspace-scoped and shared across the projects that
+            # link them, so a name may only exist once per workspace. Without this,
+            # `ensure_default_issue_types()` racing itself (project PATCH + type list
+            # fetch land ~1ms apart) inserts the six defaults twice.
+            models.UniqueConstraint(
+                fields=["workspace", "name"],
+                condition=Q(deleted_at__isnull=True),
+                name="issue_type_unique_workspace_name_when_deleted_at_null",
+            )
+        ]
         verbose_name = "Issue Type"
         verbose_name_plural = "Issue Types"
         db_table = "issue_types"
