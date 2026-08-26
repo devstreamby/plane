@@ -125,6 +125,7 @@ export const ISSUE_GROUP_BY_KEY: Record<TIssueDisplayFilterOptions, keyof TIssue
   target_date: "target_date",
   cycle: "cycle_id",
   module: "module_ids",
+  work_item_type: "type_id",
   team_project: "project_id",
 };
 
@@ -140,6 +141,7 @@ export const ISSUE_FILTER_DEFAULT_DATA: Record<TIssueDisplayFilterOptions, keyof
   created_by: "created_by",
   assignees: "assignee_ids",
   target_date: "target_date",
+  work_item_type: "type_id",
   team_project: "project_id",
 };
 
@@ -174,6 +176,8 @@ const ISSUE_ORDERBY_KEY: Record<TIssueOrderByOptions, keyof TIssue> = {
   "-attachment_count": "attachment_count",
   sub_issues_count: "sub_issues_count",
   "-sub_issues_count": "sub_issues_count",
+  type__level: "type_id",
+  "-type__level": "type_id",
 };
 
 export abstract class BaseIssuesStore implements IBaseIssuesStore {

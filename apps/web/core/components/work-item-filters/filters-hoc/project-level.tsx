@@ -17,6 +17,7 @@ import { removeNillKeys } from "@/components/issues/issue-layouts/utils";
 import { CreateUpdateProjectViewModal } from "@/components/views/modal";
 // hooks
 import { useCycle } from "@/hooks/store/use-cycle";
+import { useIssueType } from "@/hooks/store/use-issue-type";
 import { useLabel } from "@/hooks/store/use-label";
 import { useMember } from "@/hooks/store/use-member";
 import { useModule } from "@/hooks/store/use-module";
@@ -48,6 +49,7 @@ export const ProjectLevelWorkItemFiltersHOC = observer(function ProjectLevelWork
   const { data: currentUser } = useUser();
   const { allowPermissions } = useUserPermissions();
   const { getProjectCycleIds } = useCycle();
+  const { getProjectIssueTypeIds } = useIssueType();
   const { getProjectLabelIds } = useLabel();
   const {
     project: { getProjectMemberIds },
@@ -150,13 +152,13 @@ export const ProjectLevelWorkItemFiltersHOC = observer(function ProjectLevelWork
       updateView(workspaceSlug, projectId, viewDetails.id, {
         ...getViewFilterPayload(filterExpression),
       })
-        .then(() => {
+        .then(() =>
           setToast({
             type: TOAST_TYPE.SUCCESS,
             title: "Success!",
             message: "Your view has been updated successfully.",
-          });
-        })
+          })
+        )
         .catch(() => {
           setToast({
             type: TOAST_TYPE.ERROR,
@@ -207,6 +209,7 @@ export const ProjectLevelWorkItemFiltersHOC = observer(function ProjectLevelWork
         memberIds={getProjectMemberIds(projectId, false) ?? undefined}
         moduleIds={getProjectModuleIds(projectId) ?? undefined}
         stateIds={getProjectStateIds(projectId)}
+        workItemTypeIds={getProjectIssueTypeIds(projectId)}
         saveViewOptions={saveViewOptions}
         updateViewOptions={updateViewOptions}
       >

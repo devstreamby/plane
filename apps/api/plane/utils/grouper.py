@@ -13,9 +13,11 @@ from plane.db.models import (
     BoardColumn,
     Cycle,
     Issue,
+    IssueType,
     Label,
     Module,
     Project,
+    ProjectIssueType,
     ProjectMember,
     State,
     WorkspaceMember,
@@ -194,6 +196,19 @@ def issue_group_values(
         if project_id:
             return list(queryset.filter(project_id=project_id)) + ["None"]
         return list(queryset) + ["None"]
+
+    if field == "type_id":
+        # Ordered by the project's own type order, so the groups line up with
+        # Settings -> Work item types. Queried through the link rather than
+        # IssueType, which keeps one row per type without a DISTINCT that
+        # Postgres would reject alongside an ORDER BY on the joined level.
+        if project_id:
+            return list(
+                ProjectIssueType.objects.filter(project_id=project_id, issue_type__deleted_at__isnull=True)
+                .order_by("level")
+                .values_list("issue_type_id", flat=True)
+            ) + ["None"]
+        return list(IssueType.objects.filter(workspace__slug=slug).values_list("id", flat=True)) + ["None"]
 
     if field == "project_id":
         queryset = Project.objects.filter(workspace__slug=slug).values_list("id", flat=True)

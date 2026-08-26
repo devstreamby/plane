@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "Tipe Item Kerja",
+    "label_singular": "Tipe item kerja",
     "label_lowercase": "tipe item kerja",
     "switcher": {
       "tooltip": "Ubah tipe item kerja"

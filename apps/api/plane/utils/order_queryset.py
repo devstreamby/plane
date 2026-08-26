@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-from django.db.models import Case, CharField, Min, Value, When
+from django.db.models import Case, CharField, F, Min, OuterRef, Subquery, Value, When
+
+# Module imports
+from plane.db.models import ProjectIssueType
 
 # Custom ordering for priority and state
 PRIORITY_ORDER = ["urgent", "high", "medium", "low", "none"]
@@ -31,6 +34,7 @@ ISSUE_ORDER_BY_ALLOWLIST = frozenset({
     "assignees__first_name",
     "labels__name",
     "issue_module__module__name",
+    "type__level",
 })
 
 # IntakeIssue queryset — fields are prefixed with `issue__` for the join.
@@ -126,6 +130,29 @@ def order_issue_queryset(issue_queryset, order_by_param="-created_at"):
             )
         ).order_by("state_order", "-created_at")
         order_by_param = "-state_order" if order_by_param.startswith("-") else "state_order"
+    # Work item type ordering
+    elif order_by_param in ["type__level", "-type__level"]:
+        # Ordered by ProjectIssueType.level rather than IssueType.level: the project
+        # settings screen orders types by the link's level, and that is the value the
+        # serializer hands the frontend as `pit_level`.
+        issue_queryset = issue_queryset.annotate(
+            work_item_type_order=Subquery(
+                ProjectIssueType.objects.filter(
+                    issue_type_id=OuterRef("type_id"),
+                    project_id=OuterRef("project_id"),
+                    deleted_at__isnull=True,
+                ).values("level")[:1]
+            )
+        )
+        is_desc = order_by_param.startswith("-")
+        type_order = F("work_item_type_order")
+        issue_queryset = issue_queryset.order_by(
+            type_order.desc(nulls_last=True) if is_desc else type_order.asc(nulls_last=True),
+            "-created_at",
+        )
+        # Returned for the cursor paginator, which re-applies the ordering by name
+        # and puts untyped work items last either way.
+        order_by_param = "-work_item_type_order" if is_desc else "work_item_type_order"
     # assignee and label ordering
     elif order_by_param in [
         "labels__name",

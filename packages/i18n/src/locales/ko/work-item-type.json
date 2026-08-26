@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "워크 아이템 타입",
+    "label_singular": "워크 아이템 타입",
     "label_lowercase": "워크 아이템 타입",
     "switcher": {
       "tooltip": "워크 아이템 타입 변경"

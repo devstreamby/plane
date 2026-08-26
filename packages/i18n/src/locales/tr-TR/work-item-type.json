@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "İş Öğesi Tipleri",
+    "label_singular": "İş öğesi tipi",
     "label_lowercase": "iş öğesi tipleri",
     "switcher": {
       "tooltip": "İş öğesi tipini değiştir"

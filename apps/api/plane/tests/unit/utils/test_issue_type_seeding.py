@@ -32,6 +32,23 @@ class TestEnsureDefaultIssueTypes:
             assert issue_type.logo_props["icon"]["package"] == "work-item-type"
 
     @pytest.mark.django_db
+    def test_levels_follow_the_seed_order(self, project):
+        """Group-by columns and order-by both read this level, so it must be distinct."""
+        ensure_default_issue_types(project)
+
+        ordered = (
+            ProjectIssueType.objects.filter(project=project).order_by("level").values_list("issue_type__name", "level")
+        )
+        assert list(ordered) == [
+            ("Task", 0),
+            ("Story", 1),
+            ("Subtask", 2),
+            ("Epic", 3),
+            ("Bug", 4),
+            ("Spike", 5),
+        ]
+
+    @pytest.mark.django_db
     def test_exactly_one_default(self, project):
         ensure_default_issue_types(project)
 

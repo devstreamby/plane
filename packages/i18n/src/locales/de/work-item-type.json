@@ -1,6 +1,7 @@
 {
   "work_item_types": {
     "label": "Arbeitsaufgabentypen",
+    "label_singular": "Arbeitsaufgabentyp",
     "label_lowercase": "arbeitsaufgabentypen",
     "switcher": {
       "tooltip": "Arbeitsaufgabentyp ändern"

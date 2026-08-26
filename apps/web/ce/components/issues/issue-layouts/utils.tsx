@@ -47,6 +47,7 @@ import {
   SpreadsheetUpdatedOnColumn,
 } from "@/components/issues/issue-layouts/spreadsheet/columns";
 // hooks
+import { useIssueType } from "@/hooks/store/use-issue-type";
 import { useProjectState } from "@/hooks/store/use-project-state";
 // store
 import { store } from "@/lib/store-context";
@@ -122,10 +123,16 @@ export const useGroupByOptions = (
 }[] => {
   const { projectId } = useParams();
   const { getProjectBoardColumns } = useProjectState();
+  const { getProjectIssueTypes } = useIssueType();
   // Grouping by board column is meaningless until the project has columns configured.
   const hasBoardColumns = getProjectBoardColumns(projectId?.toString()).length > 0;
+  // Same for work item types, which are off until the project opts into them.
+  const hasWorkItemTypes = getProjectIssueTypes(projectId?.toString()).length > 0;
 
   return ISSUE_GROUP_BY_OPTIONS.filter(
-    (option) => options.includes(option.key) && (option.key !== "board_column" || hasBoardColumns)
+    (option) =>
+      options.includes(option.key) &&
+      (option.key !== "board_column" || hasBoardColumns) &&
+      (option.key !== "work_item_type" || hasWorkItemTypes)
   );
 };

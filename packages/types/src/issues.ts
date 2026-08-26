@@ -127,6 +127,7 @@ export type GroupByColumnTypes =
   | "labels"
   | "assignees"
   | "created_by"
+  | "work_item_type"
   | "team_project";
 
 export type TGetColumns = {
