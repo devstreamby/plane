@@ -31,6 +31,7 @@ from plane.api.serializers import (
     TransferCycleIssueRequestSerializer,
     CycleCreateSerializer,
     CycleUpdateSerializer,
+    CycleLiteSerializer,
     IssueSerializer,
 )
 from plane.app.permissions import ProjectEntityPermission
@@ -55,6 +56,7 @@ from plane.utils.openapi import (
     CURSOR_PARAMETER,
     PER_PAGE_PARAMETER,
     CYCLE_VIEW_PARAMETER,
+    CYCLE_STATUS_PARAMETER,
     ORDER_BY_PARAMETER,
     FIELDS_PARAMETER,
     EXPAND_PARAMETER,
@@ -76,6 +78,29 @@ from plane.utils.openapi import (
     UNARCHIVED_RESPONSE,
     REQUIRED_FIELDS_RESPONSE,
 )
+
+
+def filter_cycles_by_status(queryset, cycle_status):
+    """Narrow a cycle queryset to one of the named status buckets.
+
+    Shared by the full cycle list (where the bucket arrives as ``cycle_view``) and
+    the lite list (where it arrives as ``status``), so the two cannot drift apart.
+    An unrecognised or absent value returns the queryset untouched, which is what
+    both callers want for "all".
+    """
+    now = timezone.now()
+
+    if cycle_status == "current":
+        return queryset.filter(start_date__lte=now, end_date__gte=now)
+    if cycle_status == "upcoming":
+        return queryset.filter(start_date__gt=now)
+    if cycle_status == "completed":
+        return queryset.filter(end_date__lt=now)
+    if cycle_status == "draft":
+        return queryset.filter(end_date=None, start_date=None)
+    if cycle_status == "incomplete":
+        return queryset.filter(Q(end_date__gte=now) | Q(end_date__isnull=True))
+    return queryset
 
 
 class CycleListCreateAPIEndpoint(BaseAPIView):
@@ -195,91 +220,28 @@ class CycleListCreateAPIEndpoint(BaseAPIView):
         Supports filtering by cycle status like current, upcoming, completed, or draft.
         """
         project = Project.objects.get(workspace__slug=slug, pk=project_id)
-        queryset = self.get_queryset().filter(archived_at__isnull=True)
         cycle_view = request.GET.get("cycle_view", "all")
+        queryset = filter_cycles_by_status(
+            self.get_queryset().filter(archived_at__isnull=True),
+            cycle_view,
+        )
 
-        # Current Cycle
-        if cycle_view == "current":
-            queryset = queryset.filter(start_date__lte=timezone.now(), end_date__gte=timezone.now())
-            data = CycleSerializer(
-                queryset,
-                many=True,
-                fields=self.fields,
-                expand=self.expand,
-                context={"project": project},
-            ).data
-            return Response(data, status=status.HTTP_200_OK)
-
-        # Upcoming Cycles
-        if cycle_view == "upcoming":
-            queryset = queryset.filter(start_date__gt=timezone.now())
-            return self.paginate(
-                request=request,
-                queryset=(queryset),
-                on_results=lambda cycles: CycleSerializer(
-                    cycles,
-                    many=True,
-                    fields=self.fields,
-                    expand=self.expand,
-                    context={"project": project},
-                ).data,
-            )
-
-        # Completed Cycles
-        if cycle_view == "completed":
-            queryset = queryset.filter(end_date__lt=timezone.now())
-            return self.paginate(
-                request=request,
-                queryset=(queryset),
-                on_results=lambda cycles: CycleSerializer(
-                    cycles,
-                    many=True,
-                    fields=self.fields,
-                    expand=self.expand,
-                    context={"project": project},
-                ).data,
-            )
-
-        # Draft Cycles
-        if cycle_view == "draft":
-            queryset = queryset.filter(end_date=None, start_date=None)
-            return self.paginate(
-                request=request,
-                queryset=(queryset),
-                on_results=lambda cycles: CycleSerializer(
-                    cycles,
-                    many=True,
-                    fields=self.fields,
-                    expand=self.expand,
-                    context={"project": project},
-                ).data,
-            )
-
-        # Incomplete Cycles
-        if cycle_view == "incomplete":
-            queryset = queryset.filter(Q(end_date__gte=timezone.now()) | Q(end_date__isnull=True))
-            return self.paginate(
-                request=request,
-                queryset=(queryset),
-                on_results=lambda cycles: CycleSerializer(
-                    cycles,
-                    many=True,
-                    fields=self.fields,
-                    expand=self.expand,
-                    context={"project": project},
-                ).data,
-            )
-        return self.paginate(
-            request=request,
-            queryset=(queryset),
-            on_results=lambda cycles: CycleSerializer(
+        def serialize(cycles):
+            return CycleSerializer(
                 cycles,
                 many=True,
                 fields=self.fields,
                 expand=self.expand,
                 context={"project": project},
-            ).data,
-        )
+            ).data
+
+        # "current" is the one bucket that answers with a bare array rather than the
+        # paginated envelope. Preserved as-is for backward compatibility -- the lite
+        # endpoint deliberately does not copy this quirk.
+        if cycle_view == "current":
+            return Response(serialize(queryset), status=status.HTTP_200_OK)
+
+        return self.paginate(request=request, queryset=queryset, on_results=serialize)
 
     @cycle_docs(
         operation_id="create_cycle",
@@ -354,6 +316,69 @@ class CycleListCreateAPIEndpoint(BaseAPIView):
                 {"error": "Both start date and end date are either required or are to be null"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class CycleLiteListAPIEndpoint(BaseAPIView):
+    """Read-only, field-trimmed cycle list.
+
+    Same membership filtering as CycleListCreateAPIEndpoint's GET, without its
+    per-cycle issue-count annotations.
+
+    Two deliberate differences from the full list: the status bucket arrives as
+    ``status`` (no ``cycle_view`` alias), and every bucket -- ``current`` included --
+    answers with the paginated envelope. The full list returns a bare array for
+    ``current``, and clients of this route are documented to never expect that.
+    """
+
+    serializer_class = CycleLiteSerializer
+    model = Cycle
+    permission_classes = [ProjectEntityPermission]
+    use_read_replica = True
+
+    def get_queryset(self):
+        return (
+            Cycle.objects.filter(workspace__slug=self.kwargs.get("slug"))
+            .filter(project_id=self.kwargs.get("project_id"))
+            .filter(
+                project__project_projectmember__member=self.request.user,
+                project__project_projectmember__is_active=True,
+            )
+            .filter(archived_at__isnull=True)
+            .distinct()
+        )
+
+    @cycle_docs(
+        operation_id="list_cycles_lite",
+        summary="List cycles (lite)",
+        description=(
+            "Retrieve a field-trimmed, cursor-paginated list of cycles in a project. "
+            "Unlike the full cycle list, every status bucket returns the paginated envelope."
+        ),
+        parameters=[
+            CURSOR_PARAMETER,
+            PER_PAGE_PARAMETER,
+            CYCLE_STATUS_PARAMETER,
+            ORDER_BY_PARAMETER,
+        ],
+        responses={
+            200: create_paginated_response(
+                CycleLiteSerializer,
+                "PaginatedCycleLiteResponse",
+                "Paginated lite list of cycles",
+                "Paginated Lite Cycles",
+            ),
+        },
+    )
+    def get(self, request, slug, project_id):
+        """List cycles (lite)"""
+        queryset = filter_cycles_by_status(self.get_queryset(), request.GET.get("status"))
+        queryset = queryset.order_by(request.GET.get("order_by", "-created_at"))
+
+        return self.paginate(
+            request=request,
+            queryset=queryset,
+            on_results=lambda cycles: CycleLiteSerializer(cycles, many=True).data,
+        )
 
 
 class CycleDetailAPIEndpoint(BaseAPIView):

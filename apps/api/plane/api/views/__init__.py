@@ -4,6 +4,7 @@
 
 from .project import (
     ProjectListCreateAPIEndpoint,
+    ProjectLiteListAPIEndpoint,
     ProjectDetailAPIEndpoint,
     ProjectArchiveUnarchiveAPIEndpoint,
     ProjectSummaryAPIEndpoint,
@@ -36,6 +37,7 @@ from .issue import (
 
 from .cycle import (
     CycleListCreateAPIEndpoint,
+    CycleLiteListAPIEndpoint,
     CycleDetailAPIEndpoint,
     CycleIssueListCreateAPIEndpoint,
     CycleIssueDetailAPIEndpoint,
@@ -45,13 +47,19 @@ from .cycle import (
 
 from .module import (
     ModuleListCreateAPIEndpoint,
+    ModuleLiteListAPIEndpoint,
     ModuleDetailAPIEndpoint,
     ModuleIssueListCreateAPIEndpoint,
     ModuleIssueDetailAPIEndpoint,
     ModuleArchiveUnarchiveAPIEndpoint,
 )
 
-from .member import ProjectMemberListCreateAPIEndpoint, ProjectMemberDetailAPIEndpoint, WorkspaceMemberAPIEndpoint
+from .member import (
+    ProjectMemberListCreateAPIEndpoint,
+    ProjectMemberDetailAPIEndpoint,
+    WorkspaceMemberAPIEndpoint,
+    WorkspaceMemberLiteAPIEndpoint,
+)
 
 from .intake import (
     IntakeIssueListCreateAPIEndpoint,

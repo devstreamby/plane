@@ -45,6 +45,7 @@ from plane.api.serializers import (
     ProjectSerializer,
     ProjectCreateSerializer,
     ProjectUpdateSerializer,
+    ProjectLiteSerializer,
 )
 from plane.app.permissions import ProjectBasePermission, WorkSpaceAdminPermission
 from plane.utils.openapi import (
@@ -56,6 +57,7 @@ from plane.utils.openapi import (
     ORDER_BY_PARAMETER,
     FIELDS_PARAMETER,
     EXPAND_PARAMETER,
+    INCLUDE_ARCHIVED_PARAMETER,
     create_paginated_response,
     # Request Examples
     PROJECT_CREATE_EXAMPLE,
@@ -328,6 +330,79 @@ class ProjectListCreateAPIEndpoint(BaseAPIView):
                 {"error": "An unexpected error occurred"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+class ProjectLiteListAPIEndpoint(BaseAPIView):
+    """Read-only, field-trimmed project list.
+
+    Same visibility rules as ProjectListCreateAPIEndpoint's GET, but without any
+    of its per-project count annotations -- the lite shape needs none of them, and
+    dropping them keeps this cheap enough for pickers and reference lookups that
+    only want id/identifier/name.
+
+    Archived projects are excluded unless ``include_archived=true``.
+    """
+
+    serializer_class = ProjectLiteSerializer
+    model = Project
+    permission_classes = [ProjectBasePermission]
+    use_read_replica = True
+
+    def get_queryset(self):
+        return (
+            Project.objects.filter(workspace__slug=self.kwargs.get("slug"))
+            .filter(
+                Q(
+                    project_projectmember__member=self.request.user,
+                    project_projectmember__is_active=True,
+                )
+                | Q(network=2)
+            )
+            .distinct()
+        )
+
+    @project_docs(
+        operation_id="list_projects_lite",
+        summary="List projects (lite)",
+        description=(
+            "Retrieve a field-trimmed, cursor-paginated list of projects in a workspace, "
+            "suitable for pickers and reference lookups. Archived projects are excluded "
+            "unless include_archived is true."
+        ),
+        parameters=[
+            CURSOR_PARAMETER,
+            PER_PAGE_PARAMETER,
+            ORDER_BY_PARAMETER,
+            INCLUDE_ARCHIVED_PARAMETER,
+        ],
+        responses={
+            200: create_paginated_response(
+                ProjectLiteSerializer,
+                "PaginatedProjectLiteResponse",
+                "Paginated lite list of projects",
+                "Paginated Lite Projects",
+            ),
+            404: WORKSPACE_NOT_FOUND_RESPONSE,
+        },
+    )
+    def get(self, request, slug):
+        """List projects (lite)
+
+        Returns id, identifier, name and the visual properties only.
+        """
+        projects = self.get_queryset()
+
+        # Default to hiding archived projects; the client opts back in explicitly.
+        if request.GET.get("include_archived", "false").lower() != "true":
+            projects = projects.filter(archived_at__isnull=True)
+
+        projects = projects.order_by(request.GET.get("order_by", "-created_at"))
+
+        return self.paginate(
+            request=request,
+            queryset=projects,
+            on_results=lambda projects: ProjectLiteSerializer(projects, many=True).data,
+        )
 
 
 class ProjectDetailAPIEndpoint(BaseAPIView):
