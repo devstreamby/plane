@@ -188,6 +188,12 @@ def send_email_notification(issue_id, notification_data, receiver_id, email_noti
             actors_involved = []
             for actor_id, changes in data.items():
                 actor = User.objects.get(pk=actor_id)
+                # User.avatar_url is None when the user has no avatar. Interpolating
+                # that straight into an f-string yielded "<base_api>None" -- a truthy
+                # string -- so the template's {% if actor_detail.avatar_url %} guard
+                # always took the <img> branch and its initial-circle fallback never
+                # fired, rendering a broken image in every such notification email.
+                actor_avatar_url = f"{base_api}{actor.avatar_url}" if actor.avatar_url else None
                 total_changes = total_changes + len(changes)
                 comment = changes.pop("comment", False)
                 mention = changes.pop("mention", False)
@@ -197,7 +203,7 @@ def send_email_notification(issue_id, notification_data, receiver_id, email_noti
                         {
                             "actor_comments": comment,
                             "actor_detail": {
-                                "avatar_url": f"{base_api}{actor.avatar_url}",
+                                "avatar_url": actor_avatar_url,
                                 "first_name": actor.first_name,
                                 "last_name": actor.last_name,
                             },
@@ -210,7 +216,7 @@ def send_email_notification(issue_id, notification_data, receiver_id, email_noti
                         {
                             "actor_comments": mention,
                             "actor_detail": {
-                                "avatar_url": f"{base_api}{actor.avatar_url}",
+                                "avatar_url": actor_avatar_url,
                                 "first_name": actor.first_name,
                                 "last_name": actor.last_name,
                             },
@@ -224,7 +230,7 @@ def send_email_notification(issue_id, notification_data, receiver_id, email_noti
                     template_data.append(
                         {
                             "actor_detail": {
-                                "avatar_url": f"{base_api}{actor.avatar_url}",
+                                "avatar_url": actor_avatar_url,
                                 "first_name": actor.first_name,
                                 "last_name": actor.last_name,
                             },
