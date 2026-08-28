@@ -101,7 +101,12 @@ dev-editor
 
 storybook-static
 
+# Agent guidance is kept local to this checkout: it carries deploy and
+# environment notes for our own infrastructure, and this fork is public.
+# AGENTS.md and CLAUDE.md are the same file (one is a symlink to the other),
+# so the two can never drift apart.
 CLAUDE.md
+AGENTS.md
 
 build/
 .react-router/
