@@ -101,10 +101,14 @@ export const IssueAttachmentActionButton = observer(function IssueAttachmentActi
         type="button"
         disabled={disabled}
         onClick={(e) => {
-          // Stop the click from bubbling to the issue row (which opens the issue), then
-          // run react-dropzone's own click handler to open the file picker.
-          e.stopPropagation();
+          // Order matters: react-dropzone composes its handlers with composeEventHandlers,
+          // which skips every handler once the event has had stopPropagation() called on it
+          // ("if propagation was stopped before invoking the fns, no handlers will be
+          // executed"). So open the file picker first, and only then stop the click from
+          // bubbling to the issue row (which would open the issue). Stopping first silently
+          // swallows the click and the picker never opens.
           rootProps.onClick?.(e);
+          e.stopPropagation();
         }}
       >
         {customButton ? customButton : <PlusIcon className="h-4 w-4" />}
