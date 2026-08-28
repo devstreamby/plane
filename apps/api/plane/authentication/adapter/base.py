@@ -303,16 +303,28 @@ class Adapter:
         # Set display name
         user.display_name = display_name
 
-        # Download and upload avatar only if the avatar is different from the one in the storage
+        # Only touch the avatar when the provider actually sent one.
+        #
+        # delete_old_avatar() removes the object from storage as well as the
+        # FileAsset row, so calling it unconditionally destroyed avatars that
+        # users had uploaded themselves, irrecoverably, on their next sign-in.
+        # Providers that never supply an avatar made that the norm rather than an
+        # edge case: the LDAP provider hardcodes "avatar": "", and ENABLE_LDAP_SYNC
+        # defaults to on, so every LDAP login wiped the user's avatar and put
+        # nothing back (download_and_upload_avatar returns None for an empty URL).
+        #
+        # The signup path below already guards this the same way; only the sync
+        # path was missing it.
         avatar = self.user_data.get("user", {}).get("avatar", "")
-        # Delete the old avatar if it exists
-        self.delete_old_avatar(user=user)
-        avatar_asset = self.download_and_upload_avatar(avatar_url=avatar, user=user)
-        if avatar_asset:
-            user.avatar_asset = avatar_asset
-        # If avatar upload fails, set the avatar to the original URL
-        else:
-            user.avatar = avatar
+        if avatar:
+            # Delete the old avatar if it exists
+            self.delete_old_avatar(user=user)
+            avatar_asset = self.download_and_upload_avatar(avatar_url=avatar, user=user)
+            if avatar_asset:
+                user.avatar_asset = avatar_asset
+            # If avatar upload fails, set the avatar to the original URL
+            else:
+                user.avatar = avatar
 
         user.save()
         return user
