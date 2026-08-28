@@ -6,6 +6,7 @@ from django.urls import path
 
 from plane.api.views import (
     ProjectListCreateAPIEndpoint,
+    ProjectLiteListAPIEndpoint,
     ProjectDetailAPIEndpoint,
     ProjectArchiveUnarchiveAPIEndpoint,
     ProjectSummaryAPIEndpoint,
@@ -16,6 +17,12 @@ urlpatterns = [
         "workspaces/<str:slug>/projects/",
         ProjectListCreateAPIEndpoint.as_view(http_method_names=["get", "post"]),
         name="project",
+    ),
+    # Registered before the <uuid:pk> detail route so the literal segment always wins.
+    path(
+        "workspaces/<str:slug>/projects-lite/",
+        ProjectLiteListAPIEndpoint.as_view(http_method_names=["get"]),
+        name="projects-lite",
     ),
     path(
         "workspaces/<str:slug>/projects/<uuid:pk>/",

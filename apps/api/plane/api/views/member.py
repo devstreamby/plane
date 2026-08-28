@@ -15,16 +15,24 @@ from drf_spectacular.utils import (
 from .base import BaseAPIView
 from plane.api.serializers import UserLiteSerializer, ProjectMemberSerializer
 from plane.db.models import User, Workspace, WorkspaceMember, ProjectMember
-from plane.utils.permissions import ProjectMemberPermission, WorkSpaceAdminPermission, ProjectAdminPermission
+from plane.utils.permissions import (
+    ProjectMemberPermission,
+    WorkSpaceAdminPermission,
+    ProjectAdminPermission,
+    WorkspaceEntityPermission,
+)
 from plane.utils.openapi import (
     WORKSPACE_SLUG_PARAMETER,
     PROJECT_ID_PARAMETER,
+    CURSOR_PARAMETER,
+    PER_PAGE_PARAMETER,
     UNAUTHORIZED_RESPONSE,
     FORBIDDEN_RESPONSE,
     WORKSPACE_NOT_FOUND_RESPONSE,
     PROJECT_NOT_FOUND_RESPONSE,
     WORKSPACE_MEMBER_EXAMPLE,
     PROJECT_MEMBER_EXAMPLE,
+    create_paginated_response,
 )
 
 
@@ -89,6 +97,71 @@ class WorkspaceMemberAPIEndpoint(BaseAPIView):
             users_with_roles.append(user_data)
 
         return Response(users_with_roles, status=status.HTTP_200_OK)
+
+
+class WorkspaceMemberLiteAPIEndpoint(BaseAPIView):
+    """Cursor-paginated workspace member list.
+
+    Two differences from WorkspaceMemberAPIEndpoint, which is left untouched:
+
+    - It answers with the paginated envelope rather than a bare array, and
+      serializes only the page rather than every member in the workspace.
+    - It is readable by any active workspace member, not just admins. Resolving
+      assignees is an everyday lookup, and the fields returned (name, email,
+      role) are already visible to every member in the UI.
+    """
+
+    permission_classes = [WorkspaceEntityPermission]
+    use_read_replica = True
+
+    def get_queryset(self):
+        return (
+            WorkspaceMember.objects.filter(workspace__slug=self.kwargs.get("slug"), is_active=True)
+            .select_related("member")
+            .order_by("-created_at")
+        )
+
+    @extend_schema(
+        operation_id="get_workspace_members_lite",
+        summary="List workspace members (lite)",
+        description=(
+            "Retrieve a cursor-paginated list of the workspace's active members. Readable by any workspace member."
+        ),
+        tags=["Members"],
+        parameters=[WORKSPACE_SLUG_PARAMETER, CURSOR_PARAMETER, PER_PAGE_PARAMETER],
+        responses={
+            200: create_paginated_response(
+                UserLiteSerializer,
+                "PaginatedWorkspaceMemberResponse",
+                "Paginated list of workspace members",
+                "Paginated Workspace Members",
+            ),
+            401: UNAUTHORIZED_RESPONSE,
+            403: FORBIDDEN_RESPONSE,
+            404: WORKSPACE_NOT_FOUND_RESPONSE,
+        },
+    )
+    def get(self, request, slug):
+        """List workspace members (lite)"""
+        if not Workspace.objects.filter(slug=slug).exists():
+            return Response(
+                {"error": "Provided workspace does not exist"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        def serialize(workspace_members):
+            rows = []
+            for workspace_member in workspace_members:
+                user_data = UserLiteSerializer(workspace_member.member).data
+                user_data["role"] = workspace_member.role
+                rows.append(user_data)
+            return rows
+
+        return self.paginate(
+            request=request,
+            queryset=self.get_queryset(),
+            on_results=serialize,
+        )
 
 
 class ProjectMemberListCreateAPIEndpoint(BaseAPIView):

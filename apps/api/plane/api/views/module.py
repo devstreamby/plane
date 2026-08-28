@@ -24,6 +24,7 @@ from plane.api.serializers import (
     ModuleIssueRequestSerializer,
     ModuleCreateSerializer,
     ModuleUpdateSerializer,
+    ModuleLiteSerializer,
 )
 from plane.app.permissions import ProjectEntityPermission
 from plane.bgtasks.issue_activities_task import issue_activity
@@ -274,6 +275,59 @@ class ModuleListCreateAPIEndpoint(BaseAPIView):
             on_results=lambda modules: ModuleSerializer(
                 modules, many=True, fields=self.fields, expand=self.expand
             ).data,
+        )
+
+
+class ModuleLiteListAPIEndpoint(BaseAPIView):
+    """Read-only, field-trimmed module list.
+
+    Same membership filtering as ModuleListCreateAPIEndpoint's GET, without its
+    per-module issue-count annotations and link prefetches.
+    """
+
+    serializer_class = ModuleLiteSerializer
+    model = Module
+    permission_classes = [ProjectEntityPermission]
+    use_read_replica = True
+
+    def get_queryset(self):
+        return (
+            Module.objects.filter(project_id=self.kwargs.get("project_id"))
+            .filter(workspace__slug=self.kwargs.get("slug"))
+            .filter(
+                project__project_projectmember__member=self.request.user,
+                project__project_projectmember__is_active=True,
+            )
+            .filter(archived_at__isnull=True)
+            .distinct()
+        )
+
+    @module_docs(
+        operation_id="list_modules_lite",
+        summary="List modules (lite)",
+        description="Retrieve a field-trimmed, cursor-paginated list of modules in a project.",
+        parameters=[
+            CURSOR_PARAMETER,
+            PER_PAGE_PARAMETER,
+            ORDER_BY_PARAMETER,
+        ],
+        responses={
+            200: create_paginated_response(
+                ModuleLiteSerializer,
+                "PaginatedModuleLiteResponse",
+                "Paginated lite list of modules",
+                "Paginated Lite Modules",
+            ),
+        },
+    )
+    def get(self, request, slug, project_id):
+        """List modules (lite)"""
+        modules = self.get_queryset().order_by(request.GET.get("order_by", "-created_at"))
+
+        return self.paginate(
+            request=request,
+            queryset=modules,
+            on_results=lambda modules: ModuleLiteSerializer(modules, many=True).data,
         )
 
 

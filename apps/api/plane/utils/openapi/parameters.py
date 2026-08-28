@@ -455,6 +455,33 @@ CYCLE_VIEW_PARAMETER = OpenApiParameter(
     ],
 )
 
+CYCLE_STATUS_PARAMETER = OpenApiParameter(
+    name="status",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.QUERY,
+    description="Filter cycles by status. Omit to return all cycles.",
+    required=False,
+    examples=[
+        OpenApiExample(name="Current cycles", value="current"),
+        OpenApiExample(name="Upcoming cycles", value="upcoming"),
+        OpenApiExample(name="Completed cycles", value="completed"),
+        OpenApiExample(name="Draft cycles", value="draft"),
+        OpenApiExample(name="Incomplete cycles", value="incomplete"),
+    ],
+)
+
+INCLUDE_ARCHIVED_PARAMETER = OpenApiParameter(
+    name="include_archived",
+    type=OpenApiTypes.BOOL,
+    location=OpenApiParameter.QUERY,
+    description="Include archived records in the results. Defaults to false.",
+    required=False,
+    examples=[
+        OpenApiExample(name="Exclude archived (default)", value="false"),
+        OpenApiExample(name="Include archived", value="true"),
+    ],
+)
+
 # Field Selection Parameters
 FIELDS_PARAMETER = OpenApiParameter(
     name="fields",
