@@ -171,6 +171,21 @@ SPECTACULAR_SETTINGS = {
                 "*Use Cases:* Custom workflows, status tracking, process automation, progress monitoring."
             ),
         },
+        # Reporting
+        {
+            "name": "Time Tracking",
+            "description": (
+                "**Aggregated Time Log Reports**\n\n"
+                "Fetch every logged hour for a period in a single request, aggregated per user, "
+                "work item and workspace-local day.\n\n"
+                "*Key Features:*\n"
+                "- Workspace-wide or project-scoped reporting\n"
+                "- Hours split across workspace-local calendar dates\n"
+                "- Archived, draft and triage work items are always included\n"
+                "- Inline work item and user lookup tables, no follow-up requests needed\n\n"
+                "*Use Cases:* Timesheets, monthly billing exports, payroll input, capacity analysis."
+            ),
+        },
         # Team & User Management
         {
             "name": "Users",

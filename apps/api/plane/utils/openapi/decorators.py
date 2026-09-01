@@ -323,3 +323,17 @@ def estimate_point_docs(**kwargs):
         },
     }
     return extend_schema(**_merge_schema_options(defaults, kwargs))
+
+def time_report_docs(**kwargs):
+    """Decorator for time-log reporting endpoints"""
+    defaults = {
+        "tags": ["Time Tracking"],
+        "parameters": [WORKSPACE_SLUG_PARAMETER],
+        "responses": {
+            401: UNAUTHORIZED_RESPONSE,
+            403: FORBIDDEN_RESPONSE,
+            404: NOT_FOUND_RESPONSE,
+        },
+    }
+
+    return extend_schema(**_merge_schema_options(defaults, kwargs))
