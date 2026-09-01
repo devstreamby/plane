@@ -530,3 +530,63 @@ ESTIMATE_ID_PARAMETER = OpenApiParameter(
     type=OpenApiTypes.UUID,
     location=OpenApiParameter.PATH,
 )
+
+# Time Report Parameters
+REPORT_START_DATE_PARAMETER = OpenApiParameter(
+    name="start_date",
+    type=OpenApiTypes.DATE,
+    location=OpenApiParameter.QUERY,
+    description="First day of the reporting period (inclusive), in `YYYY-MM-DD` and workspace local time",
+    required=True,
+    examples=[OpenApiExample(name="Start of August", value="2026-08-01")],
+)
+
+REPORT_END_DATE_PARAMETER = OpenApiParameter(
+    name="end_date",
+    type=OpenApiTypes.DATE,
+    location=OpenApiParameter.QUERY,
+    description=(
+        "Last day of the reporting period (inclusive), in `YYYY-MM-DD` and workspace local time. "
+        "The period must not exceed 92 days."
+    ),
+    required=True,
+    examples=[OpenApiExample(name="End of August", value="2026-08-31")],
+)
+
+REPORT_PROJECT_IDS_PARAMETER = OpenApiParameter(
+    name="project_ids",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.QUERY,
+    description="Comma-separated project IDs to report on. Defaults to every project the caller belongs to.",
+    required=False,
+    examples=[
+        OpenApiExample(
+            name="Two projects",
+            value="550e8400-e29b-41d4-a716-446655440000,6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+        )
+    ],
+)
+
+REPORT_USER_IDS_PARAMETER = OpenApiParameter(
+    name="user_ids",
+    type=OpenApiTypes.STR,
+    location=OpenApiParameter.QUERY,
+    description="Comma-separated user IDs to report on. Defaults to every user visible to the caller.",
+    required=False,
+    examples=[OpenApiExample(name="Single user", value="550e8400-e29b-41d4-a716-446655440000")],
+)
+
+REPORT_STRICT_PARAMETER = OpenApiParameter(
+    name="strict",
+    type=OpenApiTypes.BOOL,
+    location=OpenApiParameter.QUERY,
+    description=(
+        "Return 403 instead of a quietly incomplete report when any project in scope would be "
+        "reported with the caller's own logs only, or is not accessible at all. Defaults to false."
+    ),
+    required=False,
+    examples=[
+        OpenApiExample(name="Fail on incomplete data", value="true"),
+        OpenApiExample(name="Report what is visible (default)", value="false"),
+    ],
+)

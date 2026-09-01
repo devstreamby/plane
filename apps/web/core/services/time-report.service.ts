@@ -22,12 +22,15 @@ export type TTimeReportIssue = {
   sequence_id: number;
   project_id: string;
   project_identifier: string;
+  state_name: string | null;
+  archived: boolean;
 };
 
 export type TTimeReportUser = {
   display_name: string;
   first_name: string;
   last_name: string;
+  email: string;
   avatar_url: string | null;
 };
 
@@ -35,6 +38,10 @@ export type TTimeReportResponse = {
   start_date: string;
   end_date: string;
   can_view_others: boolean;
+  /** Projects reported with the caller's own logs only. */
+  restricted_project_ids: string[];
+  /** Requested projects the caller has no access to; absent from the report entirely. */
+  unavailable_project_ids: string[];
   entries: TTimeReportEntry[];
   issues: Record<string, TTimeReportIssue>;
   users: Record<string, TTimeReportUser>;

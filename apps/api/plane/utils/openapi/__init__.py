@@ -50,6 +50,11 @@ from .parameters import (
     FIELDS_PARAMETER,
     EXPAND_PARAMETER,
     ESTIMATE_ID_PARAMETER,
+    REPORT_START_DATE_PARAMETER,
+    REPORT_END_DATE_PARAMETER,
+    REPORT_PROJECT_IDS_PARAMETER,
+    REPORT_USER_IDS_PARAMETER,
+    REPORT_STRICT_PARAMETER,
 )
 
 # Responses
@@ -177,6 +182,7 @@ from .decorators import (
     state_docs,
     estimate_docs,
     estimate_point_docs,
+    time_report_docs,
 )
 
 # Schema processing hooks
@@ -221,6 +227,11 @@ __all__ = [
     "FIELDS_PARAMETER",
     "EXPAND_PARAMETER",
     "ESTIMATE_ID_PARAMETER",
+    "REPORT_START_DATE_PARAMETER",
+    "REPORT_END_DATE_PARAMETER",
+    "REPORT_PROJECT_IDS_PARAMETER",
+    "REPORT_USER_IDS_PARAMETER",
+    "REPORT_STRICT_PARAMETER",
     # Responses
     "UNAUTHORIZED_RESPONSE",
     "FORBIDDEN_RESPONSE",
@@ -339,6 +350,7 @@ __all__ = [
     "state_docs",
     "estimate_docs",
     "estimate_point_docs",
+    "time_report_docs",
     # Hooks
     "preprocess_filter_api_v1_paths",
     "generate_operation_summary",
