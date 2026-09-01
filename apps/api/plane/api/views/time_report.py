@@ -20,7 +20,12 @@ from plane.utils.openapi import (
     REPORT_STRICT_PARAMETER,
     INVALID_REQUEST_RESPONSE,
 )
-from plane.utils.time_report import build_time_log_report, split_ids
+from plane.utils.time_report import (
+    TimeLogReportValidationError,
+    build_time_log_report,
+    report_validation_message,
+    split_ids,
+)
 from .base import BaseAPIView
 
 
@@ -59,8 +64,11 @@ class TimeLogReportMixin:
                 project_ids=project_ids,
                 user_ids=split_ids(request.GET.get("user_ids")),
             )
-        except ValueError as exc:
-            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except TimeLogReportValidationError as exc:
+            return Response(
+                {"error": report_validation_message(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         if request.GET.get("strict", "").lower() in STRICT_PARAMETER_VALUES and (
             report["restricted_project_ids"] or report["unavailable_project_ids"]

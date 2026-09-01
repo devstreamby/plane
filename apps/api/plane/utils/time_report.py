@@ -20,6 +20,33 @@ from plane.db.models.project import ROLE
 
 MAX_REPORT_RANGE_DAYS = 92
 
+# Rejection messages live here, keyed by code, so views render a known constant
+# instead of echoing the exception's own text back to the caller.
+REPORT_VALIDATION_MESSAGES = {
+    "invalid_dates": "start_date and end_date are required and must be in YYYY-MM-DD format.",
+    "inverted_range": "start_date must not be after end_date.",
+    "range_too_long": f"Date range must not exceed {MAX_REPORT_RANGE_DAYS} days.",
+}
+
+GENERIC_VALIDATION_MESSAGE = "The requested reporting period is not valid."
+
+
+class TimeLogReportValidationError(ValueError):
+    """Raised when the requested reporting period is not valid.
+
+    `code` indexes REPORT_VALIDATION_MESSAGES; render the message with
+    `report_validation_message()` rather than stringifying the exception.
+    """
+
+    def __init__(self, code: str):
+        self.code = code
+        super().__init__(REPORT_VALIDATION_MESSAGES.get(code, GENERIC_VALIDATION_MESSAGE))
+
+
+def report_validation_message(error: "TimeLogReportValidationError") -> str:
+    """Return the response text for a validation error, from constants only."""
+    return REPORT_VALIDATION_MESSAGES.get(error.code, GENERIC_VALIDATION_MESSAGE)
+
 
 def _parse_date(value: Optional[str]):
     if not value:
@@ -80,7 +107,7 @@ def build_time_log_report(
     project_ids: Optional[List[str]],
     user_ids: Optional[List[str]],
 ) -> Dict[str, Any]:
-    """Build an aggregated time-log report for the given scope, or raise ValueError on bad input.
+    """Build an aggregated time-log report, or raise TimeLogReportValidationError on bad input.
 
     The selection deliberately starts from ``IssueTimeLog`` and never goes through
     ``Issue.issue_objects``: that manager excludes archived, draft and triage work
@@ -93,13 +120,13 @@ def build_time_log_report(
     end_date = _parse_date(end_date_str)
 
     if not start_date or not end_date:
-        raise ValueError("start_date and end_date are required and must be in YYYY-MM-DD format.")
+        raise TimeLogReportValidationError("invalid_dates")
 
     if start_date > end_date:
-        raise ValueError("start_date must not be after end_date.")
+        raise TimeLogReportValidationError("inverted_range")
 
     if (end_date - start_date).days + 1 > MAX_REPORT_RANGE_DAYS:
-        raise ValueError(f"Date range must not exceed {MAX_REPORT_RANGE_DAYS} days.")
+        raise TimeLogReportValidationError("range_too_long")
 
     # Projects the requesting user is an active member of, scoped to the requested project_ids
     member_project_qs = ProjectMember.objects.filter(

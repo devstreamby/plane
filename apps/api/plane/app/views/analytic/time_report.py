@@ -8,7 +8,12 @@ from rest_framework.response import Response
 
 from plane.app.permissions import ROLE, allow_permission
 from plane.app.views.base import BaseAPIView
-from plane.utils.time_report import build_time_log_report, split_ids
+from plane.utils.time_report import (
+    TimeLogReportValidationError,
+    build_time_log_report,
+    report_validation_message,
+    split_ids,
+)
 
 
 class WorkspaceTimeLogReportEndpoint(BaseAPIView):
@@ -23,8 +28,11 @@ class WorkspaceTimeLogReportEndpoint(BaseAPIView):
                 project_ids=split_ids(request.GET.get("project_ids")),
                 user_ids=split_ids(request.GET.get("user_ids")),
             )
-        except ValueError as exc:
-            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except TimeLogReportValidationError as exc:
+            return Response(
+                {"error": report_validation_message(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(report, status=status.HTTP_200_OK)
 
@@ -41,7 +49,10 @@ class ProjectTimeLogReportEndpoint(BaseAPIView):
                 project_ids=[str(project_id)],
                 user_ids=split_ids(request.GET.get("user_ids")),
             )
-        except ValueError as exc:
-            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except TimeLogReportValidationError as exc:
+            return Response(
+                {"error": report_validation_message(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(report, status=status.HTTP_200_OK)
