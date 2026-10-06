@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-# Python imports
-import re
-
 # Django imports
 from django.db import models
 from django.db.models import (
@@ -29,6 +26,7 @@ from rest_framework.response import Response
 # Module imports
 from plane.app.views.base import BaseAPIView
 from plane.app.permissions import WorkspaceUserPermission
+from plane.utils.issue_search import build_issue_search_q
 from plane.db.models import (
     Workspace,
     Project,
@@ -81,17 +79,7 @@ class GlobalSearchEndpoint(BaseAPIView):
         )
 
     def filter_issues(self, query, slug, project_id, workspace_search):
-        fields = ["name", "sequence_id", "project__identifier"]
-        q = Q()
-        if query:
-            for field in fields:
-                if field == "sequence_id":
-                    # Match whole integers only (exclude decimal numbers)
-                    sequences = re.findall(r"\b\d+\b", query)
-                    for sequence_id in sequences:
-                        q |= Q(**{"sequence_id": sequence_id})
-                else:
-                    q |= Q(**{f"{field}__icontains": query})
+        q = build_issue_search_q(query)
 
         issues = Issue.issue_objects.filter(
             q,
@@ -232,17 +220,7 @@ class GlobalSearchEndpoint(BaseAPIView):
         )
 
     def filter_intakes(self, query, slug, project_id, workspace_search):
-        fields = ["name", "sequence_id", "project__identifier"]
-        q = Q()
-        if query:
-            for field in fields:
-                if field == "sequence_id":
-                    # Match whole integers only (exclude decimal numbers)
-                    sequences = re.findall(r"\b\d+\b", query)
-                    for sequence_id in sequences:
-                        q |= Q(**{"sequence_id": sequence_id})
-                else:
-                    q |= Q(**{f"{field}__icontains": query})
+        q = build_issue_search_q(query)
 
         issues = Issue.objects.filter(
             q,
@@ -385,17 +363,7 @@ class SearchEndpoint(BaseAPIView):
                     response_data["project"] = list(projects)
 
                 elif query_type == "issue":
-                    fields = ["name", "sequence_id", "project__identifier"]
-                    q = Q()
-
-                    if query:
-                        for field in fields:
-                            if field == "sequence_id":
-                                sequences = re.findall(r"\b\d+\b", query)
-                                for sequence_id in sequences:
-                                    q |= Q(**{"sequence_id": sequence_id})
-                            else:
-                                q |= Q(**{f"{field}__icontains": query})
+                    q = build_issue_search_q(query)
 
                     issues = (
                         Issue.issue_objects.filter(
@@ -590,17 +558,7 @@ class SearchEndpoint(BaseAPIView):
                     response_data["project"] = list(projects)
 
                 elif query_type == "issue":
-                    fields = ["name", "sequence_id", "project__identifier"]
-                    q = Q()
-
-                    if query:
-                        for field in fields:
-                            if field == "sequence_id":
-                                sequences = re.findall(r"\b\d+\b", query)
-                                for sequence_id in sequences:
-                                    q |= Q(**{"sequence_id": sequence_id})
-                            else:
-                                q |= Q(**{f"{field}__icontains": query})
+                    q = build_issue_search_q(query)
 
                     issues = (
                         Issue.issue_objects.filter(
