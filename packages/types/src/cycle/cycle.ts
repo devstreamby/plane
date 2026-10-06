@@ -97,6 +97,7 @@ export interface ICycle extends TProgressSnapshot {
   owned_by_id: string;
   project_id: string;
   status?: TCycleGroups;
+  manual_status?: "DRAFT" | "CURRENT" | "COMPLETED";
   sort_order: number;
   start_date: string | null;
   sub_issues?: number;

@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Döngü} other {Döngüler}}",
-    "no_cycle": "Döngü yok"
+    "no_cycle": "Döngü yok",
+    "manual": {
+      "start": "Döngüyü başlat",
+      "complete": "Döngüyü tamamla",
+      "confirm": "Bu döngü tamamlansın mı? Tamamlanmamış iş öğeleri, siz aktarıncaya kadar döngüde kalır.",
+      "optional_dates": "Tarihler isteğe bağlıdır. Tarihsiz bir döngü elle başlatılır ve tamamlanır."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

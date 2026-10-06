@@ -19,6 +19,7 @@ from rest_framework.response import Response
 
 
 # Module imports
+from plane.utils.cycle_status import get_cycle_status
 from .. import BaseViewSet
 from plane.app.serializers import CycleIssueSerializer
 from plane.bgtasks.issue_activities_task import issue_activity
@@ -229,7 +230,7 @@ class CycleIssueViewSet(BaseViewSet):
 
         cycle = Cycle.objects.get(workspace__slug=slug, project_id=project_id, pk=cycle_id)
 
-        if cycle.end_date is not None and cycle.end_date < timezone.now():
+        if get_cycle_status(cycle) == "COMPLETED":
             return Response(
                 {"error": "The Cycle has already been completed so no new issues can be added"},
                 status=status.HTTP_400_BAD_REQUEST,

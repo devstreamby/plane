@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Cycle} other {Cycles}}",
-    "no_cycle": "No cycle"
+    "no_cycle": "No cycle",
+    "manual": {
+      "start": "Start cycle",
+      "complete": "Complete cycle",
+      "confirm": "Complete this cycle? Unfinished work items will remain in it until you transfer them.",
+      "optional_dates": "Dates are optional. A cycle without dates is started and completed manually."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

@@ -34,6 +34,7 @@ import { useTimeZoneConverter } from "@/hooks/use-timezone-converter";
 // plane web components
 import { CycleAdditionalActions } from "@/plane-web/components/cycles";
 // local imports
+import { CycleLifecycleActions } from "../lifecycle-actions";
 import { CycleQuickActions } from "../quick-actions";
 import { TransferIssuesModal } from "../transfer-issues-modal";
 
@@ -111,6 +112,7 @@ export const CycleListItemAction = observer(function CycleListItemAction(props: 
     const addToFavoritePromise = addCycleToFavorites(workspaceSlug?.toString(), projectId.toString(), cycleId).then(
       () => {
         if (!isFavoriteMenuOpen) toggleFavoriteMenu(true);
+        return undefined;
       }
     );
 
@@ -192,9 +194,11 @@ export const CycleListItemAction = observer(function CycleListItemAction(props: 
           <span className="text-11 text-tertiary">{cycleDetails.total_issues}</span>
         </div>
       )}
+      <CycleLifecycleActions workspaceSlug={workspaceSlug} projectId={projectId} cycleId={cycleId} />
       <CycleAdditionalActions cycleId={cycleId} projectId={projectId} />
       {showTransferIssues && (
-        <div
+        <button
+          type="button"
           className="flex h-6 cursor-pointer items-center gap-1 px-2 text-accent-secondary"
           onClick={() => {
             setTransferIssuesModal(true);
@@ -202,32 +206,36 @@ export const CycleListItemAction = observer(function CycleListItemAction(props: 
         >
           <TransferIcon className="w-4 fill-accent-primary" />
           <span>{t("project_cycles.transfer_work_items", { count: transferableIssuesCount })}</span>
-        </div>
+        </button>
       )}
       {isActive ? (
         <>
           <div className="flex gap-2">
             {/* Duration */}
-            <Tooltip
-              tooltipContent={
-                <span className="flex gap-1">
-                  {renderFormattedDateInUserTimezone(cycleDetails.start_date ?? "")}
-                  <ArrowRight className="my-auto h-3 w-3 flex-shrink-0" />
-                  {renderFormattedDateInUserTimezone(cycleDetails.end_date ?? "")}
-                </span>
-              }
-              disabled={!isProjectTimeZoneDifferent()}
-              tooltipHeading={t("project_cycles.in_your_timezone")}
-            >
-              <div className="flex items-center gap-1 text-11 font-medium text-tertiary">
-                <CalendarDays className="my-auto h-3 w-3 flex-shrink-0" />
-                <MergedDateDisplay startDate={cycleDetails.start_date} endDate={cycleDetails.end_date} />
-              </div>
-            </Tooltip>
-            {projectUTCOffset && (
-              <span className="cursor-default rounded-md bg-layer-1 px-2 py-1 text-11 text-tertiary">
-                {projectUTCOffset}
-              </span>
+            {cycleDetails.start_date && cycleDetails.end_date && (
+              <>
+                <Tooltip
+                  tooltipContent={
+                    <span className="flex gap-1">
+                      {renderFormattedDateInUserTimezone(cycleDetails.start_date ?? "")}
+                      <ArrowRight className="my-auto h-3 w-3 flex-shrink-0" />
+                      {renderFormattedDateInUserTimezone(cycleDetails.end_date ?? "")}
+                    </span>
+                  }
+                  disabled={!isProjectTimeZoneDifferent()}
+                  tooltipHeading={t("project_cycles.in_your_timezone")}
+                >
+                  <div className="flex items-center gap-1 text-11 font-medium text-tertiary">
+                    <CalendarDays className="my-auto h-3 w-3 flex-shrink-0" />
+                    <MergedDateDisplay startDate={cycleDetails.start_date} endDate={cycleDetails.end_date} />
+                  </div>
+                </Tooltip>
+                {projectUTCOffset && (
+                  <span className="cursor-default rounded-md bg-layer-1 px-2 py-1 text-11 text-tertiary">
+                    {projectUTCOffset}
+                  </span>
+                )}
+              </>
             )}
             {/* created by */}
             {createdByDetails && <ButtonAvatars showTooltip={false} userIds={createdByDetails?.id} />}

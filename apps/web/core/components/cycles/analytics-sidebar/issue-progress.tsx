@@ -128,7 +128,7 @@ export const CycleAnalyticsProgress = observer(function CycleAnalyticsProgress(p
             )}
             <Transition show={open}>
               <Disclosure.Panel className="flex flex-col divide-y divide-subtle-1">
-                {cycleStartDate && cycleEndDate ? (
+                {(cycleStartDate && cycleEndDate) || cycleDetails.manual_status !== "DRAFT" ? (
                   <>
                     {isCycleDateValid && (
                       <SidebarChartRoot workspaceSlug={workspaceSlug} projectId={projectId} cycleId={cycleId} />

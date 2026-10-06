@@ -10,10 +10,12 @@ from .base import BaseSerializer
 from .issue import IssueStateSerializer
 from plane.db.models import Cycle, CycleIssue, CycleUserProperties
 from plane.utils.timezone_converter import convert_to_utc
+from plane.utils.cycle_status import validate_cycle_dates
 
 
 class CycleWriteSerializer(BaseSerializer):
     def validate(self, data):
+        validate_cycle_dates(self.instance, data)
         if (
             data.get("start_date", None) is not None
             and data.get("end_date", None) is not None
@@ -40,7 +42,7 @@ class CycleWriteSerializer(BaseSerializer):
     class Meta:
         model = Cycle
         fields = "__all__"
-        read_only_fields = ["workspace", "project", "owned_by", "archived_at"]
+        read_only_fields = ["workspace", "project", "owned_by", "archived_at", "manual_status"]
 
 
 class CycleSerializer(BaseSerializer):
@@ -67,6 +69,7 @@ class CycleSerializer(BaseSerializer):
             # model fields
             "name",
             "description",
+            "manual_status",
             "start_date",
             "end_date",
             "owned_by_id",

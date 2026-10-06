@@ -78,6 +78,12 @@ export interface ICycleStore {
     cycleId: string,
     analytic_type: string
   ) => Promise<TCycleDistribution | TCycleEstimateDistribution>;
+  transitionCycle: (
+    workspaceSlug: string,
+    projectId: string,
+    cycleId: string,
+    action: "start" | "complete"
+  ) => Promise<ICycle>;
   // crud
   createCycle: (workspaceSlug: string, projectId: string, data: Partial<ICycle>) => Promise<ICycle>;
   updateCycleDetails: (
@@ -577,6 +583,21 @@ export class CycleStore implements ICycleStore {
    * @param data
    * @returns
    */
+  transitionCycle = async (
+    workspaceSlug: string,
+    projectId: string,
+    cycleId: string,
+    transition: "start" | "complete"
+  ) => {
+    const response = await this.cycleService.transitionCycle(workspaceSlug, projectId, cycleId, transition);
+    runInAction(() => {
+      set(this.cycleMap, cycleId, { ...this.cycleMap[cycleId], ...response });
+      if (response.status?.toLowerCase() === "current") this.activeCycleIdMap[cycleId] = true;
+      else delete this.activeCycleIdMap[cycleId];
+    });
+    return response;
+  };
+
   createCycle = action(
     async (workspaceSlug: string, projectId: string, data: Partial<ICycle>) =>
       await this.cycleService.createCycle(workspaceSlug, projectId, data).then((response) => {
@@ -624,6 +645,7 @@ export class CycleStore implements ICycleStore {
         delete this.activeCycleIdMap[cycleId];
         if (this.rootStore.favorite.entityMap[cycleId]) this.rootStore.favorite.removeFavoriteFromStore(cycleId);
       });
+      return undefined;
     });
 
   /**
@@ -695,6 +717,7 @@ export class CycleStore implements ICycleStore {
           set(this.cycleMap, [cycleId, "archived_at"], response.archived_at);
           if (this.rootStore.favorite.entityMap[cycleId]) this.rootStore.favorite.removeFavoriteFromStore(cycleId);
         });
+        return undefined;
       })
       .catch((error) => {
         console.error("Failed to archive cycle in cycle store", error);
@@ -717,6 +740,7 @@ export class CycleStore implements ICycleStore {
         runInAction(() => {
           set(this.cycleMap, [cycleId, "archived_at"], null);
         });
+        return undefined;
       })
       .catch((error) => {
         console.error("Failed to restore cycle in cycle store", error);

@@ -14,6 +14,7 @@ from plane.app.views.base import BaseAPIView
 from plane.db.models import Cycle
 from plane.app.permissions import WorkspaceViewerPermission
 from plane.app.serializers.cycle import CycleSerializer
+from plane.utils.cycle_status import cycle_status_expression
 
 
 class WorkspaceCyclesEndpoint(BaseAPIView):
@@ -26,6 +27,7 @@ class WorkspaceCyclesEndpoint(BaseAPIView):
             .select_related("workspace")
             .select_related("owned_by")
             .filter(archived_at__isnull=True)
+            .annotate(status=cycle_status_expression())
             .annotate(
                 total_issues=Count(
                     "issue_cycle",

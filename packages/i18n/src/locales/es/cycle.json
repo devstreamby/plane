@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Ciclo} other {Ciclos}}",
-    "no_cycle": "Sin ciclo"
+    "no_cycle": "Sin ciclo",
+    "manual": {
+      "start": "Iniciar ciclo",
+      "complete": "Completar ciclo",
+      "confirm": "¿Completar este ciclo? Las tareas pendientes permanecerán en él hasta que las transfiera.",
+      "optional_dates": "Las fechas son opcionales. Un ciclo sin fechas se inicia y se completa manualmente."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

@@ -89,7 +89,7 @@ export function CycleForm(props: Props) {
                     }}
                     multiple={false}
                     buttonVariant="border-with-text"
-                    renderCondition={(projectId) => !!projectsWithCreatePermissions?.[projectId]}
+                    renderCondition={(candidateProjectId) => !!projectsWithCreatePermissions?.[candidateProjectId]}
                     tabIndex={getIndex("cover_image")}
                   />
                 </div>
@@ -100,6 +100,7 @@ export function CycleForm(props: Props) {
             {status ? t("project_cycles.update_cycle") : t("project_cycles.create_cycle")}
           </h3>
         </div>
+        <p className="text-13 text-secondary">{t("cycle.manual.optional_dates")}</p>
         <div className="space-y-3">
           <div className="space-y-1">
             <Controller
@@ -123,7 +124,6 @@ export function CycleForm(props: Props) {
                   onChange={onChange}
                   hasError={Boolean(errors?.name)}
                   tabIndex={getIndex("description")}
-                  autoFocus
                 />
               )}
             />
@@ -159,6 +159,7 @@ export function CycleForm(props: Props) {
                       buttonVariant="border-with-text"
                       className="h-7"
                       minDate={new Date()}
+                      disabled={data?.manual_status === "CURRENT" || data?.manual_status === "COMPLETED"}
                       value={{
                         from: getDate(startDateValue),
                         to: getDate(endDateValue),

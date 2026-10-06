@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {週期} other {週期}}",
-    "no_cycle": "無週期"
+    "no_cycle": "無週期",
+    "manual": {
+      "start": "開始週期",
+      "complete": "完成週期",
+      "confirm": "完成此週期？未完成的工作項目將保留在其中，直到您將其移轉。",
+      "optional_dates": "日期為選填項目。沒有日期的週期需要手動開始和完成。"
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

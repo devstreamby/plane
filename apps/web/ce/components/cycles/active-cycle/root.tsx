@@ -82,7 +82,9 @@ const ActiveCyclesComponent = observer(function ActiveCyclesComponent({
             workspaceSlug={workspaceSlug}
             cycle={activeCycle}
           />
-          <ActiveCycleProductivity workspaceSlug={workspaceSlug} projectId={projectId} cycle={activeCycle} />
+          {activeCycle.start_date && activeCycle.end_date && (
+            <ActiveCycleProductivity workspaceSlug={workspaceSlug} projectId={projectId} cycle={activeCycle} />
+          )}
           <ActiveCycleStats
             workspaceSlug={workspaceSlug}
             projectId={projectId}
@@ -97,7 +99,7 @@ const ActiveCyclesComponent = observer(function ActiveCyclesComponent({
   );
 });
 
-export const ActiveCycleRoot = observer(function ActiveCycleRoot(props: IActiveCycleDetails) {
+const SingleActiveCycle = observer(function SingleActiveCycle(props: IActiveCycleDetails) {
   const { workspaceSlug, projectId, cycleId: propsCycleId, showHeader = true } = props;
   // theme hook
   const { resolvedTheme } = useTheme();
@@ -149,6 +151,27 @@ export const ActiveCycleRoot = observer(function ActiveCycleRoot(props: IActiveC
           cycleIssueDetails={cycleIssueDetails}
         />
       )}
+    </>
+  );
+});
+
+export const ActiveCycleRoot = observer(function ActiveCycleRoot(props: IActiveCycleDetails) {
+  const { getFilteredCycleIds, getCycleById } = useCycle();
+  if (props.cycleId) return <SingleActiveCycle {...props} />;
+  const cycleIds = (getFilteredCycleIds(props.projectId, false) ?? []).filter(
+    (id) => getCycleById(id)?.status?.toLowerCase() === "current"
+  );
+  if (cycleIds.length === 0) return <SingleActiveCycle {...props} cycleId="" />;
+  return (
+    <>
+      {cycleIds.map((cycleId, index) => (
+        <SingleActiveCycle
+          key={cycleId}
+          {...props}
+          cycleId={cycleId}
+          showHeader={index === 0 && props.showHeader !== false}
+        />
+      ))}
     </>
   );
 });

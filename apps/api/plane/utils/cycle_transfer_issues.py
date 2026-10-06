@@ -28,6 +28,7 @@ from plane.db.models import (
     Project,
 )
 from plane.utils.analytics_plot import burndown_plot
+from plane.utils.cycle_status import get_cycle_status
 from plane.bgtasks.issue_activities_task import issue_activity
 from plane.utils.host import base_host
 
@@ -57,8 +58,11 @@ def transfer_cycle_issues(
     # Get the new cycle
     new_cycle = Cycle.objects.filter(workspace__slug=slug, project_id=project_id, pk=new_cycle_id).first()
 
+    if new_cycle is None:
+        return {"success": False, "error": "Target cycle not found"}
+
     # Check if new cycle is already completed
-    if new_cycle.end_date is not None and new_cycle.end_date < timezone.now():
+    if get_cycle_status(new_cycle) == "COMPLETED" or new_cycle.archived_at:
         return {
             "success": False,
             "error": "The cycle where the issues are transferred is already completed",
@@ -146,6 +150,9 @@ def transfer_cycle_issues(
             "success": False,
             "error": "Source cycle not found",
         }
+
+    if old_cycle.archived_at or (old_cycle.manual_status != "DRAFT" and get_cycle_status(old_cycle) != "COMPLETED"):
+        return {"success": False, "error": "Source cycle must be completed before transferring work items"}
 
     # Check if project uses estimates
     estimate_type = Project.objects.filter(

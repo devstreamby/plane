@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Siklus} other {Siklus}}",
-    "no_cycle": "Tidak ada siklus"
+    "no_cycle": "Tidak ada siklus",
+    "manual": {
+      "start": "Mulai siklus",
+      "complete": "Selesaikan siklus",
+      "confirm": "Selesaikan siklus ini? Item pekerjaan yang belum selesai akan tetap di dalamnya sampai Anda memindahkannya.",
+      "optional_dates": "Tanggal bersifat opsional. Siklus tanpa tanggal dimulai dan diselesaikan secara manual."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

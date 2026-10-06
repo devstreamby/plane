@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Cyklus} few {Cykly} other {Cyklů}}",
-    "no_cycle": "Žádný cyklus"
+    "no_cycle": "Žádný cyklus",
+    "manual": {
+      "start": "Spustit cyklus",
+      "complete": "Dokončit cyklus",
+      "confirm": "Dokončit tento cyklus? Nedokončené úkoly v něm zůstanou až do přesunutí.",
+      "optional_dates": "Data jsou volitelná. Cyklus bez dat se spouští a dokončuje ručně."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

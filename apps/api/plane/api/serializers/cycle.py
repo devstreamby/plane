@@ -10,6 +10,7 @@ from rest_framework import serializers
 from .base import BaseSerializer
 from plane.db.models import Cycle, CycleIssue, User, Project
 from plane.utils.timezone_converter import convert_to_utc
+from plane.utils.cycle_status import validate_cycle_dates, get_cycle_status
 
 
 class CycleCreateSerializer(BaseSerializer):
@@ -59,6 +60,7 @@ class CycleCreateSerializer(BaseSerializer):
         ]
 
     def validate(self, data):
+        validate_cycle_dates(self.instance, data)
         project_id = (
             self.context.get("project_id")
             or self.initial_data.get("project_id")
@@ -130,6 +132,11 @@ class CycleSerializer(BaseSerializer):
     completed_estimates = serializers.FloatField(read_only=True)
     started_estimates = serializers.FloatField(read_only=True)
 
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        return get_cycle_status(obj)
+
     class Meta:
         model = Cycle
         fields = "__all__"
@@ -169,6 +176,11 @@ class CycleLiteSerializer(BaseSerializer):
     Provides essential cycle information without computed metrics,
     optimized for list views and reference lookups.
     """
+
+    status = serializers.SerializerMethodField()
+
+    def get_status(self, obj):
+        return get_cycle_status(obj)
 
     class Meta:
         model = Cycle
