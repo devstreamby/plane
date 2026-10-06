@@ -5,7 +5,6 @@
 # Python imports
 import json
 import uuid
-import re
 from datetime import datetime, timedelta
 
 # Django imports
@@ -85,6 +84,7 @@ from plane.utils.order_queryset import ACTIVITY_ORDER_BY_ALLOWLIST, sanitize_ord
 from plane.bgtasks.storage_metadata_task import get_asset_object_metadata
 from .base import BaseAPIView
 from plane.utils.host import base_host
+from plane.utils.issue_search import build_issue_search_q
 from plane.utils.issue_relation_mapper import get_actual_relation
 from plane.utils.state_transition import (
     STATE_TRANSITION_NOT_ALLOWED,
@@ -2443,16 +2443,7 @@ class IssueSearchEndpoint(BaseAPIView):
             return Response({"issues": []}, status=status.HTTP_200_OK)
 
         # Build search query
-        fields = ["name", "sequence_id", "project__identifier"]
-        q = Q()
-        for field in fields:
-            if field == "sequence_id":
-                # Match whole integers only (exclude decimal numbers)
-                sequences = re.findall(r"\b\d+\b", query)
-                for sequence_id in sequences:
-                    q |= Q(**{"sequence_id": sequence_id})
-            else:
-                q |= Q(**{f"{field}__icontains": query})
+        q = build_issue_search_q(query)
 
         # Filter issues
         issues = Issue.issue_objects.filter(

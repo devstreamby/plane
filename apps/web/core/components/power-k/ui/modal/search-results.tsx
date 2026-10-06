@@ -38,7 +38,9 @@ export const PowerKModalSearchResults = observer(function PowerKModalSearchResul
         if (section.length <= 0) return null;
 
         return (
-          <Command.Group key={key} heading={currentSection.title}>
+          // the server already matched these against the query (every word, in any order, in the name
+          // or description), so cmdk's own whole-string substring filter must not hide them again
+          <Command.Group key={key} heading={currentSection.title} forceMount>
             {section.map((item) => {
               let value = `${key}-${item?.id}-${item.name}`;
 
@@ -66,6 +68,7 @@ export const PowerKModalSearchResults = observer(function PowerKModalSearchResul
                     // if (itemProjectId) openProjectAndScrollToSidebar(itemProjectId);
                   }}
                   value={value}
+                  forceMount
                 />
               );
             })}
