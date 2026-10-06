@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Zyklus} few {Zyklen} other {Zyklen}}",
-    "no_cycle": "Kein Zyklus"
+    "no_cycle": "Kein Zyklus",
+    "manual": {
+      "start": "Zyklus starten",
+      "complete": "Zyklus abschließen",
+      "confirm": "Diesen Zyklus abschließen? Offene Aufgaben bleiben darin, bis Sie sie übertragen.",
+      "optional_dates": "Datumsangaben sind optional. Ein Zyklus ohne Daten wird manuell gestartet und abgeschlossen."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

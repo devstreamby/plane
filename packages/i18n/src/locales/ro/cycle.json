@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Ciclu} other {Cicluri}}",
-    "no_cycle": "Niciun ciclu"
+    "no_cycle": "Niciun ciclu",
+    "manual": {
+      "start": "Porniți ciclul",
+      "complete": "Finalizați ciclul",
+      "confirm": "Finalizați acest ciclu? Sarcinile neterminate vor rămâne în el până când le transferați.",
+      "optional_dates": "Datele sunt opționale. Un ciclu fără date este pornit și finalizat manual."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

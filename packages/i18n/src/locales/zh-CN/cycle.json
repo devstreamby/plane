@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {周期} other {周期}}",
-    "no_cycle": "无周期"
+    "no_cycle": "无周期",
+    "manual": {
+      "start": "开始周期",
+      "complete": "完成周期",
+      "confirm": "完成此周期？未完成的工作项将保留在其中，直到您将其转移。",
+      "optional_dates": "日期为可选项。无日期的周期需要手动开始和完成。"
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

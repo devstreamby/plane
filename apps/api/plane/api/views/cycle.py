@@ -24,6 +24,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import OpenApiRequest, OpenApiResponse
 
 # Module imports
+from plane.utils.cycle_status import cycle_status_expression, get_cycle_status
 from plane.api.serializers import (
     CycleIssueSerializer,
     CycleSerializer,
@@ -88,18 +89,11 @@ def filter_cycles_by_status(queryset, cycle_status):
     An unrecognised or absent value returns the queryset untouched, which is what
     both callers want for "all".
     """
-    now = timezone.now()
-
-    if cycle_status == "current":
-        return queryset.filter(start_date__lte=now, end_date__gte=now)
-    if cycle_status == "upcoming":
-        return queryset.filter(start_date__gt=now)
-    if cycle_status == "completed":
-        return queryset.filter(end_date__lt=now)
-    if cycle_status == "draft":
-        return queryset.filter(end_date=None, start_date=None)
+    queryset = queryset.annotate(status=cycle_status_expression())
+    if cycle_status in ("current", "upcoming", "completed", "draft"):
+        return queryset.filter(status=cycle_status.upper())
     if cycle_status == "incomplete":
-        return queryset.filter(Q(end_date__gte=now) | Q(end_date__isnull=True))
+        return queryset.exclude(status="COMPLETED")
     return queryset
 
 
@@ -534,7 +528,7 @@ class CycleDetailAPIEndpoint(BaseAPIView):
 
         request_data = request.data
 
-        if cycle.end_date is not None and cycle.end_date < timezone.now():
+        if get_cycle_status(cycle) == "COMPLETED":
             if "sort_order" in request_data:
                 # Can only change sort order
                 request_data = {"sort_order": request_data.get("sort_order", cycle.sort_order)}
@@ -545,7 +539,7 @@ class CycleDetailAPIEndpoint(BaseAPIView):
                 )
 
         serializer = CycleUpdateSerializer(
-            cycle, data=request.data, partial=True, context={"request": request, "project_id": project_id}
+            cycle, data=request_data, partial=True, context={"request": request, "project_id": project_id}
         )
         if serializer.is_valid():
             if (
@@ -789,7 +783,7 @@ class CycleArchiveUnarchiveAPIEndpoint(BaseAPIView):
         Only cycles that have ended can be archived.
         """
         cycle = Cycle.objects.get(pk=cycle_id, project_id=project_id, workspace__slug=slug)
-        if cycle.end_date >= timezone.now():
+        if get_cycle_status(cycle) != "COMPLETED":
             return Response(
                 {"error": "Only completed cycles can be archived"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -955,7 +949,7 @@ class CycleIssueListCreateAPIEndpoint(BaseAPIView):
 
         cycle = Cycle.objects.get(workspace__slug=slug, project_id=project_id, pk=cycle_id)
 
-        if cycle.end_date is not None and cycle.end_date < timezone.now():
+        if get_cycle_status(cycle) == "COMPLETED":
             return Response(
                 {
                     "code": "CYCLE_COMPLETED",
@@ -1216,7 +1210,7 @@ class TransferCycleIssueAPIEndpoint(BaseAPIView):
             pk=cycle_id,
         )
         # transfer work items only when cycle is completed (passed the end data)
-        if old_cycle.end_date is not None and old_cycle.end_date > timezone.now():
+        if get_cycle_status(old_cycle) != "COMPLETED":
             return Response(
                 {"error": "The old cycle is not completed yet"},
                 status=status.HTTP_400_BAD_REQUEST,

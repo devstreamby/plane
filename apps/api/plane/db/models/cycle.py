@@ -78,6 +78,11 @@ class Cycle(ProjectBaseModel):
     TIMEZONE_CHOICES = tuple(zip(pytz.common_timezones, pytz.common_timezones))
     timezone = models.CharField(max_length=255, default="UTC", choices=TIMEZONE_CHOICES)
     version = models.IntegerField(default=1)
+    manual_status = models.CharField(
+        max_length=20,
+        choices=(("DRAFT", "Draft"), ("CURRENT", "Current"), ("COMPLETED", "Completed")),
+        default="DRAFT",
+    )
 
     class Meta:
         verbose_name = "Cycle"

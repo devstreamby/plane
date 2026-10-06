@@ -4,7 +4,6 @@
 
 # Python imports
 import json
-import pytz
 
 
 # Django imports
@@ -12,7 +11,6 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
     Case,
-    CharField,
     Count,
     Exists,
     F,
@@ -53,6 +51,7 @@ from plane.db.models import (
     UserRecentVisit,
 )
 from plane.utils.analytics_plot import burndown_plot
+from plane.utils.cycle_status import cycle_status_expression, get_cycle_status, transition_cycle
 from plane.bgtasks.recent_visited_task import recent_visited_task
 from plane.utils.host import base_host
 from plane.utils.cycle_transfer_issues import transfer_cycle_issues
@@ -74,18 +73,6 @@ class CycleViewSet(BaseViewSet):
             project_id=self.kwargs.get("project_id"),
             workspace__slug=self.kwargs.get("slug"),
         )
-
-        project = Project.objects.get(id=self.kwargs.get("project_id"))
-
-        # Fetch project for the specific record or pass project_id dynamically
-        project_timezone = project.timezone
-
-        # Convert the current time (timezone.now()) to the project's timezone
-        local_tz = pytz.timezone(project_timezone)
-        current_time_in_project_tz = timezone.now().astimezone(local_tz)
-
-        # Convert project local time back to UTC for comparison (start_date is stored in UTC)
-        current_time_in_utc = current_time_in_project_tz.astimezone(pytz.utc)
 
         return self.filter_queryset(
             super()
@@ -149,22 +136,7 @@ class CycleViewSet(BaseViewSet):
                     ),
                 )
             )
-            .annotate(
-                status=Case(
-                    When(
-                        Q(start_date__lte=current_time_in_utc) & Q(end_date__gte=current_time_in_utc),
-                        then=Value("CURRENT"),
-                    ),
-                    When(start_date__gt=current_time_in_utc, then=Value("UPCOMING")),
-                    When(end_date__lt=current_time_in_utc, then=Value("COMPLETED")),
-                    When(
-                        Q(start_date__isnull=True) & Q(end_date__isnull=True),
-                        then=Value("DRAFT"),
-                    ),
-                    default=Value("DRAFT"),
-                    output_field=CharField(),
-                )
-            )
+            .annotate(status=cycle_status_expression())
             .annotate(
                 assignee_ids=Coalesce(
                     ArrayAgg(
@@ -180,6 +152,29 @@ class CycleViewSet(BaseViewSet):
             .distinct()
         )
 
+    def _transition(self, request, target):
+        cycle = self.get_queryset().get(pk=self.kwargs["pk"])
+        before = json.dumps(CycleSerializer(cycle).data, cls=DjangoJSONEncoder)
+        transition_cycle(cycle, target, request.user)
+        model_activity.delay(
+            model_name="cycle",
+            model_id=str(cycle.id),
+            requested_data={"manual_status": target},
+            current_instance=before,
+            actor_id=request.user.id,
+            slug=self.kwargs["slug"],
+            origin=base_host(request=request, is_app=True),
+        )
+        return Response(CycleSerializer(self.get_queryset().get(pk=cycle.pk)).data)
+
+    @allow_permission([ROLE.ADMIN, ROLE.MEMBER])
+    def start(self, request, slug, project_id, pk):
+        return self._transition(request, "CURRENT")
+
+    @allow_permission([ROLE.ADMIN, ROLE.MEMBER])
+    def complete(self, request, slug, project_id, pk):
+        return self._transition(request, "COMPLETED")
+
     @allow_permission([ROLE.ADMIN, ROLE.MEMBER, ROLE.GUEST])
     def list(self, request, slug, project_id):
         queryset = self.get_queryset().filter(archived_at__isnull=True)
@@ -193,16 +188,9 @@ class CycleViewSet(BaseViewSet):
         # Fetch project for the specific record or pass project_id dynamically
         project_timezone = project.timezone
 
-        # Convert the current time (timezone.now()) to the project's timezone
-        local_tz = pytz.timezone(project_timezone)
-        current_time_in_project_tz = timezone.now().astimezone(local_tz)
-
-        # Convert project local time back to UTC for comparison (start_date is stored in UTC)
-        current_time_in_utc = current_time_in_project_tz.astimezone(pytz.utc)
-
         # Current Cycle
         if cycle_view == "current":
-            queryset = queryset.filter(start_date__lte=current_time_in_utc, end_date__gte=current_time_in_utc)
+            queryset = queryset.filter(status="CURRENT")
 
             data = queryset.values(
                 # necessary fields
@@ -212,6 +200,7 @@ class CycleViewSet(BaseViewSet):
                 # model fields
                 "name",
                 "description",
+                "manual_status",
                 "start_date",
                 "end_date",
                 "owned_by_id",
@@ -244,6 +233,7 @@ class CycleViewSet(BaseViewSet):
             # model fields
             "name",
             "description",
+            "manual_status",
             "start_date",
             "end_date",
             "owned_by_id",
@@ -286,6 +276,7 @@ class CycleViewSet(BaseViewSet):
                         # model fields
                         "name",
                         "description",
+                        "manual_status",
                         "start_date",
                         "end_date",
                         "owned_by_id",
@@ -346,7 +337,7 @@ class CycleViewSet(BaseViewSet):
 
         request_data = request.data
 
-        if cycle.end_date is not None and cycle.end_date < timezone.now():
+        if get_cycle_status(cycle) == "COMPLETED":
             if "sort_order" in request_data:
                 # Can only change sort order for a completed cycle``
                 request_data = {"sort_order": request_data.get("sort_order", cycle.sort_order)}
@@ -356,7 +347,7 @@ class CycleViewSet(BaseViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        serializer = CycleWriteSerializer(cycle, data=request.data, partial=True, context={"project_id": project_id})
+        serializer = CycleWriteSerializer(cycle, data=request_data, partial=True, context={"project_id": project_id})
         if serializer.is_valid():
             serializer.save()
             cycle = queryset.values(
@@ -367,6 +358,7 @@ class CycleViewSet(BaseViewSet):
                 # model fields
                 "name",
                 "description",
+                "manual_status",
                 "start_date",
                 "end_date",
                 "owned_by_id",
@@ -433,6 +425,7 @@ class CycleViewSet(BaseViewSet):
                 # model fields
                 "name",
                 "description",
+                "manual_status",
                 "start_date",
                 "end_date",
                 "owned_by_id",
@@ -803,12 +796,6 @@ class CycleAnalyticsEndpoint(BaseAPIView):
             )
             .first()
         )
-
-        if not cycle.start_date or not cycle.end_date:
-            return Response(
-                {"error": "Cycle has no start or end date"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
         # this will tell whether the issues were transferred to the new cycle
         """ 

@@ -86,6 +86,19 @@ export class CycleService extends APIService {
       });
   }
 
+  async transitionCycle(
+    workspaceSlug: string,
+    projectId: string,
+    cycleId: string,
+    action: "start" | "complete"
+  ): Promise<ICycle> {
+    return this.post(`/api/workspaces/${workspaceSlug}/projects/${projectId}/cycles/${cycleId}/${action}/`, {})
+      .then((response) => response.data)
+      .catch((error) => {
+        throw error?.response?.data;
+      });
+  }
+
   async createCycle(workspaceSlug: string, projectId: string, data: any): Promise<ICycle> {
     return this.post(`/api/workspaces/${workspaceSlug}/projects/${projectId}/cycles/`, data)
       .then((response) => response?.data)

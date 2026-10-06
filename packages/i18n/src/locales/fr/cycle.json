@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Cycle} other {Cycles}}",
-    "no_cycle": "Pas de cycle"
+    "no_cycle": "Pas de cycle",
+    "manual": {
+      "start": "Démarrer le cycle",
+      "complete": "Terminer le cycle",
+      "confirm": "Terminer ce cycle ? Les tâches inachevées y resteront jusqu’à leur transfert.",
+      "optional_dates": "Les dates sont facultatives. Un cycle sans dates est démarré et terminé manuellement."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

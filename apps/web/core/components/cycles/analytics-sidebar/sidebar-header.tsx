@@ -22,6 +22,7 @@ import { useCycle } from "@/hooks/store/use-cycle";
 import { useUserPermissions } from "@/hooks/store/user";
 import { useTimeZoneConverter } from "@/hooks/use-timezone-converter";
 // services
+import { CycleLifecycleActions } from "../lifecycle-actions";
 import { CycleService } from "@/services/cycle.service";
 
 type Props = {
@@ -147,6 +148,7 @@ export const CycleSidebarHeader = observer(function CycleSidebarHeader(props: Pr
           )}
         </div>
 
+        <CycleLifecycleActions workspaceSlug={workspaceSlug} projectId={projectId} cycleId={cycleDetails.id} />
         <Controller
           control={control}
           name="start_date"
@@ -186,7 +188,9 @@ export const CycleSidebarHeader = observer(function CycleSidebarHeader(props: Pr
                     mergeDates
                     showTooltip={!!cycleDetails.start_date && !!cycleDetails.end_date} // show tooltip only if both start and end date are present
                     required={cycleDetails.status !== "draft"}
-                    disabled={!isEditingAllowed || isArchived || isCompleted}
+                    disabled={
+                      !isEditingAllowed || isArchived || isCompleted || cycleDetails.manual_status === "CURRENT"
+                    }
                   />
                 )}
               />

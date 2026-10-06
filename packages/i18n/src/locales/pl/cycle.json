@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Cykl} few {Cykle} other {Cyklów}}",
-    "no_cycle": "Brak cyklu"
+    "no_cycle": "Brak cyklu",
+    "manual": {
+      "start": "Rozpocznij cykl",
+      "complete": "Zakończ cykl",
+      "confirm": "Zakończyć ten cykl? Nieukończone zadania pozostaną w nim do czasu przeniesienia.",
+      "optional_dates": "Daty są opcjonalne. Cykl bez dat rozpoczyna się i kończy ręcznie."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

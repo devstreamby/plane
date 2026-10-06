@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {Ciclo} other {Cicli}}",
-    "no_cycle": "Nessun ciclo"
+    "no_cycle": "Nessun ciclo",
+    "manual": {
+      "start": "Avvia ciclo",
+      "complete": "Completa ciclo",
+      "confirm": "Completare questo ciclo? Le attività incomplete rimarranno al suo interno fino al trasferimento.",
+      "optional_dates": "Le date sono facoltative. Un ciclo senza date viene avviato e completato manualmente."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

@@ -21,6 +21,16 @@ from plane.app.views import (
 
 urlpatterns = [
     path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/cycles/<uuid:pk>/start/",
+        CycleViewSet.as_view({"post": "start"}),
+        name="cycle-start",
+    ),
+    path(
+        "workspaces/<str:slug>/projects/<uuid:project_id>/cycles/<uuid:pk>/complete/",
+        CycleViewSet.as_view({"post": "complete"}),
+        name="cycle-complete",
+    ),
+    path(
         "workspaces/<str:slug>/projects/<uuid:project_id>/cycles/",
         CycleViewSet.as_view({"get": "list", "post": "create"}),
         name="project-cycle",

@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {サイクル} other {サイクル}}",
-    "no_cycle": "サイクルなし"
+    "no_cycle": "サイクルなし",
+    "manual": {
+      "start": "サイクルを開始",
+      "complete": "サイクルを完了",
+      "confirm": "このサイクルを完了しますか？未完了の作業項目は、移動するまでこのサイクルに残ります。",
+      "optional_dates": "日付は任意です。日付のないサイクルは手動で開始・完了します。"
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {

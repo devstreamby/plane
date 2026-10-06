@@ -20,7 +20,13 @@
   },
   "cycle": {
     "label": "{count, plural, one {chu kỳ} other {chu kỳ}}",
-    "no_cycle": "Không có chu kỳ"
+    "no_cycle": "Không có chu kỳ",
+    "manual": {
+      "start": "Bắt đầu chu kỳ",
+      "complete": "Hoàn thành chu kỳ",
+      "confirm": "Hoàn thành chu kỳ này? Các công việc chưa hoàn thành sẽ ở lại cho đến khi bạn chuyển chúng.",
+      "optional_dates": "Ngày là tùy chọn. Chu kỳ không có ngày được bắt đầu và hoàn thành thủ công."
+    }
   },
   "active_cycle_analytics": {
     "empty_state": {
