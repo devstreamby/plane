@@ -420,6 +420,11 @@
     "load_error": "Não foi possível carregar esta semana.",
     "save_error": "Não foi possível salvar este registro de tempo.",
     "delete_error": "Não foi possível excluir este registro de tempo.",
-    "member": "Membro"
+    "member": "Membro",
+    "start": "Start",
+    "timezone_note": "Times shown in {timezone}",
+    "search_issue": "Search work items",
+    "click_hint": "Click a time slot to log an hour.",
+    "no_matches": "No matching work items."
   }
 }
