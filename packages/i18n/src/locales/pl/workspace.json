@@ -401,5 +401,25 @@
       "range_too_long": "Nie udało się wczytać raportu. Spróbuj krótszego zakresu dat.",
       "no_access": "Nie masz dostępu do wyświetlenia tego raportu."
     }
+  },
+  "time_calendar": {
+    "label": "Czas zespołu",
+    "page_label": "{workspace} – Czas zespołu",
+    "today": "Dzisiaj",
+    "week_total": "{logged} z {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Ostatnie elementy pracy",
+    "no_issues": "Brak przypisanych elementów pracy",
+    "select_issue": "Wybierz element pracy, aby zapisać ten czas.",
+    "logged": "Zapisano: {duration}",
+    "hours": "Godziny",
+    "minutes": "Minuty",
+    "clock_event": "Zapisane przez timer. Godzina rozpoczęcia pozostaje bez zmian.",
+    "running": "Timer działa",
+    "forbidden": "Kalendarze zespołu są dostępne dla adminów projektu i workspace. Twój tydzień jest w Twoja praca.",
+    "load_error": "Nie udało się wczytać tego tygodnia.",
+    "save_error": "Nie udało się zapisać tego wpisu czasu.",
+    "delete_error": "Nie udało się usunąć tego wpisu czasu.",
+    "member": "Członek"
   }
 }

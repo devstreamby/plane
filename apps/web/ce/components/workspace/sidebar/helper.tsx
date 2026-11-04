@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import { Clock } from "lucide-react";
+import { CalendarDays, Clock } from "lucide-react";
 import {
   AnalyticsIcon,
   ArchiveIcon,
@@ -43,5 +43,7 @@ export const getSidebarNavigationItemIcon = (key: string, className: string = ""
       return <MultipleStickyIcon className={cn("size-4 flex-shrink-0", className)} />;
     case "reports":
       return <Clock className={cn("size-4 flex-shrink-0", className)} />;
+    case "team_time":
+      return <CalendarDays className={cn("size-4 flex-shrink-0", className)} />;
   }
 };

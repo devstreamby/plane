@@ -16,6 +16,13 @@ export const PROFILE_VIEWER_TAB = [
   },
 ];
 
+export const PROFILE_TIME_TAB = {
+  key: "time",
+  route: "time",
+  i18n_label: "profile.tabs.time",
+  selected: "/time/",
+};
+
 export const PROFILE_ADMINS_TAB = [
   {
     key: "assigned",

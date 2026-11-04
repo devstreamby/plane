@@ -401,5 +401,25 @@
       "range_too_long": "Zostavu sa nepodarilo načítať. Skúste kratší rozsah dátumov.",
       "no_access": "Nemáte prístup na zobrazenie tejto zostavy."
     }
+  },
+  "time_calendar": {
+    "label": "Tímový čas",
+    "page_label": "{workspace} – Tímový čas",
+    "today": "Dnes",
+    "week_total": "{logged} z {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Nedávne pracovné položky",
+    "no_issues": "Žiadne priradené pracovné položky",
+    "select_issue": "Vyberte pracovnú položku na zapísanie tohto času.",
+    "logged": "Zapísané: {duration}",
+    "hours": "Hodiny",
+    "minutes": "Minúty",
+    "clock_event": "Zaznamenané časovačom. Čas začiatku ostáva uložený.",
+    "running": "Časovač beží",
+    "forbidden": "Tímové kalendáre sú dostupné adminom projektu a workspace. Váš týždeň je vo Vaša práca.",
+    "load_error": "Tento týždeň sa nepodarilo načítať.",
+    "save_error": "Tento záznam času sa nepodarilo uložiť.",
+    "delete_error": "Tento záznam času sa nepodarilo odstrániť.",
+    "member": "Člen"
   }
 }

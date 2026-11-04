@@ -47,7 +47,7 @@ type TimeLog = {
 };
 
 type TTimeLogFormValues = {
-  date: string;
+  startedAt: string;
   hours: string;
   minutes: string;
   userId: string;
@@ -57,7 +57,11 @@ const notifyTimeLogsChanged = (issueId: string) => {
   window.dispatchEvent(new CustomEvent("plane:time-logs-changed", { detail: { issueId } }));
 };
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/** Value for an input[type=datetime-local], in the browser's local time. */
+const toLocalDateTimeInput = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 
 const formatDuration = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
@@ -87,17 +91,21 @@ const formatElapsedHHMMSS = (startedAt: string, now: number): string => {
 };
 
 const durationToForm = (log: TimeLog, fallbackUserId: string): TTimeLogFormValues => ({
-  date: log.date,
+  startedAt: toLocalDateTimeInput(new Date(log.started_at)),
   hours: String(Math.floor(log.duration_seconds / 3600)),
   minutes: String(Math.floor((log.duration_seconds % 3600) / 60)),
   userId: log.user_id ?? fallbackUserId,
 });
 
-const formToPayload = (form: TTimeLogFormValues) => ({
-  date: form.date,
-  duration_seconds: (Number(form.hours) || 0) * 3600 + (Number(form.minutes) || 0) * 60,
-  user_id: form.userId,
-});
+const formToPayload = (form: TTimeLogFormValues) => {
+  const started = new Date(form.startedAt);
+  return {
+    date: form.startedAt.slice(0, 10),
+    duration_seconds: (Number(form.hours) || 0) * 3600 + (Number(form.minutes) || 0) * 60,
+    user_id: form.userId,
+    started_at: Number.isNaN(started.getTime()) ? undefined : started.toISOString(),
+  };
+};
 
 export const IssueWorklogProperty = observer(function IssueWorklogProperty(props: TIssueWorklogProperty) {
   const { workspaceSlug, projectId, issueId, disabled, stateId, updatedAt } = props;
@@ -111,7 +119,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
   const [totalTime, setTotalTime] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [addForm, setAddForm] = useState<TTimeLogFormValues>(() => ({
-    date: todayISO(),
+    startedAt: toLocalDateTimeInput(new Date()),
     hours: "0",
     minutes: "0",
     userId: currentUserId,
@@ -181,6 +189,10 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
       setError("Duration must be greater than zero");
       return;
     }
+    if (!payload.started_at) {
+      setError("Start time is required");
+      return;
+    }
     try {
       await issueService.createTimeLog(workspaceSlug, projectId, issueId, payload);
       setIsAdding(false);
@@ -198,6 +210,10 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
     const payload = formToPayload(isAdmin ? editForm : { ...editForm, userId: currentUserId });
     if (payload.duration_seconds <= 0) {
       setError("Duration must be greater than zero");
+      return;
+    }
+    if (!payload.started_at) {
+      setError("Start time is required");
       return;
     }
     try {
@@ -254,7 +270,12 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
               type="button"
               className="text-xs text-custom-primary-100 flex items-center gap-1 hover:underline"
               onClick={() => {
-                setAddForm({ date: todayISO(), hours: "0", minutes: "0", userId: currentUserId });
+                setAddForm({
+                  startedAt: toLocalDateTimeInput(new Date()),
+                  hours: "0",
+                  minutes: "0",
+                  userId: currentUserId,
+                });
                 setError(null);
                 setIsAdding(true);
               }}
@@ -271,10 +292,10 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
       {isAdding && (
         <div className="border-custom-border-200 flex flex-wrap items-center gap-1.5 rounded border p-1.5">
           <input
-            type="date"
-            className="border-custom-border-200 text-xs w-28 rounded border bg-transparent px-1 py-0.5"
-            value={addForm.date}
-            onChange={(e) => setAddForm((f) => ({ ...f, date: e.target.value }))}
+            type="datetime-local"
+            className="border-custom-border-200 text-xs w-44 rounded border bg-transparent px-1 py-0.5"
+            value={addForm.startedAt}
+            onChange={(e) => setAddForm((f) => ({ ...f, startedAt: e.target.value }))}
           />
           <input
             type="number"
@@ -332,6 +353,12 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                     editingId === log.id && editForm ? (
                       <div key={log.id} className="flex flex-wrap items-center gap-1.5 pl-2">
                         <input
+                          type="datetime-local"
+                          className="border-custom-border-200 text-xs w-44 rounded border bg-transparent px-1 py-0.5"
+                          value={editForm.startedAt}
+                          onChange={(e) => setEditForm((f) => (f ? { ...f, startedAt: e.target.value } : f))}
+                        />
+                        <input
                           type="number"
                           min={0}
                           className="border-custom-border-200 text-xs w-10 rounded border bg-transparent px-1 py-0.5"
@@ -364,7 +391,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                     ) : (
                       <div key={log.id} className="text-xs flex items-center justify-between pl-2 text-secondary">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-secondary">{formatTime(log.created_at)}</span>
+                          <span className="text-secondary">{formatTime(log.started_at)}</span>
                           <ButtonAvatars showTooltip userIds={log.user_id ? [log.user_id] : []} size="sm" />
                           <span>{log.user_id ? getUserDetails(log.user_id)?.display_name : "Someone"}</span>
                         </div>

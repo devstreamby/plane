@@ -86,6 +86,7 @@ from plane.utils.time_tracking import (
     is_time_log_admin,
     parse_manual_time_log_payload,
     recalculate_total_time_spent,
+    resolve_manual_interval,
     resolve_time_log_user,
     serialize_time_log,
 )
@@ -1426,13 +1427,15 @@ class IssueTimeLogsEndpoint(BaseAPIView):
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
-        started_at = timezone.make_aware(datetime.combine(log_date, datetime.min.time()))
+        started_at, stopped_at, error = resolve_manual_interval(request.data, log_date, duration_seconds)
+        if error:
+            return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
         time_log = IssueTimeLog.objects.create(
             issue=issue,
             user=log_user,
             date=log_date,
             started_at=started_at,
-            stopped_at=started_at + timedelta(seconds=duration_seconds),
+            stopped_at=stopped_at,
             duration_seconds=duration_seconds,
             stop_reason=IssueTimeLog.StopReason.MANUAL_ENTRY,
             workspace=issue.workspace,
@@ -1478,10 +1481,14 @@ class IssueTimeLogDetailEndpoint(BaseAPIView):
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
+        started_at, stopped_at, error = resolve_manual_interval(request.data, log_date, duration_seconds)
+        if error:
+            return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+
         time_log.date = log_date
         time_log.user = log_user
-        time_log.started_at = timezone.make_aware(datetime.combine(log_date, datetime.min.time()))
-        time_log.stopped_at = time_log.started_at + timedelta(seconds=duration_seconds)
+        time_log.started_at = started_at
+        time_log.stopped_at = stopped_at
         time_log.duration_seconds = duration_seconds
         time_log.save(update_fields=["date", "user", "started_at", "stopped_at", "duration_seconds", "updated_at"])
         recalculate_total_time_spent(issue)

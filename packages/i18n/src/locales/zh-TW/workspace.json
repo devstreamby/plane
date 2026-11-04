@@ -401,5 +401,25 @@
       "range_too_long": "無法載入報告。請嘗試更短的日期範圍。",
       "no_access": "您無權查看此報告。"
     }
+  },
+  "time_calendar": {
+    "label": "團隊時間",
+    "page_label": "{workspace} - 團隊時間",
+    "today": "今天",
+    "week_total": "{logged} / {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "最近的工作項目",
+    "no_issues": "沒有被指派的工作項目",
+    "select_issue": "選擇一個工作項目來記錄這段時間。",
+    "logged": "已記錄：{duration}",
+    "hours": "小時",
+    "minutes": "分鐘",
+    "clock_event": "由計時器記錄。開始時間維持原樣。",
+    "running": "計時器執行中",
+    "forbidden": "團隊日曆僅供專案與工作區管理員使用。你自己的一週在你的工作中。",
+    "load_error": "無法載入本週。",
+    "save_error": "無法儲存這筆時間紀錄。",
+    "delete_error": "無法刪除這筆時間紀錄。",
+    "member": "成員"
   }
 }

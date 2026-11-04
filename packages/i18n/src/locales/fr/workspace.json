@@ -401,5 +401,25 @@
       "range_too_long": "Impossible de charger le rapport. Essayez une période plus courte.",
       "no_access": "Vous n'avez pas accès à ce rapport."
     }
+  },
+  "time_calendar": {
+    "label": "Temps d'équipe",
+    "page_label": "{workspace} - Temps d'équipe",
+    "today": "Aujourd'hui",
+    "week_total": "{logged} sur {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Éléments de travail récents",
+    "no_issues": "Aucun élément de travail assigné",
+    "select_issue": "Choisissez un élément de travail pour enregistrer ce temps.",
+    "logged": "Enregistré : {duration}",
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "clock_event": "Enregistré par le minuteur. L'heure de début reste celle du journal.",
+    "running": "Minuteur en cours",
+    "forbidden": "Les calendriers d'équipe sont réservés aux admins de projet et de workspace. Votre semaine est dans Votre travail.",
+    "load_error": "Impossible de charger cette semaine.",
+    "save_error": "Impossible d'enregistrer ce temps.",
+    "delete_error": "Impossible de supprimer ce temps.",
+    "member": "Membre"
   }
 }

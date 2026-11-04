@@ -110,7 +110,8 @@
       "assigned": "Assigned",
       "created": "Created",
       "subscribed": "Subscribed",
-      "activity": "Activity"
+      "activity": "Activity",
+      "time": "Time"
     },
     "empty_state": {
       "activity": {

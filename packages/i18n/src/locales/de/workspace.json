@@ -401,5 +401,25 @@
       "range_too_long": "Der Bericht konnte nicht geladen werden. Versuchen Sie einen kürzeren Zeitraum.",
       "no_access": "Sie haben keine Berechtigung, diesen Bericht anzuzeigen."
     }
+  },
+  "time_calendar": {
+    "label": "Teamzeit",
+    "page_label": "{workspace} – Teamzeit",
+    "today": "Heute",
+    "week_total": "{logged} von {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Neueste Arbeitselemente",
+    "no_issues": "Keine zugewiesenen Arbeitselemente",
+    "select_issue": "Wählen Sie ein Arbeitselement, um diese Zeit zu erfassen.",
+    "logged": "Erfasst: {duration}",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "clock_event": "Vom Timer erfasst. Die Startzeit bleibt wie protokolliert.",
+    "running": "Timer läuft",
+    "forbidden": "Teamkalender sind für Projekt- und Workspace-Admins verfügbar. Die eigene Woche liegt unter Ihre Arbeit.",
+    "load_error": "Diese Woche konnte nicht geladen werden.",
+    "save_error": "Dieser Zeiteintrag konnte nicht gespeichert werden.",
+    "delete_error": "Dieser Zeiteintrag konnte nicht gelöscht werden.",
+    "member": "Mitglied"
   }
 }

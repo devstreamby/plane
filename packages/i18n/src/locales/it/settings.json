@@ -110,7 +110,8 @@
       "assigned": "Assegnati",
       "created": "Creati",
       "subscribed": "Iscritti",
-      "activity": "Attività"
+      "activity": "Attività",
+      "time": "Tempo"
     },
     "empty_state": {
       "activity": {

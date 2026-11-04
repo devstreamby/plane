@@ -110,7 +110,8 @@
       "assigned": "할당됨",
       "created": "생성됨",
       "subscribed": "구독됨",
-      "activity": "활동"
+      "activity": "활동",
+      "time": "시간"
     },
     "empty_state": {
       "activity": {

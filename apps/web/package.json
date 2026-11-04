@@ -55,6 +55,7 @@
     "mobx-utils": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
+    "react-big-calendar": "catalog:",
     "react-color": "catalog:",
     "react-dom": "catalog:",
     "react-dropzone": "catalog:",

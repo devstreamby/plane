@@ -401,5 +401,25 @@
       "range_too_long": "Rapor yüklenemedi. Daha kısa bir tarih aralığı deneyin.",
       "no_access": "Bu raporu görüntüleme yetkiniz yok."
     }
+  },
+  "time_calendar": {
+    "label": "Ekip zamanı",
+    "page_label": "{workspace} - Ekip zamanı",
+    "today": "Bugün",
+    "week_total": "{logged} / {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Son iş öğeleri",
+    "no_issues": "Atanmış iş öğesi yok",
+    "select_issue": "Bu süreyi kaydetmek için bir iş öğesi seçin.",
+    "logged": "Kaydedildi: {duration}",
+    "hours": "Saat",
+    "minutes": "Dakika",
+    "clock_event": "Zamanlayıcı kaydetti. Başlangıç saati olduğu gibi kalır.",
+    "running": "Zamanlayıcı çalışıyor",
+    "forbidden": "Ekip takvimleri proje ve workspace yöneticilerine açıktır. Kendi haftanız Çalışmalarınız bölümündedir.",
+    "load_error": "Bu hafta yüklenemedi.",
+    "save_error": "Bu zaman kaydı kaydedilemedi.",
+    "delete_error": "Bu zaman kaydı silinemedi.",
+    "member": "Üye"
   }
 }

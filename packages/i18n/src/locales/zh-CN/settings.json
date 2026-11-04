@@ -110,7 +110,8 @@
       "assigned": "已分配",
       "created": "已创建",
       "subscribed": "已订阅",
-      "activity": "活动"
+      "activity": "活动",
+      "time": "时间"
     },
     "empty_state": {
       "activity": {

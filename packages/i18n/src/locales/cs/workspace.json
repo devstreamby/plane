@@ -401,5 +401,25 @@
       "range_too_long": "Sestavu se nepodařilo načíst. Zkuste kratší časový rozsah.",
       "no_access": "Nemáte oprávnění zobrazit tuto sestavu."
     }
+  },
+  "time_calendar": {
+    "label": "Týmový čas",
+    "page_label": "{workspace} – Týmový čas",
+    "today": "Dnes",
+    "week_total": "{logged} z {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Nedávné pracovní položky",
+    "no_issues": "Žádné přiřazené pracovní položky",
+    "select_issue": "Vyberte pracovní položku pro zapsání tohoto času.",
+    "logged": "Zapsáno: {duration}",
+    "hours": "Hodiny",
+    "minutes": "Minuty",
+    "clock_event": "Zaznamenáno časovačem. Čas začátku zůstává uložený.",
+    "running": "Časovač běží",
+    "forbidden": "Týmové kalendáře jsou dostupné adminům projektu a workspace. Váš týden je ve Vaše práce.",
+    "load_error": "Tento týden se nepodařilo načíst.",
+    "save_error": "Tento záznam času se nepodařilo uložit.",
+    "delete_error": "Tento záznam času se nepodařilo smazat.",
+    "member": "Člen"
   }
 }

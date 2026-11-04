@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone as dt_timezone
 from unittest.mock import patch
 
 import pytest
@@ -291,3 +291,34 @@ class TestIssueTimeLogPermissions:
         assert response.status_code == status.HTTP_403_FORBIDDEN
         context["admin_log"].refresh_from_db()
         assert context["admin_log"].duration_seconds == 1800
+
+    @pytest.mark.django_db
+    def test_manual_time_log_keeps_a_clock_start(self, session_client, workspace, time_log_context):
+        context = time_log_context
+        session_client.force_authenticate(user=context["member"])
+        url = self.get_url(workspace.slug, context["project"].id, context["issue"].id)
+        started = datetime(2026, 11, 4, 8, 15, tzinfo=dt_timezone.utc)
+
+        created = session_client.post(
+            url,
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": started.isoformat()},
+            format="json",
+        )
+
+        assert created.status_code == status.HTTP_201_CREATED
+        log = IssueTimeLog.objects.get(pk=created.data["id"])
+        assert log.started_at == started
+        assert log.stopped_at == started + timedelta(hours=1)
+        assert log.duration_seconds == 3600
+
+        moved = started + timedelta(hours=2)
+        updated = session_client.patch(
+            f"{url}{log.id}/",
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": moved.isoformat()},
+            format="json",
+        )
+
+        assert updated.status_code == status.HTTP_200_OK
+        log.refresh_from_db()
+        assert log.started_at == moved
+        assert log.stopped_at == moved + timedelta(hours=1)

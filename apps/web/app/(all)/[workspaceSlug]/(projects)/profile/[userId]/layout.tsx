@@ -9,7 +9,13 @@ import { usePathname } from "next/navigation";
 import { Outlet } from "react-router";
 import useSWR from "swr";
 // components
-import { PROFILE_VIEWER_TAB, PROFILE_ADMINS_TAB, EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
+import {
+  PROFILE_VIEWER_TAB,
+  PROFILE_ADMINS_TAB,
+  PROFILE_TIME_TAB,
+  EUserPermissions,
+  EUserPermissionsLevel,
+} from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { AppHeader } from "@/components/core/app-header";
 import { ContentWrapper } from "@/components/core/content-wrapper";
@@ -51,8 +57,9 @@ function UseProfileLayout({ params }: Route.ComponentProps) {
   const isAuthorizedPath =
     pathname.includes("assigned") || pathname.includes("created") || pathname.includes("subscribed");
   const isIssuesTab = pathname.includes("assigned") || pathname.includes("created") || pathname.includes("subscribed");
+  const isTimeTab = pathname.endsWith("/time") || pathname.endsWith("/time/");
 
-  const tabsList = isAuthorized ? [...PROFILE_VIEWER_TAB, ...PROFILE_ADMINS_TAB] : PROFILE_VIEWER_TAB;
+  const tabsList = [...PROFILE_VIEWER_TAB, PROFILE_TIME_TAB, ...(isAuthorized ? PROFILE_ADMINS_TAB : [])];
   const currentTab = tabsList.find((tab) => pathname === `/${workspaceSlug}/profile/${userId}${tab.selected}`);
 
   return (
@@ -85,11 +92,11 @@ function UseProfileLayout({ params }: Route.ComponentProps) {
                   </div>
                 )}
               </div>
-              {!isSmallerScreen && <ProfileSidebar userProjectsData={userProjectsData} />}
+              {!isTimeTab && !isSmallerScreen && <ProfileSidebar userProjectsData={userProjectsData} />}
             </div>
           </ContentWrapper>
         </div>
-        {isSmallerScreen && <ProfileSidebar userProjectsData={userProjectsData} />}
+        {!isTimeTab && isSmallerScreen && <ProfileSidebar userProjectsData={userProjectsData} />}
       </div>
     </>
   );

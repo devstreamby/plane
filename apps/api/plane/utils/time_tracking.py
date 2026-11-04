@@ -2,10 +2,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone as dt_timezone
 
 from django.db import IntegrityError, models
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from plane.db.models import IssueTimeLog
 
 
@@ -286,3 +287,21 @@ def parse_manual_time_log_payload(data, default_date=None, default_duration_seco
         return None, None, "duration must be greater than zero"
 
     return log_date, normalize_time_log_duration(duration_seconds), None
+
+
+def resolve_manual_interval(data, log_date, duration_seconds):
+    """Return ``(started_at, stopped_at, error)`` for a manual log.
+
+    ``date`` and ``duration_seconds`` stay the source of the length. An optional
+    ``started_at`` pins the clock time; without it the log still starts at midnight.
+    """
+    raw = data.get("started_at") if hasattr(data, "get") else None
+    if raw in (None, ""):
+        started_at = timezone.make_aware(datetime.combine(log_date, datetime.min.time()))
+    else:
+        started_at = parse_datetime(str(raw))
+        if started_at is None:
+            return None, None, "started_at must be an ISO-8601 datetime"
+        if timezone.is_naive(started_at):
+            started_at = timezone.make_aware(started_at, dt_timezone.utc)
+    return started_at, started_at + timedelta(seconds=duration_seconds), None

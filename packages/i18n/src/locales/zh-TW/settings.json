@@ -110,7 +110,8 @@
       "assigned": "已指派",
       "created": "已建立",
       "subscribed": "已訂閱",
-      "activity": "活動"
+      "activity": "活動",
+      "time": "時間"
     },
     "empty_state": {
       "activity": {

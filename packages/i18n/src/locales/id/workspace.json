@@ -401,5 +401,25 @@
       "range_too_long": "Laporan tidak dapat dimuat. Coba gunakan rentang tanggal yang lebih pendek.",
       "no_access": "Anda tidak memiliki akses untuk melihat laporan ini."
     }
+  },
+  "time_calendar": {
+    "label": "Waktu tim",
+    "page_label": "{workspace} - Waktu tim",
+    "today": "Hari ini",
+    "week_total": "{logged} dari {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Item kerja terbaru",
+    "no_issues": "Tidak ada item kerja yang ditugaskan",
+    "select_issue": "Pilih item kerja untuk mencatat waktu ini.",
+    "logged": "Tercatat: {duration}",
+    "hours": "Jam",
+    "minutes": "Menit",
+    "clock_event": "Dicatat oleh timer. Waktu mulai tetap seperti yang tersimpan.",
+    "running": "Timer berjalan",
+    "forbidden": "Kalender tim tersedia untuk admin proyek dan workspace. Minggu Anda ada di Pekerjaan anda.",
+    "load_error": "Tidak dapat memuat minggu ini.",
+    "save_error": "Tidak dapat menyimpan catatan waktu ini.",
+    "delete_error": "Tidak dapat menghapus catatan waktu ini.",
+    "member": "Anggota"
   }
 }

@@ -110,7 +110,8 @@
       "assigned": "Назначенные",
       "created": "Созданные",
       "subscribed": "Отслеживаемые",
-      "activity": "Активность"
+      "activity": "Активность",
+      "time": "Время"
     },
     "empty_state": {
       "activity": {

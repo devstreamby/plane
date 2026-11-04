@@ -487,7 +487,7 @@ export class IssueService extends APIService {
     workspaceSlug: string,
     projectId: string,
     issueId: string,
-    data: { date: string; duration_seconds: number; user_id?: string }
+    data: { date: string; duration_seconds: number; user_id?: string; started_at?: string }
   ) {
     return this.post(
       `/api/workspaces/${workspaceSlug}/projects/${projectId}/${this.serviceType}/${issueId}/time-logs/`,
@@ -504,7 +504,7 @@ export class IssueService extends APIService {
     projectId: string,
     issueId: string,
     timeLogId: string,
-    data: { date: string; duration_seconds: number; user_id?: string }
+    data: { date: string; duration_seconds: number; user_id?: string; started_at?: string }
   ) {
     return this.patch(
       `/api/workspaces/${workspaceSlug}/projects/${projectId}/${this.serviceType}/${issueId}/time-logs/${timeLogId}/`,

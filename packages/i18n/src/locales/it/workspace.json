@@ -401,5 +401,25 @@
       "range_too_long": "Impossibile caricare il report. Provi un intervallo di date più breve.",
       "no_access": "Non ha accesso per visualizzare questo report."
     }
+  },
+  "time_calendar": {
+    "label": "Tempo del team",
+    "page_label": "{workspace} - Tempo del team",
+    "today": "Oggi",
+    "week_total": "{logged} di {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Elementi di lavoro recenti",
+    "no_issues": "Nessun elemento di lavoro assegnato",
+    "select_issue": "Scegli un elemento di lavoro per registrare questo tempo.",
+    "logged": "Registrato: {duration}",
+    "hours": "Ore",
+    "minutes": "Minuti",
+    "clock_event": "Registrato dal timer. L'orario di inizio resta quello salvato.",
+    "running": "Timer in corso",
+    "forbidden": "I calendari del team sono disponibili per gli admin di progetto e di workspace. La tua settimana è in Il tuo lavoro.",
+    "load_error": "Impossibile caricare questa settimana.",
+    "save_error": "Impossibile salvare questo registro di tempo.",
+    "delete_error": "Impossibile eliminare questo registro di tempo.",
+    "member": "Membro"
   }
 }
