@@ -5,7 +5,6 @@
 # Python imports
 import json
 import uuid
-from datetime import datetime, timedelta
 
 # Django imports
 from django.core.serializers.json import DjangoJSONEncoder

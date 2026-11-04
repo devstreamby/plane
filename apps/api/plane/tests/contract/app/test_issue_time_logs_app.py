@@ -339,7 +339,9 @@ class TestIssueTimeLogPermissions:
         assert response.data["error"] == "started_at must include a timezone offset"
 
     @pytest.mark.django_db
-    def test_manual_time_log_rejects_a_date_that_disagrees_with_the_start(self, session_client, workspace, time_log_context):
+    def test_manual_time_log_rejects_a_date_that_disagrees_with_the_start(
+        self, session_client, workspace, time_log_context
+    ):
         context = time_log_context
         workspace.timezone = "Europe/Minsk"
         workspace.save(update_fields=["timezone", "updated_at"])

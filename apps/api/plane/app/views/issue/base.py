@@ -5,7 +5,7 @@
 # Python imports
 import copy
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Django imports
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -1140,7 +1140,6 @@ class IssueBulkUpdateDateEndpoint(BaseAPIView):
         """
         Validate that start date is before target date.
         """
-        from datetime import datetime
 
         start = new_start or current_start
         target = new_target or current_target
