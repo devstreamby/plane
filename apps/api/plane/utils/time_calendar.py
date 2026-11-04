@@ -100,13 +100,12 @@ def build_time_log_calendar(slug, user, start_date_str, end_date_str, target_use
             raise TimeLogCalendarBadRequest() from None
         if not admin_ids:
             raise TimeLogCalendarForbidden()
-        if not WorkspaceMember.objects.filter(
-            workspace__slug=slug, member_id=target_user_id, is_active=True
-        ).exists():
-            raise TimeLogCalendarNotFound()
-        try:
-            target_user = User.objects.get(pk=target_user_id)
-        except User.DoesNotExist:
+        target_user = User.objects.filter(
+            pk=target_user_id,
+            member_workspace__workspace__slug=slug,
+            member_workspace__is_active=True,
+        ).first()
+        if target_user is None:
             raise TimeLogCalendarNotFound()
         scoped_project_ids = list(admin_ids)
 
@@ -141,6 +140,23 @@ def build_time_log_calendar(slug, user, start_date_str, end_date_str, target_use
             | Q(started_at__lt=window_end, stopped_at__gt=window_start, stopped_at__isnull=False)
         )
         .select_related("issue", "issue__project")
+        .only(
+            "id",
+            "project_id",
+            "issue_id",
+            "user_id",
+            "date",
+            "started_at",
+            "stopped_at",
+            "duration_seconds",
+            "stop_reason",
+            "issue__id",
+            "issue__name",
+            "issue__sequence_id",
+            "issue__project_id",
+            "issue__project__id",
+            "issue__project__identifier",
+        )
         .order_by("started_at", "id")
     )
 

@@ -45,8 +45,8 @@ services:
       MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
       MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
     ports:
-      - "9000:9000"
-      - "9090:9090"
+      - "${MINIO_HOST_PORT:-9002}:9000"
+      - "${MINIO_CONSOLE_HOST_PORT:-9092}:9090"
 
   plane-db:
     image: postgres:15.7-alpine
@@ -61,7 +61,7 @@ services:
     environment:
       PGDATA: /var/lib/postgresql/data
     ports:
-      - "${POSTGRES_HOST_PORT:-5432}:5432"
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
 
   api:
     build:
@@ -79,7 +79,7 @@ services:
       - ./apps/api/.env
     environment:
       AWS_S3_ENDPOINT_URL: http://plane-minio:9000
-      AWS_S3_PUBLIC_ENDPOINT_URL: http://localhost:9000
+      AWS_S3_PUBLIC_ENDPOINT_URL: http://localhost:${MINIO_HOST_PORT:-9002}
     depends_on:
       - plane-db
       - plane-redis

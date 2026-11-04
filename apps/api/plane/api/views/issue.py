@@ -947,7 +947,9 @@ class IssueTimeLogsAPIEndpoint(BaseAPIView):
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
-        started_at, stopped_at, error = resolve_manual_interval(request.data, log_date, duration_seconds)
+        started_at, stopped_at, error = resolve_manual_interval(
+            request.data, log_date, duration_seconds, issue.workspace.timezone
+        )
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
         time_log = IssueTimeLog.objects.create(
@@ -1019,7 +1021,9 @@ class IssueTimeLogDetailAPIEndpoint(BaseAPIView):
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
-        started_at, stopped_at, error = resolve_manual_interval(request.data, log_date, duration_seconds)
+        started_at, stopped_at, error = resolve_manual_interval(
+            request.data, log_date, duration_seconds, issue.workspace.timezone
+        )
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 

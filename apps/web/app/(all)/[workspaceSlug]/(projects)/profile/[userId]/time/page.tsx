@@ -4,10 +4,15 @@
  * See the LICENSE file for details.
  */
 
+import { lazy, Suspense } from "react";
+import { observer } from "mobx-react";
 import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { PageHead } from "@/components/core/page-title";
-import { TimeCalendarRoot } from "@/components/time-calendar";
+
+const TimeCalendarRoot = lazy(() =>
+  import("@/components/time-calendar/root").then((module) => ({ default: module.TimeCalendarRoot }))
+);
 import { useWorkspace } from "@/hooks/store/use-workspace";
 import { useUser, useUserPermissions } from "@/hooks/store/user";
 import type { Route } from "./+types/page";
@@ -34,9 +39,15 @@ function ProfileTimePage({ params }: Route.ComponentProps) {
   return (
     <>
       <PageHead title={pageTitle} />
-      <TimeCalendarRoot workspaceSlug={workspaceSlug} mode="self" />
+      <Suspense fallback={null}>
+        <TimeCalendarRoot
+          workspaceSlug={workspaceSlug}
+          mode="self"
+          timeZone={currentWorkspace ? currentWorkspace.timezone || "UTC" : ""}
+        />
+      </Suspense>
     </>
   );
 }
 
-export default ProfileTimePage;
+export default observer(ProfileTimePage);

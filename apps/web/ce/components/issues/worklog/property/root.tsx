@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { EUserPermissions } from "@plane/constants";
+import { useTranslation } from "@plane/i18n";
 // icons
 import { Clock, Pencil, Plus, Trash2, X } from "lucide-react";
 // ui
@@ -14,8 +15,10 @@ import { Tooltip } from "@plane/propel/tooltip";
 // components
 import { ButtonAvatars } from "@/components/dropdowns/member/avatar";
 // hooks
+import { toDateTimeLocalValue, zonedDateTimeToIso } from "@/components/time-calendar/time";
 import { useMember } from "@/hooks/store/use-member";
 import { useUser, useUserPermissions } from "@/hooks/store/user";
+import { useWorkspace } from "@/hooks/store/use-workspace";
 // components
 import { WORKING_HOURS_TIMER_STOPPED_EVENT } from "@/components/workspace/working-hours-notifications-poller";
 // services
@@ -57,12 +60,6 @@ const notifyTimeLogsChanged = (issueId: string) => {
   window.dispatchEvent(new CustomEvent("plane:time-logs-changed", { detail: { issueId } }));
 };
 
-const pad = (value: number) => String(value).padStart(2, "0");
-
-/** Value for an input[type=datetime-local], in the browser's local time. */
-const toLocalDateTimeInput = (date: Date) =>
-  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-
 const formatDuration = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -90,25 +87,36 @@ const formatElapsedHHMMSS = (startedAt: string, now: number): string => {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 };
 
-const durationToForm = (log: TimeLog, fallbackUserId: string): TTimeLogFormValues => ({
-  startedAt: toLocalDateTimeInput(new Date(log.started_at)),
+const durationToForm = (log: TimeLog, fallbackUserId: string, timeZone: string): TTimeLogFormValues => ({
+  startedAt: toDateTimeLocalValue(log.started_at, timeZone),
   hours: String(Math.floor(log.duration_seconds / 3600)),
   minutes: String(Math.floor((log.duration_seconds % 3600) / 60)),
   userId: log.user_id ?? fallbackUserId,
 });
 
-const formToPayload = (form: TTimeLogFormValues) => {
-  const started = new Date(form.startedAt);
+const formToPayload = (form: TTimeLogFormValues, timeZone: string, original?: Pick<TimeLog, "date" | "started_at">) => {
+  const duration_seconds = (Number(form.hours) || 0) * 3600 + (Number(form.minutes) || 0) * 60;
+  if (original && form.startedAt === toDateTimeLocalValue(original.started_at, timeZone)) {
+    return {
+      date: original.date,
+      duration_seconds,
+      user_id: form.userId,
+      started_at: original.started_at,
+    };
+  }
   return {
     date: form.startedAt.slice(0, 10),
-    duration_seconds: (Number(form.hours) || 0) * 3600 + (Number(form.minutes) || 0) * 60,
+    duration_seconds,
     user_id: form.userId,
-    started_at: Number.isNaN(started.getTime()) ? undefined : started.toISOString(),
+    started_at: zonedDateTimeToIso(form.startedAt, timeZone) ?? undefined,
   };
 };
 
 export const IssueWorklogProperty = observer(function IssueWorklogProperty(props: TIssueWorklogProperty) {
   const { workspaceSlug, projectId, issueId, disabled, stateId, updatedAt } = props;
+  const { t } = useTranslation();
+  const { currentWorkspace } = useWorkspace();
+  const timeZone = currentWorkspace?.timezone || "UTC";
   const { project: projectMember, getUserDetails } = useMember();
   const { data: currentUser } = useUser();
   const { getProjectRoleByWorkspaceSlugAndProjectId } = useUserPermissions();
@@ -119,7 +127,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
   const [totalTime, setTotalTime] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [addForm, setAddForm] = useState<TTimeLogFormValues>(() => ({
-    startedAt: toLocalDateTimeInput(new Date()),
+    startedAt: toDateTimeLocalValue(new Date().toISOString(), "UTC"),
     hours: "0",
     minutes: "0",
     userId: currentUserId,
@@ -184,13 +192,13 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
 
   const handleCreate = async () => {
     setError(null);
-    const payload = formToPayload(isAdmin ? addForm : { ...addForm, userId: currentUserId });
+    const payload = formToPayload(isAdmin ? addForm : { ...addForm, userId: currentUserId }, timeZone);
     if (payload.duration_seconds <= 0) {
-      setError("Duration must be greater than zero");
+      setError(t("worklog.duration_required"));
       return;
     }
     if (!payload.started_at) {
-      setError("Start time is required");
+      setError(t("worklog.start_required"));
       return;
     }
     try {
@@ -198,7 +206,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
       setIsAdding(false);
       await fetchTimeLogs();
     } catch (err: any) {
-      setError(err?.error || "Failed to add time log");
+      setError(err?.error || t("worklog.add_error"));
     }
   };
 
@@ -207,13 +215,13 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
     const timeLog = timeLogs.find((log) => log.id === logId);
     if (!timeLog || (!isAdmin && timeLog.user_id !== currentUserId)) return;
     setError(null);
-    const payload = formToPayload(isAdmin ? editForm : { ...editForm, userId: currentUserId });
+    const payload = formToPayload(isAdmin ? editForm : { ...editForm, userId: currentUserId }, timeZone, timeLog);
     if (payload.duration_seconds <= 0) {
-      setError("Duration must be greater than zero");
+      setError(t("worklog.duration_required"));
       return;
     }
     if (!payload.started_at) {
-      setError("Start time is required");
+      setError(t("worklog.start_required"));
       return;
     }
     try {
@@ -221,7 +229,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
       setEditingId(null);
       await fetchTimeLogs();
     } catch (err: any) {
-      setError(err?.error || "Failed to update time log");
+      setError(err?.error || t("worklog.update_error"));
     }
   };
 
@@ -233,12 +241,13 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
       await issueService.deleteTimeLog(workspaceSlug, projectId, issueId, logId);
       await fetchTimeLogs();
     } catch (err: any) {
-      setError(err?.error || "Failed to delete time log");
+      setError(err?.error || t("worklog.delete_error"));
     }
   };
 
   const renderUserSelect = (value: string, onChange: (userId: string) => void) => (
     <select
+      aria-label="Member"
       className="border-custom-border-200 text-xs rounded border bg-transparent px-1 py-0.5"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -271,7 +280,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
               className="text-xs text-custom-primary-100 flex items-center gap-1 hover:underline"
               onClick={() => {
                 setAddForm({
-                  startedAt: toLocalDateTimeInput(new Date()),
+                  startedAt: toDateTimeLocalValue(new Date().toISOString(), timeZone),
                   hours: "0",
                   minutes: "0",
                   userId: currentUserId,
@@ -293,6 +302,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
         <div className="border-custom-border-200 flex flex-wrap items-center gap-1.5 rounded border p-1.5">
           <input
             type="datetime-local"
+            aria-label="Start"
             className="border-custom-border-200 text-xs w-44 rounded border bg-transparent px-1 py-0.5"
             value={addForm.startedAt}
             onChange={(e) => setAddForm((f) => ({ ...f, startedAt: e.target.value }))}
@@ -300,6 +310,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
           <input
             type="number"
             min={0}
+            aria-label="Hours"
             className="border-custom-border-200 text-xs w-12 rounded border bg-transparent px-1 py-0.5"
             value={addForm.hours}
             onChange={(e) => setAddForm((f) => ({ ...f, hours: e.target.value }))}
@@ -309,6 +320,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
             type="number"
             min={0}
             max={59}
+            aria-label="Minutes"
             className="border-custom-border-200 text-xs w-12 rounded border bg-transparent px-1 py-0.5"
             value={addForm.minutes}
             onChange={(e) => setAddForm((f) => ({ ...f, minutes: e.target.value }))}
@@ -318,7 +330,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
           <button type="button" className="text-xs text-custom-primary-100 ml-auto" onClick={handleCreate}>
             Save
           </button>
-          <button type="button" className="text-secondary" onClick={() => setIsAdding(false)}>
+          <button type="button" className="text-secondary" aria-label="Close" onClick={() => setIsAdding(false)}>
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -354,6 +366,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                       <div key={log.id} className="flex flex-wrap items-center gap-1.5 pl-2">
                         <input
                           type="datetime-local"
+                          aria-label="Start"
                           className="border-custom-border-200 text-xs w-44 rounded border bg-transparent px-1 py-0.5"
                           value={editForm.startedAt}
                           onChange={(e) => setEditForm((f) => (f ? { ...f, startedAt: e.target.value } : f))}
@@ -361,6 +374,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                         <input
                           type="number"
                           min={0}
+                          aria-label="Hours"
                           className="border-custom-border-200 text-xs w-10 rounded border bg-transparent px-1 py-0.5"
                           value={editForm.hours}
                           onChange={(e) => setEditForm((f) => (f ? { ...f, hours: e.target.value } : f))}
@@ -370,6 +384,7 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                           type="number"
                           min={0}
                           max={59}
+                          aria-label="Minutes"
                           className="border-custom-border-200 text-xs w-10 rounded border bg-transparent px-1 py-0.5"
                           value={editForm.minutes}
                           onChange={(e) => setEditForm((f) => (f ? { ...f, minutes: e.target.value } : f))}
@@ -384,7 +399,12 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                         >
                           Save
                         </button>
-                        <button type="button" className="text-secondary" onClick={() => setEditingId(null)}>
+                        <button
+                          type="button"
+                          className="text-secondary"
+                          aria-label="Close"
+                          onClick={() => setEditingId(null)}
+                        >
                           <X className="h-3.5 w-3.5" />
                         </button>
                       </div>
@@ -401,15 +421,16 @@ export const IssueWorklogProperty = observer(function IssueWorklogProperty(props
                             <div className="flex items-center gap-1.5">
                               <button
                                 type="button"
+                                aria-label="Edit"
                                 onClick={() => {
                                   setEditingId(log.id);
-                                  setEditForm(durationToForm(log, currentUserId));
+                                  setEditForm(durationToForm(log, currentUserId, timeZone));
                                   setError(null);
                                 }}
                               >
                                 <Pencil className="h-3 w-3" />
                               </button>
-                              <button type="button" onClick={() => handleDelete(log.id)}>
+                              <button type="button" aria-label="Delete" onClick={() => handleDelete(log.id)}>
                                 <Trash2 className="h-3 w-3" />
                               </button>
                             </div>

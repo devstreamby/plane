@@ -322,3 +322,53 @@ class TestIssueTimeLogPermissions:
         log.refresh_from_db()
         assert log.started_at == moved
         assert log.stopped_at == moved + timedelta(hours=1)
+
+    @pytest.mark.django_db
+    def test_manual_time_log_rejects_a_naive_start(self, session_client, workspace, time_log_context):
+        context = time_log_context
+        session_client.force_authenticate(user=context["member"])
+        url = self.get_url(workspace.slug, context["project"].id, context["issue"].id)
+
+        response = session_client.post(
+            url,
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": "2026-11-04T08:15:00"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["error"] == "started_at must include a timezone offset"
+
+    @pytest.mark.django_db
+    def test_manual_time_log_rejects_a_date_that_disagrees_with_the_start(self, session_client, workspace, time_log_context):
+        context = time_log_context
+        workspace.timezone = "Europe/Minsk"
+        workspace.save(update_fields=["timezone", "updated_at"])
+        session_client.force_authenticate(user=context["member"])
+        url = self.get_url(workspace.slug, context["project"].id, context["issue"].id)
+
+        response = session_client.post(
+            url,
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": "2026-12-01T08:00:00+00:00"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["error"] == "date must match started_at in the workspace timezone"
+
+    @pytest.mark.django_db
+    def test_manual_time_log_keeps_a_legacy_utc_midnight_date(self, session_client, workspace, time_log_context):
+        context = time_log_context
+        workspace.timezone = "America/Los_Angeles"
+        workspace.save(update_fields=["timezone", "updated_at"])
+        session_client.force_authenticate(user=context["member"])
+        url = self.get_url(workspace.slug, context["project"].id, context["issue"].id)
+
+        response = session_client.post(
+            url,
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": "2026-11-04T00:00:00+00:00"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        log = IssueTimeLog.objects.get(pk=response.data["id"])
+        assert log.date.isoformat() == "2026-11-04"

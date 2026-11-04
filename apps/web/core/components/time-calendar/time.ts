@@ -91,9 +91,38 @@ export function hasPlacedStart(log: { date: string; started_at: string }): boole
   return !(midnight && log.started_at.slice(0, 10) === log.date);
 }
 
-/** ISO instant for a grid drop, snapped to the 15-minute grid. */
-export function placedInstant(start: Date): string {
-  return snapStart(start).toISOString();
+/**
+ * UTC instant for a wall-clock `YYYY-MM-DDTHH:mm` in `timeZone`.
+ * The grid stores that wall clock on a Date, so `Date#toISOString` would treat it as the browser zone.
+ */
+export function zonedDateTimeToIso(value: string, timeZone: string): string | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const desiredUtc = Date.UTC(year, month - 1, day, hour, minute);
+  let instant = desiredUtc;
+  for (let pass = 0; pass < 2; pass += 1) {
+    const wall = wallTimeAsLocalDate(new Date(instant).toISOString(), timeZone);
+    const wallAsUtc = Date.UTC(wall.getFullYear(), wall.getMonth(), wall.getDate(), wall.getHours(), wall.getMinutes());
+    instant += desiredUtc - wallAsUtc;
+  }
+  const corrected = new Date(instant);
+  return Number.isNaN(corrected.getTime()) ? null : corrected.toISOString();
+}
+
+/** ISO instant for a grid drop, snapped to the 15-minute grid in the workspace zone. */
+export function placedInstant(start: Date, timeZone: string): string {
+  const snapped = snapStart(start);
+  const month = String(snapped.getMonth() + 1).padStart(2, "0");
+  const day = String(snapped.getDate()).padStart(2, "0");
+  const hours = String(snapped.getHours()).padStart(2, "0");
+  const minutes = String(snapped.getMinutes()).padStart(2, "0");
+  const wall = `${snapped.getFullYear()}-${month}-${day}T${hours}:${minutes}`;
+  return zonedDateTimeToIso(wall, timeZone) ?? snapped.toISOString();
 }
 
 export function formatDuration(seconds: number): string {
@@ -139,19 +168,14 @@ const DEFAULT_WORK_END = 18 * 60;
 const DINNER_BREAK_START = 13 * 60;
 const DINNER_BREAK_END = 14 * 60;
 
-export function browserTimeZone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  } catch {
-    return "UTC";
-  }
-}
-
-/** Localized zone name plus offset, for example "Minsk Time (GMT+3)". */
+/** Localized zone name plus offset, for example "Moscow Standard Time (GMT+3)". */
 export function timezoneLabel(timeZone: string, locale: string): string {
   let name = timeZone;
   try {
-    name = new Intl.DisplayNames([locale], { type: "timeZone" }).of(timeZone) ?? timeZone;
+    name =
+      new Intl.DateTimeFormat(locale, { timeZone, timeZoneName: "longGeneric" })
+        .formatToParts(new Date())
+        .find((part) => part.type === "timeZoneName")?.value ?? timeZone;
   } catch {
     name = timeZone;
   }
@@ -196,6 +220,14 @@ export function isOffHours(
   return minutes < start || minutes >= end;
 }
 
+/** Seconds in a working window, with the 13:00–14:00 lunch break removed where it overlaps. */
+function scheduledSeconds(start: number, end: number): number {
+  const lunchStart = Math.max(start, DINNER_BREAK_START);
+  const lunchEnd = Math.min(end, DINNER_BREAK_END);
+  const lunch = lunchEnd > lunchStart ? lunchEnd - lunchStart : 0;
+  return (end - start - lunch) * 60;
+}
+
 export function capacitySeconds(schedule: TTimeCalendarScheduleDay[], enabled: boolean): number {
   if (!enabled) return 0;
   return schedule.reduce((total, day) => {
@@ -203,12 +235,19 @@ export function capacitySeconds(schedule: TTimeCalendarScheduleDay[], enabled: b
     const start = parseHHMM(day.start);
     const end = parseHHMM(day.end);
     if (start == null || end == null || end <= start) return total;
-    return total + (end - start) * 60;
+    return total + scheduledSeconds(start, end);
   }, 0);
 }
 
-/** A weekday is 09:00–18:00 with the 13:00–14:00 break left out. */
-export const DAY_CAPACITY_SECONDS = 8 * 3600;
+/** Working seconds for one schedule day. `null` when the workspace schedule is off. */
+export function dayCapacitySeconds(day: TTimeCalendarScheduleDay | undefined, enabled: boolean): number | null {
+  if (!enabled) return null;
+  if (!day?.working) return 0;
+  const start = parseHHMM(day.start);
+  const end = parseHHMM(day.end);
+  if (start == null || end == null || end <= start) return 0;
+  return scheduledSeconds(start, end);
+}
 
 export function loggedSecondsOnDay(logs: TTimeCalendarLog[], day: Date, timeZone: string, now: Date): number {
   const key = localDateKey(day);
