@@ -8,7 +8,7 @@
 import { observer } from "mobx-react";
 import { useParams, useRouter } from "next/navigation";
 import { PanelRight } from "lucide-react";
-import { PROFILE_VIEWER_TAB, PROFILE_ADMINS_TAB, EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
+import { EUserPermissions, EUserPermissionsLevel } from "@plane/constants";
 import { useTranslation } from "@plane/i18n";
 import { YourWorkIcon, ChevronDownIcon } from "@plane/propel/icons";
 import type { IUserProfileProjectSegregation } from "@plane/types";
@@ -20,6 +20,7 @@ import { ProfileIssuesFilter } from "@/components/profile/profile-issues-filter"
 import { useAppTheme } from "@/hooks/store/use-app-theme";
 import { useUser, useUserPermissions } from "@/hooks/store/user";
 import { Button } from "@plane/propel/button";
+import { getProfileTabs } from "./profile-tabs";
 
 type TUserProfileHeader = {
   userProjectsData: IUserProfileProjectSegregation | undefined;
@@ -45,11 +46,11 @@ export const UserProfileHeader = observer(function UserProfileHeader(props: TUse
 
   if (!workspaceUserInfo) return null;
 
-  const tabsList = isAuthorized ? [...PROFILE_VIEWER_TAB, ...PROFILE_ADMINS_TAB] : PROFILE_VIEWER_TAB;
+  const isCurrentUser = currentUser?.id === userId;
+
+  const tabsList = getProfileTabs(isAuthorized, isCurrentUser);
 
   const userName = `${userProjectsData?.user_data?.first_name} ${userProjectsData?.user_data?.last_name}`;
-
-  const isCurrentUser = currentUser?.id === userId;
 
   const breadcrumbLabel = isCurrentUser ? t("profile.page_label") : `${userName} ${t("profile.work")}`;
 

@@ -110,7 +110,8 @@
       "assigned": "Atribuite",
       "created": "Create",
       "subscribed": "Urmărite",
-      "activity": "Activitate"
+      "activity": "Activitate",
+      "time": "Timp"
     },
     "empty_state": {
       "activity": {

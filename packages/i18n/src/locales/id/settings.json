@@ -110,7 +110,8 @@
       "assigned": "Ditugaskan",
       "created": "Dibuat",
       "subscribed": "Disubscribe",
-      "activity": "Aktivitas"
+      "activity": "Aktivitas",
+      "time": "Waktu"
     },
     "empty_state": {
       "activity": {

@@ -401,5 +401,39 @@
       "range_too_long": "Не вдалося завантажити звіт. Спробуйте коротший період.",
       "no_access": "У вас немає доступу для перегляду цього звіту."
     }
+  },
+  "time_calendar": {
+    "label": "Час команди",
+    "page_label": "{workspace} — Час команди",
+    "today": "Сьогодні",
+    "week_total": "{logged} із {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Нещодавні робочі елементи",
+    "no_issues": "Немає призначених робочих елементів",
+    "select_issue": "Виберіть робочий елемент, щоб записати цей час.",
+    "logged": "Записано: {duration}",
+    "hours": "Години",
+    "minutes": "Хвилини",
+    "clock_event": "Записано таймером. Час початку лишається таким, як у журналі.",
+    "running": "Таймер іде",
+    "forbidden": "Календарі команди доступні адмінам проєкту та workspace. Власний тиждень — у розділі Ваша робота.",
+    "load_error": "Не вдалося завантажити цей тиждень.",
+    "save_error": "Не вдалося зберегти цей запис часу.",
+    "delete_error": "Не вдалося видалити цей запис часу.",
+    "member": "Учасник",
+    "start": "Start",
+    "timezone_note": "Times shown in {timezone}",
+    "search_issue": "Search work items",
+    "click_hint": "Click a time slot to log an hour.",
+    "no_matches": "No matching work items.",
+    "previous_week": "Previous week",
+    "next_week": "Next week"
+  },
+  "worklog": {
+    "duration_required": "Duration must be greater than zero",
+    "start_required": "Start time is required",
+    "add_error": "Failed to add time log",
+    "update_error": "Failed to update time log",
+    "delete_error": "Failed to delete time log"
   }
 }

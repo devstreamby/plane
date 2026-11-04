@@ -229,6 +229,8 @@ from .analytic.time_report import (
     ProjectTimeLogReportEndpoint,
 )
 
+from .analytic.time_calendar import WorkspaceTimeLogsEndpoint
+
 from .notification.base import (
     NotificationViewSet,
     UnreadNotificationEndpoint,

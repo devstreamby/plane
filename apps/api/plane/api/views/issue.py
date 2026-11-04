@@ -5,7 +5,6 @@
 # Python imports
 import json
 import uuid
-from datetime import datetime, timedelta
 
 # Django imports
 from django.core.serializers.json import DjangoJSONEncoder
@@ -98,6 +97,7 @@ from plane.utils.time_tracking import (
     recalculate_total_time_spent,
     serialize_time_log,
     parse_manual_time_log_payload,
+    resolve_manual_interval,
     resolve_time_log_user,
 )
 from plane.bgtasks.webhook_task import model_activity
@@ -946,13 +946,17 @@ class IssueTimeLogsAPIEndpoint(BaseAPIView):
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
-        started_at = timezone.make_aware(datetime.combine(log_date, datetime.min.time()))
+        started_at, stopped_at, error = resolve_manual_interval(
+            request.data, log_date, duration_seconds, issue.workspace.timezone
+        )
+        if error:
+            return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
         time_log = IssueTimeLog.objects.create(
             issue=issue,
             user=log_user,
             date=log_date,
             started_at=started_at,
-            stopped_at=started_at + timedelta(seconds=duration_seconds),
+            stopped_at=stopped_at,
             duration_seconds=duration_seconds,
             workspace=issue.workspace,
             project=issue.project,
@@ -1016,10 +1020,16 @@ class IssueTimeLogDetailAPIEndpoint(BaseAPIView):
         if error:
             return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
+        started_at, stopped_at, error = resolve_manual_interval(
+            request.data, log_date, duration_seconds, issue.workspace.timezone
+        )
+        if error:
+            return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+
         time_log.date = log_date
         time_log.user = log_user
-        time_log.started_at = timezone.make_aware(datetime.combine(log_date, datetime.min.time()))
-        time_log.stopped_at = time_log.started_at + timedelta(seconds=duration_seconds)
+        time_log.started_at = started_at
+        time_log.stopped_at = stopped_at
         time_log.duration_seconds = duration_seconds
         time_log.save(update_fields=["date", "user", "started_at", "stopped_at", "duration_seconds", "updated_at"])
         recalculate_total_time_spent(issue)

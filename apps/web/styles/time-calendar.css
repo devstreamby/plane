@@ -1,0 +1,134 @@
+.time-calendar {
+  height: 100%;
+  min-height: 36rem;
+}
+
+.time-calendar .rbc-calendar {
+  height: 100%;
+  color: var(--text-color-primary);
+}
+
+.time-calendar .rbc-header,
+.time-calendar .rbc-time-header-content,
+.time-calendar .rbc-time-content,
+.time-calendar .rbc-timeslot-group,
+.time-calendar .rbc-day-bg,
+.time-calendar .rbc-time-header,
+.time-calendar .rbc-allday-cell,
+.time-calendar .rbc-month-row {
+  border-color: var(--border-color-subtle);
+}
+
+.time-calendar .rbc-header {
+  padding: 6px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color-tertiary);
+}
+
+.time-calendar .rbc-time-view .rbc-allday-cell {
+  height: 1.6rem;
+}
+
+.time-calendar .rbc-row-bg > .time-allday-slot {
+  position: relative;
+  display: flex;
+  flex: 1 0 0%;
+}
+
+.time-calendar .time-allday-slot > .rbc-day-bg {
+  flex: 1 0 0%;
+}
+
+.time-calendar .time-day-hours {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-color-secondary);
+}
+
+.time-calendar .rbc-header.rbc-today,
+.time-calendar .rbc-today {
+  background-color: color-mix(in oklch, var(--bg-accent-primary) 6%, transparent);
+}
+
+.time-calendar .rbc-timeslot-group {
+  min-height: 20px;
+}
+
+.time-calendar .rbc-day-slot .rbc-time-slot {
+  border-top-color: color-mix(in srgb, #fff 12%, transparent);
+}
+
+.time-calendar .rbc-time-column .rbc-timeslot-group:nth-child(4n) {
+  border-bottom-color: color-mix(in srgb, #fff 48%, transparent);
+}
+
+.time-calendar .rbc-time-slot {
+  color: var(--text-color-tertiary);
+  font-size: 11px;
+}
+
+.time-calendar .rbc-time-gutter,
+.time-calendar .rbc-label {
+  color: var(--text-color-tertiary);
+}
+
+.time-calendar .rbc-off-range-bg,
+.time-calendar .time-slot-off,
+.time-calendar .time-day-off {
+  background-color: color-mix(in oklch, var(--bg-layer-1) 70%, transparent);
+}
+
+.time-calendar .rbc-day-slot .rbc-time-slot.time-slot-work {
+  background-color: color-mix(in oklch, var(--bg-accent-primary) 8%, transparent);
+}
+
+.time-calendar .rbc-event,
+.time-calendar .rbc-day-slot .rbc-background-event {
+  border: none;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.time-calendar .rbc-event.time-event-clock {
+  background-color: color-mix(in oklch, var(--bg-accent-primary) 55%, var(--bg-layer-1));
+  color: var(--text-color-primary);
+}
+
+.time-calendar .rbc-event.time-event-duration {
+  background-color: color-mix(in oklch, var(--bg-accent-primary) 34%, var(--bg-layer-1));
+  color: var(--text-color-primary);
+  border: 1px solid color-mix(in oklch, var(--bg-accent-primary) 45%, transparent);
+}
+
+.time-calendar .rbc-addons-dnd-resize-ns-anchor:last-child {
+  height: 10px;
+  cursor: ns-resize;
+}
+
+.time-calendar .rbc-addons-dnd-resize-ns-anchor:last-child .rbc-addons-dnd-resize-ns-icon {
+  display: block;
+  border-top-color: var(--text-color-primary);
+}
+
+.time-calendar .rbc-event.rbc-selected {
+  outline: 1px solid var(--bg-accent-primary);
+}
+
+.time-calendar .rbc-slot-selection {
+  background-color: color-mix(in oklch, var(--bg-accent-primary) 28%, transparent);
+  color: var(--text-color-primary);
+}
+
+.time-calendar .rbc-current-time-indicator {
+  background-color: var(--bg-accent-primary);
+}

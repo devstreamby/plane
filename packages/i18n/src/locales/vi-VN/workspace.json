@@ -401,5 +401,39 @@
       "range_too_long": "Không thể tải báo cáo. Hãy thử một khoảng thời gian ngắn hơn.",
       "no_access": "Bạn không có quyền xem báo cáo này."
     }
+  },
+  "time_calendar": {
+    "label": "Thời gian nhóm",
+    "page_label": "{workspace} - Thời gian nhóm",
+    "today": "Hôm nay",
+    "week_total": "{logged} / {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Hạng mục công việc gần đây",
+    "no_issues": "Không có hạng mục công việc được giao",
+    "select_issue": "Chọn một hạng mục công việc để ghi thời gian này.",
+    "logged": "Đã ghi: {duration}",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "clock_event": "Được bộ đếm giờ ghi lại. Giờ bắt đầu được giữ nguyên.",
+    "running": "Bộ đếm giờ đang chạy",
+    "forbidden": "Lịch nhóm dành cho quản trị viên dự án và workspace. Tuần của bạn nằm trong Công việc của tôi.",
+    "load_error": "Không tải được tuần này.",
+    "save_error": "Không lưu được bản ghi thời gian này.",
+    "delete_error": "Không xóa được bản ghi thời gian này.",
+    "member": "Thành viên",
+    "start": "Start",
+    "timezone_note": "Times shown in {timezone}",
+    "search_issue": "Search work items",
+    "click_hint": "Click a time slot to log an hour.",
+    "no_matches": "No matching work items.",
+    "previous_week": "Previous week",
+    "next_week": "Next week"
+  },
+  "worklog": {
+    "duration_required": "Duration must be greater than zero",
+    "start_required": "Start time is required",
+    "add_error": "Failed to add time log",
+    "update_error": "Failed to update time log",
+    "delete_error": "Failed to delete time log"
   }
 }

@@ -157,6 +157,36 @@ def _working_interval(config, holiday_calendar, local_date):
     return start, end
 
 
+def working_schedule_for_range(config, start_date, end_date):
+    """Resolve each local date in [start_date, end_date] to a working interval.
+
+    Dates are calendar dates in the workspace timezone; the caller has already
+    chosen them in that zone. Holidays and disabled weekdays come back as
+    non-working. When the schedule is disabled, every day is non-working so the
+    client can skip capacity and shading.
+    """
+    enabled = bool((config or {}).get("enabled"))
+    holiday_calendar = build_holiday_calendar(config) if enabled else None
+    days = []
+    cursor = start_date
+    while cursor <= end_date:
+        interval = _working_interval(config, holiday_calendar, cursor) if enabled else None
+        if interval is None:
+            days.append({"date": cursor.isoformat(), "working": False, "start": None, "end": None})
+        else:
+            start_time, end_time = interval
+            days.append(
+                {
+                    "date": cursor.isoformat(),
+                    "working": True,
+                    "start": start_time.strftime("%H:%M"),
+                    "end": end_time.strftime("%H:%M"),
+                }
+            )
+        cursor += timedelta(days=1)
+    return days
+
+
 def compute_auto_stop_at(workspace, started_at):
     """Compute the UTC boundary at which a timer started at `started_at` should stop.
 

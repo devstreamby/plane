@@ -401,5 +401,39 @@
       "range_too_long": "レポートを読み込めませんでした。期間を短くしてお試しください。",
       "no_access": "このレポートを表示する権限がありません。"
     }
+  },
+  "time_calendar": {
+    "label": "チームの時間",
+    "page_label": "{workspace} - チームの時間",
+    "today": "今日",
+    "week_total": "{logged} / {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "最近の作業項目",
+    "no_issues": "割り当てられた作業項目はありません",
+    "select_issue": "この時間を記録する作業項目を選んでください。",
+    "logged": "記録: {duration}",
+    "hours": "時間",
+    "minutes": "分",
+    "clock_event": "タイマーが記録しました。開始時刻はそのまま残ります。",
+    "running": "タイマー稼働中",
+    "forbidden": "チームのカレンダーはプロジェクトとワークスペースの管理者向けです。自分の週はあなたの作業にあります。",
+    "load_error": "この週を読み込めませんでした。",
+    "save_error": "この時間の記録を保存できませんでした。",
+    "delete_error": "この時間の記録を削除できませんでした。",
+    "member": "メンバー",
+    "start": "Start",
+    "timezone_note": "Times shown in {timezone}",
+    "search_issue": "Search work items",
+    "click_hint": "Click a time slot to log an hour.",
+    "no_matches": "No matching work items.",
+    "previous_week": "Previous week",
+    "next_week": "Next week"
+  },
+  "worklog": {
+    "duration_required": "Duration must be greater than zero",
+    "start_required": "Start time is required",
+    "add_error": "Failed to add time log",
+    "update_error": "Failed to update time log",
+    "delete_error": "Failed to delete time log"
   }
 }

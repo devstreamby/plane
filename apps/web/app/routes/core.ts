@@ -77,6 +77,11 @@ export const coreRoutes: RouteConfigEntry[] = [
           route(":workspaceSlug/reports", "./(all)/[workspaceSlug]/(projects)/reports/page.tsx"),
         ]),
 
+        // Team time
+        layout("./(all)/[workspaceSlug]/(projects)/team-time/layout.tsx", [
+          route(":workspaceSlug/team-time", "./(all)/[workspaceSlug]/(projects)/team-time/page.tsx"),
+        ]),
+
         // Browse
         layout("./(all)/[workspaceSlug]/(projects)/browse/[workItem]/layout.tsx", [
           route(":workspaceSlug/browse/:workItem", "./(all)/[workspaceSlug]/(projects)/browse/[workItem]/page.tsx"),
@@ -95,6 +100,10 @@ export const coreRoutes: RouteConfigEntry[] = [
         // Profile
         layout("./(all)/[workspaceSlug]/(projects)/profile/[userId]/layout.tsx", [
           route(":workspaceSlug/profile/:userId", "./(all)/[workspaceSlug]/(projects)/profile/[userId]/page.tsx"),
+          route(
+            ":workspaceSlug/profile/:userId/time",
+            "./(all)/[workspaceSlug]/(projects)/profile/[userId]/time/page.tsx"
+          ),
           route(
             ":workspaceSlug/profile/:userId/:profileViewId",
             "./(all)/[workspaceSlug]/(projects)/profile/[userId]/[profileViewId]/page.tsx"

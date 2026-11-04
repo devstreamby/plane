@@ -2,10 +2,12 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone as dt_timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.db import IntegrityError, models
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from plane.db.models import IssueTimeLog
 
 
@@ -286,3 +288,47 @@ def parse_manual_time_log_payload(data, default_date=None, default_duration_seco
         return None, None, "duration must be greater than zero"
 
     return log_date, normalize_time_log_duration(duration_seconds), None
+
+
+def _workspace_zone(name):
+    try:
+        return ZoneInfo(name or "UTC")
+    except ZoneInfoNotFoundError:
+        return ZoneInfo("UTC")
+
+
+def _legacy_utc_midnight(started_at, log_date):
+    """A date-only log is stored at 00:00 UTC on `date`."""
+    utc = started_at.astimezone(dt_timezone.utc)
+    return (
+        utc.date() == log_date
+        and utc.hour == 0
+        and utc.minute == 0
+        and utc.second == 0
+        and utc.microsecond == 0
+    )
+
+
+def resolve_manual_interval(data, log_date, duration_seconds, workspace_timezone="UTC"):
+    """Return ``(started_at, stopped_at, error)`` for a manual log.
+
+    Without ``started_at`` the log still starts at midnight UTC on ``date``.
+    With ``started_at``, the instant must include an offset and its calendar
+    date in the workspace timezone must equal ``date``. A legacy UTC-midnight
+    log may keep its original ``date`` even when that midnight falls on the
+    previous local day.
+    """
+    raw = data.get("started_at") if hasattr(data, "get") else None
+    if raw in (None, ""):
+        started_at = timezone.make_aware(datetime.combine(log_date, datetime.min.time()))
+        return started_at, started_at + timedelta(seconds=duration_seconds), None
+
+    started_at = parse_datetime(str(raw))
+    if started_at is None:
+        return None, None, "started_at must be an ISO-8601 datetime"
+    if timezone.is_naive(started_at):
+        return None, None, "started_at must include a timezone offset"
+    local_date = started_at.astimezone(_workspace_zone(workspace_timezone)).date()
+    if local_date != log_date and not _legacy_utc_midnight(started_at, log_date):
+        return None, None, "date must match started_at in the workspace timezone"
+    return started_at, started_at + timedelta(seconds=duration_seconds), None

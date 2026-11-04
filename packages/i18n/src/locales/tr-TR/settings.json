@@ -110,7 +110,8 @@
       "assigned": "Atanan",
       "created": "Oluşturulan",
       "subscribed": "Abone olunan",
-      "activity": "Aktivite"
+      "activity": "Aktivite",
+      "time": "Zaman"
     },
     "empty_state": {
       "activity": {

@@ -7,10 +7,11 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 // plane imports
-import { PROFILE_VIEWER_TAB, PROFILE_ADMINS_TAB } from "@plane/constants";
+import { getProfileTabs } from "./profile-tabs";
 import { useTranslation } from "@plane/i18n";
 import { Header, EHeaderVariant } from "@plane/ui";
 import { cn } from "@plane/utils";
+import { useUser } from "@/hooks/store/user";
 
 type Props = {
   isAuthorized: boolean;
@@ -21,8 +22,10 @@ export function ProfileNavbar(props: Props) {
   const { t } = useTranslation();
   const { workspaceSlug, userId } = useParams();
   const pathname = usePathname();
+  const { data: currentUser } = useUser();
+  const isOwnProfile = !!currentUser?.id && currentUser.id === userId;
 
-  const tabsList = isAuthorized ? [...PROFILE_VIEWER_TAB, ...PROFILE_ADMINS_TAB] : PROFILE_VIEWER_TAB;
+  const tabsList = getProfileTabs(isAuthorized, isOwnProfile);
 
   return (
     <Header variant={EHeaderVariant.SECONDARY} showOnMobile={false}>

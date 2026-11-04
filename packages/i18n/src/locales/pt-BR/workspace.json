@@ -401,5 +401,39 @@
       "range_too_long": "Não foi possível carregar o relatório. Tente um intervalo de datas mais curto.",
       "no_access": "Você não tem acesso para ver este relatório."
     }
+  },
+  "time_calendar": {
+    "label": "Tempo da equipe",
+    "page_label": "{workspace} - Tempo da equipe",
+    "today": "Hoje",
+    "week_total": "{logged} de {capacity}",
+    "week_total_only": "{logged}",
+    "recent_issues": "Itens de trabalho recentes",
+    "no_issues": "Nenhum item de trabalho atribuído",
+    "select_issue": "Escolha um item de trabalho para registrar este tempo.",
+    "logged": "Registrado: {duration}",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "clock_event": "Registrado pelo timer. O horário de início permanece como foi salvo.",
+    "running": "Timer em andamento",
+    "forbidden": "Os calendários da equipe estão disponíveis para admins de projeto e de workspace. Sua semana está em Seu trabalho.",
+    "load_error": "Não foi possível carregar esta semana.",
+    "save_error": "Não foi possível salvar este registro de tempo.",
+    "delete_error": "Não foi possível excluir este registro de tempo.",
+    "member": "Membro",
+    "start": "Start",
+    "timezone_note": "Times shown in {timezone}",
+    "search_issue": "Search work items",
+    "click_hint": "Click a time slot to log an hour.",
+    "no_matches": "No matching work items.",
+    "previous_week": "Previous week",
+    "next_week": "Next week"
+  },
+  "worklog": {
+    "duration_required": "Duration must be greater than zero",
+    "start_required": "Start time is required",
+    "add_error": "Failed to add time log",
+    "update_error": "Failed to update time log",
+    "delete_error": "Failed to delete time log"
   }
 }
