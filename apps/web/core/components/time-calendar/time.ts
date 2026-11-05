@@ -144,7 +144,7 @@ export function formatWeekRange(start: Date, end: Date, locale = "en"): string {
   return `${startLabel} – ${endLabel}`;
 }
 
-/** A running timer, or a log closed by the timer, keeps its real interval. */
+/** A running timer, or a log the timer already closed. */
 export function isClockLog(log: Pick<TTimeCalendarLog, "stopped_at" | "stop_reason">): boolean {
   if (!log.stopped_at) return true;
   return log.stop_reason === "state_change" || log.stop_reason === "working_hours";

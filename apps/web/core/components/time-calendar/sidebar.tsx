@@ -6,9 +6,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "@plane/i18n";
-import { cn } from "@plane/utils";
+import { cn, generateWorkItemLink } from "@plane/utils";
 import type { TTimeCalendarLog } from "@/services/time-calendar.service";
-import { formatDuration, isClockLog, toDateTimeLocalValue } from "./time";
+import { formatDuration, toDateTimeLocalValue } from "./time";
 import type { TPendingCreate, TRailIssue } from "./use-time-calendar";
 
 type Props = {
@@ -20,6 +20,7 @@ type Props = {
   chosenIssueId: string | null;
   onPickIssue: (issue: TRailIssue) => void;
   selectedLog: TTimeCalendarLog | null;
+  workspaceSlug: string;
   timeZone: string;
   onSave: (startedAt: string, hours: string, minutes: string) => void;
   onDelete: (log: TTimeCalendarLog) => void;
@@ -96,22 +97,33 @@ function LogEditor(props: { log: TTimeCalendarLog; timeZone: string; onSave: Pro
 
 function SelectedLog(props: {
   log: TTimeCalendarLog;
+  workspaceSlug: string;
   timeZone: string;
   onSave: Props["onSave"];
   onDelete: Props["onDelete"];
 }) {
   const { t } = useTranslation();
-  const clock = isClockLog(props.log);
+  const running = !props.log.stopped_at;
+  const workItemHref = generateWorkItemLink({
+    workspaceSlug: props.workspaceSlug,
+    projectId: props.log.project_id,
+    issueId: props.log.issue_id,
+    projectIdentifier: props.log.issue.project_identifier,
+    sequenceId: props.log.issue.sequence_id,
+  });
   return (
     <div className="space-y-2 rounded-md bg-layer-1 p-2">
-      <div className="text-13 font-medium text-primary">
+      <a
+        href={workItemHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-13 font-medium text-accent-primary hover:underline"
+      >
         {props.log.issue.project_identifier}-{props.log.issue.sequence_id}
-      </div>
+      </a>
       <div className="text-12 text-secondary">{props.log.issue.name}</div>
-      {clock ? (
-        <p className="text-12 text-tertiary">
-          {props.log.stopped_at ? t("time_calendar.clock_event") : t("time_calendar.running")}
-        </p>
+      {running ? (
+        <p className="text-12 text-tertiary">{t("time_calendar.running")}</p>
       ) : (
         <LogEditor
           key={`${props.log.id}:${props.log.started_at}:${props.log.duration_seconds}:${props.timeZone}`}
@@ -166,6 +178,7 @@ export function TimeCalendarSidebar(props: Props) {
       {props.selectedLog && (
         <SelectedLog
           log={props.selectedLog}
+          workspaceSlug={props.workspaceSlug}
           timeZone={props.timeZone}
           onSave={props.onSave}
           onDelete={props.onDelete}
