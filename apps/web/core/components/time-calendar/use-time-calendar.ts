@@ -22,7 +22,6 @@ import { WorkspaceService } from "@/services/workspace.service";
 import {
   addDays,
   capacitySeconds,
-  isClockLog,
   localDateKey,
   loggedSeconds,
   startOfWeekMonday,
@@ -500,7 +499,7 @@ export function useTimeCalendar(props: { workspaceSlug: string; mode: CalendarMo
   };
 
   const saveLog = (startedAtLocal: string, hours: string, minutes: string) => {
-    if (!selectedLog || isClockLog(selectedLog)) return;
+    if (!selectedLog || !selectedLog.stopped_at) return;
     const update = fieldsToUpdate(startedAtLocal, hours, minutes, clock.timeZone);
     if (!update) return;
     updateLog(selectedLog, update.date, update.durationSeconds, update.startedAt, true);
@@ -575,6 +574,7 @@ export function useTimeCalendar(props: { workspaceSlug: string; mode: CalendarMo
       chosenIssueId: chosenIssue?.id ?? null,
       onPickIssue,
       selectedLog: findSelected(logs, selectedLog),
+      workspaceSlug,
       timeZone: clock.timeZone,
       onSave: saveLog,
       onDelete: deleteLog,

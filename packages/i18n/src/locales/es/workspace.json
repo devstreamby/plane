@@ -414,7 +414,6 @@
     "logged": "Registrado: {duration}",
     "hours": "Horas",
     "minutes": "Minutos",
-    "clock_event": "Registrado por el temporizador. La hora de inicio se conserva.",
     "running": "Temporizador en curso",
     "forbidden": "Los calendarios de equipo están disponibles para admins de proyecto y de workspace. Tu semana está en Tu trabajo.",
     "load_error": "No se pudo cargar esta semana.",

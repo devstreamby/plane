@@ -414,7 +414,6 @@
     "logged": "Registrato: {duration}",
     "hours": "Ore",
     "minutes": "Minuti",
-    "clock_event": "Registrato dal timer. L'orario di inizio resta quello salvato.",
     "running": "Timer in corso",
     "forbidden": "I calendari del team sono disponibili per gli admin di progetto e di workspace. La tua settimana è in Il tuo lavoro.",
     "load_error": "Impossibile caricare questa settimana.",

@@ -415,7 +415,6 @@
     "start": "Start",
     "hours": "Hours",
     "minutes": "Minutes",
-    "clock_event": "Recorded by the timer. The start time stays as logged.",
     "running": "Timer running",
     "forbidden": "Team calendars are available to project and workspace admins. Your own week is on Your work.",
     "load_error": "Couldn't load this week.",

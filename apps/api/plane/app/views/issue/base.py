@@ -1462,6 +1462,11 @@ class IssueTimeLogDetailEndpoint(BaseAPIView):
                 {"error": "You can only edit your own time logs"},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        if time_log.stopped_at is None:
+            return Response(
+                {"error": "A running timer cannot be edited. Stop it first."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if not can_assign_time_log_user(request.data.get("user_id"), request.user, is_admin):
             return Response(
                 {"error": "Only admins can reassign time logs"},
@@ -1493,7 +1498,21 @@ class IssueTimeLogDetailEndpoint(BaseAPIView):
         time_log.started_at = started_at
         time_log.stopped_at = stopped_at
         time_log.duration_seconds = duration_seconds
-        time_log.save(update_fields=["date", "user", "started_at", "stopped_at", "duration_seconds", "updated_at"])
+        # An edited interval is no longer the timer's original capture.
+        time_log.stop_reason = IssueTimeLog.StopReason.MANUAL_ENTRY
+        time_log.auto_stop_at = None
+        time_log.save(
+            update_fields=[
+                "date",
+                "user",
+                "started_at",
+                "stopped_at",
+                "duration_seconds",
+                "stop_reason",
+                "auto_stop_at",
+                "updated_at",
+            ]
+        )
         recalculate_total_time_spent(issue)
 
         return Response(serialize_time_log(time_log), status=status.HTTP_200_OK)

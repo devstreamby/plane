@@ -414,7 +414,6 @@
     "logged": "Zapísané: {duration}",
     "hours": "Hodiny",
     "minutes": "Minúty",
-    "clock_event": "Zaznamenané časovačom. Čas začiatku ostáva uložený.",
     "running": "Časovač beží",
     "forbidden": "Tímové kalendáre sú dostupné adminom projektu a workspace. Váš týždeň je vo Vaša práca.",
     "load_error": "Tento týždeň sa nepodarilo načítať.",

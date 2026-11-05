@@ -414,7 +414,6 @@
     "logged": "Kaydedildi: {duration}",
     "hours": "Saat",
     "minutes": "Dakika",
-    "clock_event": "Zamanlayıcı kaydetti. Başlangıç saati olduğu gibi kalır.",
     "running": "Zamanlayıcı çalışıyor",
     "forbidden": "Ekip takvimleri proje ve workspace yöneticilerine açıktır. Kendi haftanız Çalışmalarınız bölümündedir.",
     "load_error": "Bu hafta yüklenemedi.",

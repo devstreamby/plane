@@ -324,6 +324,71 @@ class TestIssueTimeLogPermissions:
         assert log.stopped_at == moved + timedelta(hours=1)
 
     @pytest.mark.django_db
+    def test_editing_a_timer_log_marks_it_as_manual(self, session_client, workspace, time_log_context):
+        context = time_log_context
+        session_client.force_authenticate(user=context["member"])
+        started = datetime(2026, 11, 4, 8, 15, tzinfo=dt_timezone.utc)
+        log = IssueTimeLog.objects.create(
+            issue=context["issue"],
+            project=context["project"],
+            workspace=workspace,
+            user=context["member"],
+            date=started.date(),
+            started_at=started,
+            stopped_at=started + timedelta(hours=1),
+            duration_seconds=3600,
+            stop_reason=IssueTimeLog.StopReason.STATE_CHANGE,
+            auto_stop_at=started + timedelta(hours=2),
+            created_by=context["member"],
+        )
+        url = self.get_url(workspace.slug, context["project"].id, context["issue"].id, log.id)
+        moved = started + timedelta(hours=2)
+
+        response = session_client.patch(
+            url,
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": moved.isoformat()},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        log.refresh_from_db()
+        assert log.started_at == moved
+        assert log.stopped_at == moved + timedelta(hours=1)
+        assert log.stop_reason == IssueTimeLog.StopReason.MANUAL_ENTRY
+        assert log.auto_stop_at is None
+
+    @pytest.mark.django_db
+    def test_running_timer_cannot_be_edited(self, session_client, workspace, time_log_context):
+        context = time_log_context
+        session_client.force_authenticate(user=context["member"])
+        started = datetime(2026, 11, 4, 8, 15, tzinfo=dt_timezone.utc)
+        log = IssueTimeLog.objects.create(
+            issue=context["issue"],
+            project=context["project"],
+            workspace=workspace,
+            user=context["member"],
+            date=started.date(),
+            started_at=started,
+            stopped_at=None,
+            duration_seconds=0,
+            auto_stop_at=started + timedelta(hours=8),
+            created_by=context["member"],
+        )
+        url = self.get_url(workspace.slug, context["project"].id, context["issue"].id, log.id)
+
+        response = session_client.patch(
+            url,
+            {"date": "2026-11-04", "duration_seconds": 3600, "started_at": started.isoformat()},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["error"] == "A running timer cannot be edited. Stop it first."
+        log.refresh_from_db()
+        assert log.stopped_at is None
+        assert log.duration_seconds == 0
+
+    @pytest.mark.django_db
     def test_manual_time_log_rejects_a_naive_start(self, session_client, workspace, time_log_context):
         context = time_log_context
         session_client.force_authenticate(user=context["member"])

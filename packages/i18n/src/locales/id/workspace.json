@@ -414,7 +414,6 @@
     "logged": "Tercatat: {duration}",
     "hours": "Jam",
     "minutes": "Menit",
-    "clock_event": "Dicatat oleh timer. Waktu mulai tetap seperti yang tersimpan.",
     "running": "Timer berjalan",
     "forbidden": "Kalender tim tersedia untuk admin proyek dan workspace. Minggu Anda ada di Pekerjaan anda.",
     "load_error": "Tidak dapat memuat minggu ini.",

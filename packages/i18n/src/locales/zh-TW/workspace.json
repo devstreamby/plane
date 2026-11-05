@@ -414,7 +414,6 @@
     "logged": "已記錄：{duration}",
     "hours": "小時",
     "minutes": "分鐘",
-    "clock_event": "由計時器記錄。開始時間維持原樣。",
     "running": "計時器執行中",
     "forbidden": "團隊日曆僅供專案與工作區管理員使用。你自己的一週在你的工作中。",
     "load_error": "無法載入本週。",

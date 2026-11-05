@@ -226,19 +226,19 @@ export function TimeWeekGrid(props: Props) {
           showMultiDayTimes
           scrollToTime={scrollToTime}
           getNow={() => now}
-          draggableAccessor={(event) => !isClockLog(event.resource) && event.resource.can_manage}
-          resizableAccessor={(event) => !isClockLog(event.resource) && event.resource.can_manage}
+          draggableAccessor={(event) => !!event.resource.stopped_at && event.resource.can_manage}
+          resizableAccessor={(event) => !!event.resource.stopped_at && event.resource.can_manage}
           onSelectEvent={(event) => onSelectLog(event.resource)}
           onEventDrop={({ event, start }) => {
             const log = event.resource;
-            if (isClockLog(log) || !log.can_manage) return;
+            if (!log.stopped_at || !log.can_manage) return;
             const slotStart = snapStart(toDate(start));
             if (slotStart.getTime() === snapStart(event.start).getTime()) return;
             onMoveDuration(log, localDateKey(slotStart), placedInstant(slotStart, timeZone));
           }}
           onEventResize={({ event, start, end }) => {
             const log = event.resource;
-            if (isClockLog(log) || !log.can_manage) return;
+            if (!log.stopped_at || !log.can_manage) return;
             const slotStart = snapStart(toDate(start));
             const durationSeconds = snapDurationSeconds(slotStart, toDate(end));
             const sameStart = slotStart.getTime() === snapStart(event.start).getTime();
