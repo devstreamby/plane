@@ -414,7 +414,6 @@
     "logged": "Înregistrat: {duration}",
     "hours": "Ore",
     "minutes": "Minute",
-    "clock_event": "Înregistrat de cronometru. Ora de început rămâne cea salvată.",
     "running": "Cronometrul rulează",
     "forbidden": "Calendarele de echipă sunt disponibile pentru adminii de proiect și de workspace. Săptămâna ta este în Munca ta.",
     "load_error": "Nu s-a putut încărca această săptămână.",

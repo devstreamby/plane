@@ -414,7 +414,6 @@
     "logged": "已记录：{duration}",
     "hours": "小时",
     "minutes": "分钟",
-    "clock_event": "由计时器记录。开始时间保持原样。",
     "running": "计时器运行中",
     "forbidden": "团队日历仅对项目和工作区管理员开放。你自己的一周在我的工作中。",
     "load_error": "无法加载本周。",

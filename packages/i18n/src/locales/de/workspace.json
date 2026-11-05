@@ -414,7 +414,6 @@
     "logged": "Erfasst: {duration}",
     "hours": "Stunden",
     "minutes": "Minuten",
-    "clock_event": "Vom Timer erfasst. Die Startzeit bleibt wie protokolliert.",
     "running": "Timer läuft",
     "forbidden": "Teamkalender sind für Projekt- und Workspace-Admins verfügbar. Die eigene Woche liegt unter Ihre Arbeit.",
     "load_error": "Diese Woche konnte nicht geladen werden.",

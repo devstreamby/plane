@@ -414,7 +414,6 @@
     "logged": "Enregistré : {duration}",
     "hours": "Heures",
     "minutes": "Minutes",
-    "clock_event": "Enregistré par le minuteur. L'heure de début reste celle du journal.",
     "running": "Minuteur en cours",
     "forbidden": "Les calendriers d'équipe sont réservés aux admins de projet et de workspace. Votre semaine est dans Votre travail.",
     "load_error": "Impossible de charger cette semaine.",

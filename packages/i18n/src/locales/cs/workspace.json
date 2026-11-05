@@ -414,7 +414,6 @@
     "logged": "Zapsáno: {duration}",
     "hours": "Hodiny",
     "minutes": "Minuty",
-    "clock_event": "Zaznamenáno časovačem. Čas začátku zůstává uložený.",
     "running": "Časovač běží",
     "forbidden": "Týmové kalendáře jsou dostupné adminům projektu a workspace. Váš týden je ve Vaše práce.",
     "load_error": "Tento týden se nepodařilo načíst.",

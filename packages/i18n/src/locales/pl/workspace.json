@@ -414,7 +414,6 @@
     "logged": "Zapisano: {duration}",
     "hours": "Godziny",
     "minutes": "Minuty",
-    "clock_event": "Zapisane przez timer. Godzina rozpoczęcia pozostaje bez zmian.",
     "running": "Timer działa",
     "forbidden": "Kalendarze zespołu są dostępne dla adminów projektu i workspace. Twój tydzień jest w Twoja praca.",
     "load_error": "Nie udało się wczytać tego tygodnia.",

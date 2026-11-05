@@ -414,7 +414,6 @@
     "logged": "Đã ghi: {duration}",
     "hours": "Giờ",
     "minutes": "Phút",
-    "clock_event": "Được bộ đếm giờ ghi lại. Giờ bắt đầu được giữ nguyên.",
     "running": "Bộ đếm giờ đang chạy",
     "forbidden": "Lịch nhóm dành cho quản trị viên dự án và workspace. Tuần của bạn nằm trong Công việc của tôi.",
     "load_error": "Không tải được tuần này.",
